@@ -1,0 +1,21 @@
+include ../trackDb/juju.trackDb.txt 
+
+
+track lrgasp_validation_ont_grch38_brooks_bam
+type bam
+visibility pack
+shortLabel Validation ONT (BAM)
+longLabel Validation ONT (BAM)
+bigDataUrl lrgasp-validation-ont-grch38-brooks.bam
+priority 100
+html ../empty.html
+
+# track lrgasp_validation_ont_grch38_brooks_bed
+# type bigBed 12
+# visibility pack
+# shortLabel Validation ONT (BED)
+# longLabel Validation ONT (BED)
+# color 10, 100, 85
+# bigDataUrl lrgasp-validation-ont-grch38-brooks.bb
+# priority 101
+# html ../empty.html

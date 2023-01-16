@@ -1,0 +1,97 @@
+* 2022-12-14 hub
+https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hub.txt
+
+* 2022-12-14 grch38 
+data/grch38/sequencing
+** Angela:
+Our ONT amplicon sequencing for validation should be available here:
+You will likely need to be on the UCSC VPN to access.
+My student Brandon did the basecalling and set up the server. I asked him to put all the FASTQ file pass reads into one file. Here is what he said he did:
+"I've added a pass.fastq file into the 221116-basecalled-260bps directory, from running cat pass/*fastq >pass.fastq in order to merge all the passed fastq files"
+
+** data/grch38/sequencing/221116-basecalled-260bps
+
+** align reads
+cd align
+minimap2 -ax splice
+
+find ../sequencing/221116-basecalled-260bps/pass/ -name '*.fastq'  |awk '{print "../bin/runMinimapOnt", $0, "{check out exists tmp/" gensub("^.*/", "", 1) ".sam}"}'  >jobs.para
+
+ssh to ku
+# must use 32gb of memory or get empty output
+
+para freeBatch -batch=b1
+para create -ram=32g -batch=b1 jobs.para
+para try -batch=b1
+
+# combine into BAM
+ 
+nice samtools merge --output-fmt BAM --threads 32 -c -p  lrgasp-validation-ont-grch38-brooks.bam tmp/*.sam
+
+# check id unqiueness
+samtools fasta lrgasp-validation-ont-grch38-brooks.bam | faSize -detailed stdin | cut -f 1 sort | twc -l
+
+total 4880899
+uniq  4880899
+
+
+** introns
+../bin/runIntronProspector ../align/lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.juncs.tsv  lrgasp-validation-ont-grch38-brooks.juncs.bed >&log &
+
+real	15m28.798s
+
+** Failed conversion tools:
+*** bedops doesn't work, creates bed6+, not bed12, needs recompiled
+*** bedtools bamToBed -bed12
+does not create unique names, which breaks any other tool
+*** genome tools to convert bedtools BED
+bedhttp://genometools.org/pub/
+gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
+Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
+
+** convert to other formats
+
+bamToBed -bed12 -i lrgasp-validation-ont-grch38-brooks.bam | csort -k1,1 -k2,2n >lrgasp-validation-ont-grch38-brooks.bed
+bedToBigBed -type=bed12 -sizesIs2Bit lrgasp-validation-ont-grch38-brooks.bed https://hgdownload.soe.ucsc.edu/gbdb/hg38/hg38.2bit lrgasp-validation-ont-grch38-brooks.bb
+but has duplicate ids
+       
+**  try using http://genometools.org/pub/
+
+gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
+Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
+This is a bug, please report it at
+https://github.com/genometools/genometools/issues
+Please make sure you are running the latest release which can be found at
+http://genometools.org/pub/
+You can check your version number with `gt -version`.
+Aborted
+
+tawk '$2>=$3 {print $0}' ../align/lrgasp-validation-ont-grch38-brooks.bed >bad.bed
+
+
+
+** to-gff3 with cupcake
+conda activate SQANTI3.env
+
+(time ./runSamToGff3 lrgasp-validation-ont-grch38-brooks.sam )>&log&
+
+# get GFF3 but can't convert to bed
+gff2bed<  lrgasp-validation-ont-grch38-brooks.gff3 > tmp.bed
+Error on line 25323 in -. Genomic end coordinate is less than (or equal to) start coordinate.
+
+but that doesn't actually seem to be the line; if that gene is pulled out in
+a record, it doesn't fail
+
+gt gff3validator lrgasp-validation-ont-grch38-brooks.gff3 >&log
+   gt gff3validator: error: range (14356,14662) of feature on line 3 in file "lrgasp-validation-ont-grch38-brooks.gff3"
+is not contained in range (1,307) of corresponding sequence region on line 2
+
+fgrep -v '##sequence-region' lrgasp-validation-ont-grch38-brooks.gff3 | gt gff3validator  >&log
+
+warning: the multi-feature with ID "fa03753c-8aac-4f94-98b2-bf1913fa7bfa" on line 192 in file "stdin" has a different strand than its counterpart on line 70 (possible in rare cases)
+warning: the multi-feature with ID "fa03753c-8aac-4f94-98b2-bf1913fa7bfa.exon1" on line 193 in file "stdin" has a different strand than its counterpart on line 71 (possible in rare cases)
+warning: the multi-feature with ID "8d0e1b32-d4a4-4767-88eb-051983c1ac43" on line 282 in file "stdin" has a different strand than its counterpart on line 38 (possible in rare cases)
+warning: the multi-feature with ID "8d0e1b32-d4a4-4767-88eb-051983c1ac43.exon1" on line 283 in file "stdin" has a different strand than its counterpart on line 39 (possible in rare cases)
+warning: the multi-feature with ID "07c60a84-d098-43b2-8acf-df6c6a830444" on line 427 in file "stdin" has a different strand than its counterpart on line 420 (possible in rare cases)
+
+# try making something gff3ToGenePred likes

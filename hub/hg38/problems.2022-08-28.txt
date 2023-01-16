@@ -1,0 +1,12 @@
+* changed second NEK2+1 -> NEK2+2
+* multiple exons:
+    ALG6+1
+    ASNS+1
+    CENPK+1
+    ENG+1
+    TMX2+1
+    XPO7+1
+    ZSCAN21+1
+
+* region too short
+    C19orf81+1

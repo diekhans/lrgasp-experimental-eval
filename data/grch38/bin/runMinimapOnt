@@ -1,0 +1,19 @@
+#!/bin/bash
+set -beEu -o pipefail
+source ${HOME}/.bashrc
+
+if [ $# != 2 ] ; then
+    echo "wrong num of args" >&2
+    echo "   $0 reads.fq aln.sam" >&2
+    exit 1
+fi
+reads=$1
+outsam=$2
+
+ref=/hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz
+
+outsamtmp=${outsam}.$(hostname).$$.tmp
+set -x
+minimap2 -ax splice ${ref} ${reads} | samtools sort --output-fmt=SAM >${outsamtmp}
+mv -f ${outsamtmp} ${outsam}
+

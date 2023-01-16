@@ -1,0 +1,26 @@
+#!/bin/bash
+set -beEu -o pipefail
+source ${HOME}/.bashrc
+
+if [ $# != 3 ] ; then
+    echo "wrong num of args" >&2
+    echo "   $0 bam outtsv outbed" >&2
+    exit 1
+fi
+bam=$1
+outtsv=$2
+outbed=$3
+
+ref=/hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz
+intronProspector=/hive/users/markd/gencode/projs/icedb/intronProspector/bin/intronProspector
+
+outtsvtmp=${outtsv}.$(hostname).$$.tmp
+outbedtmp=${outbed}.$(hostname).$$.tmp
+
+set -x
+
+max_anchor_indel=100
+time ${intronProspector} --max-anchor-indel-size=${max_anchor_indel} --allow-anchor-indels --genome-fasta=${ref} --junction-bed=${outbedtmp} --intron-calls=${outtsvtmp} ${bam}
+
+mv -f ${outbedtmp} ${outbed}
+mv -f ${outtsvtmp} ${outtsv}
