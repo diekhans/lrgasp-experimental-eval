@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+
+import sys
+from os import path as osp
+import re
+from collections import namedtuple
+import argparse
+import pysam
+from pycbio.sys import fileOps
+
+def parseArgs():
+    desc = """get stats on alignment to transcriptome"""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--maxEndDiff", type=int, default=None,
+                        help="""maximum variation in eds""")
+    parser.add_argument("--maxIndelBases", type=int, default=None,
+                        help="""maximum indel bases""")
+    parser.add_argument("--readStatsTsv",
+                        help="""output per-read statistics to this file""")
+    parser.add_argument("transBam",
+                        help="""alignment to transcriptome BAM""")
+    parser.add_argument("target",
+                        help="""target name""")
+    parser.add_argument("statsTsv",
+                        help="""output statistics to this file""")
+    return parser.parse_args()
+
+class AlignStats(namedtuple("AlignStats",
+                            ("qName",
+                             "qSize",
+                             "strand",
+                             "qStartOff",
+                             "qEndOff",
+                             "alnBases",
+                             "qDels",
+                             "qDelBases",
+                             "tDels",
+                             "tDelBases")
+                            )):
+    pass
+
+def fmtCigar(cigar):
+    return re.sub("([A-Z])", "\\1 ", cigar).strip()
+
+def debugDump(aln, rstats, fh=sys.stderr):
+    for fld in ("target_name", "target_length", "target_start", "target_end"):
+        fileOps.prRowv(fh, fld, getattr(aln, fld))
+    fileOps.prRowv(fh, "cigar", fmtCigar(aln.cigarstring))
+
+    for fld in AlignStats._fields:
+        fileOps.prRowv(fh, fld, getattr(rstats, fld))
+    fh.write('\n')
+
+def computeReadStats(aln):
+    baseCnts, blkCnts = aln.get_cigar_stats()
+
+    return AlignStats(qName=aln.query_name,
+                      qSize=aln.query_length,
+                      strand=('-' if aln.flag & pysam.FREVERSE else '+'),
+                      qStartOff=aln.reference_start - aln.query_alignment_start,
+                      qEndOff=aln.reference_end - aln.query_alignment_end,
+                      alnBases=baseCnts[pysam.CMATCH] + baseCnts[pysam.CEQUAL] + baseCnts[pysam.CDIFF],
+                      qDels=blkCnts[pysam.CDEL] + blkCnts[pysam.CREF_SKIP] + blkCnts[pysam.CSOFT_CLIP],
+                      qDelBases=baseCnts[pysam.CDEL] + baseCnts[pysam.CREF_SKIP] + baseCnts[pysam.CSOFT_CLIP],
+                      tDels=blkCnts[pysam.CINS],
+                      tDelBases=baseCnts[pysam.CINS]
+                      )
+
+def filterReadStats(rstats, maxEndDiff, maxIndelBases):
+    if rstats.strand == '-':
+        return False
+    if (maxEndDiff is not None) and ((abs(rstats.qStartOff) > maxEndDiff) or (abs(rstats.qEndOff) > maxEndDiff)):
+        return False
+    if (maxIndelBases is not None) and ((rstats.qDelBases + rstats.tDelBases) > maxIndelBases):
+        return False
+    return True
+
+def collectReadsStats(bamFh, target, readStatsFh, maxEndDiff, maxIndelBases):
+    # recs are AlignedSegment
+    readsStats = []
+    for aln in bamFh.fetch(reference=target):
+        rstats = computeReadStats(aln)
+        if filterReadStats(rstats, maxEndDiff, maxIndelBases):
+            readsStats.append(rstats)
+            if readStatsFh is not None:
+                fileOps.prRow(readStatsFh, rstats)
+    return readsStats
+
+def getReadsStats(transBam, target, readStatsTsv,
+                  maxEndDiff, maxIndelBases):
+    with pysam.AlignmentFile(transBam) as bamFh:
+        if readStatsTsv is not None:
+            with open(readStatsTsv, "w") as readStatsFh:
+                fileOps.prRow(readStatsFh, AlignStats._fields)
+                return collectReadsStats(bamFh, target, readStatsFh, maxEndDiff, maxIndelBases)
+        else:
+            return collectReadsStats(bamFh, target, None, maxEndDiff, maxIndelBases)
+    return readsStats
+
+def writeTargetStats(target, readsStats, maxEndDiff, maxIndelBases, statsFh):
+    fileOps.prRowv(statsFh, "target", "numSupports", "maxEndDiff", "maxIndelBases")
+    fileOps.prRowv(statsFh, target, len(readsStats), maxEndDiff, maxIndelBases)
+
+def transcriptomeAlignAnalyze(transBam, target, statsTsv, readStatsTsv,
+                              maxEndDiff, maxIndelBases):
+    readsStats = getReadsStats(transBam, target, readStatsTsv,
+                               maxEndDiff, maxIndelBases)
+    with open(statsTsv, "w") as statsFh:
+        writeTargetStats(target, readsStats, maxEndDiff, maxIndelBases, statsFh)
+
+def main(opts):
+    transcriptomeAlignAnalyze(opts.transBam, opts.target, opts.statsTsv,
+                              opts.readStatsTsv, opts.maxEndDiff, opts.maxIndelBases)
+
+main(parseArgs())

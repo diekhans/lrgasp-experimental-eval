@@ -1,0 +1,8 @@
+
+* to get regions
+samtools view -h -O SAM ../data/grch38-transcriptome/align/ont-rna-wtc11-amplicons.bam HES2+A  >input/HES2+A-amplicons.sam
+then edit
+
+* Test regions
+** HES2+B, HES2+A: chr1:6,412,558-6,420,090
+

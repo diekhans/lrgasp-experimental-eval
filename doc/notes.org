@@ -15,3 +15,10 @@ python setup.py install
 conda activate SQANTI3.env
 source ~/compbio/gencode/projs/lrgasp/experimental-eval/sequp-cupcake.sh
 conda deactivate
+
+* trascriptome alignment
+
+from gloria
+https://docs.google.com/spreadsheets/d/15B8oCs_SnOgBL6UGkD7IpjGNZgb3TZS6et_UbFtCgYo/edit#gid=0
+
+** number of aligned reads >= 50% coverage

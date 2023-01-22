@@ -1,17 +1,16 @@
 * 2022-12-14 hub
 https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hub.txt
 
-* 2022-12-14 grch38 
-data/grch38/sequencing
-** Angela:
+** data/grch38/sequencing
+* Angela:
 Our ONT amplicon sequencing for validation should be available here:
 You will likely need to be on the UCSC VPN to access.
 My student Brandon did the basecalling and set up the server. I asked him to put all the FASTQ file pass reads into one file. Here is what he said he did:
 "I've added a pass.fastq file into the 221116-basecalled-260bps directory, from running cat pass/*fastq >pass.fastq in order to merge all the passed fastq files"
 
-** data/grch38/sequencing/221116-basecalled-260bps
+* data/grch38/sequencing/221116-basecalled-260bps
 
-** align reads
+* align reads to genome
 cd align
 minimap2 -ax splice
 
@@ -35,27 +34,26 @@ total 4880899
 uniq  4880899
 
 
-** introns
+* introns
 ../bin/runIntronProspector ../align/lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.juncs.tsv  lrgasp-validation-ont-grch38-brooks.juncs.bed >&log &
 
 real	15m28.798s
 
-** Failed conversion tools:
-*** bedops doesn't work, creates bed6+, not bed12, needs recompiled
-*** bedtools bamToBed -bed12
+* Failed conversion tools:
+** bedops doesn't work, creates bed6+, not bed12, needs recompiled
+** bedtools bamToBed -bed12
 does not create unique names, which breaks any other tool
-*** genome tools to convert bedtools BED
+** genome tools to convert bedtools BED
 bedhttp://genometools.org/pub/
 gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
 Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
 
-** convert to other formats
+* convert to other formats
 
 bamToBed -bed12 -i lrgasp-validation-ont-grch38-brooks.bam | csort -k1,1 -k2,2n >lrgasp-validation-ont-grch38-brooks.bed
 bedToBigBed -type=bed12 -sizesIs2Bit lrgasp-validation-ont-grch38-brooks.bed https://hgdownload.soe.ucsc.edu/gbdb/hg38/hg38.2bit lrgasp-validation-ont-grch38-brooks.bb
-but has duplicate ids
-       
-**  try using http://genometools.org/pub/
+
+*  try using http://genometools.org/pub/
 
 gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
 Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
@@ -70,7 +68,7 @@ tawk '$2>=$3 {print $0}' ../align/lrgasp-validation-ont-grch38-brooks.bed >bad.b
 
 
 
-** to-gff3 with cupcake
+* to-gff3 with cupcake
 conda activate SQANTI3.env
 
 (time ./runSamToGff3 lrgasp-validation-ont-grch38-brooks.sam )>&log&
@@ -95,3 +93,45 @@ warning: the multi-feature with ID "8d0e1b32-d4a4-4767-88eb-051983c1ac43.exon1" 
 warning: the multi-feature with ID "07c60a84-d098-43b2-8acf-df6c6a830444" on line 427 in file "stdin" has a different strand than its counterpart on line 420 (possible in rare cases)
 
 # try making something gff3ToGenePred likes
+
+* generate transcriptome of targeted loci
+cd grch38-transcriptome/reference
+
+** WTC11_consolidated target
+bigBedToBed http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed WTC11_consolidated.bed&
+bzip2 WTC11_consolidated.bed 
+bigBedToBed https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/targets.bb targets.bed
+
+overlapSelect targets.bed WTC11_consolidated.bed.bz2 wtc11-targets.bed
+overlapSelect -statsOutput targets.bed WTC11_consolidated.bed.bz2 wtc11-targets.stats.tsv
+
+  WTC11_consolidated.bed	548786	
+  targets.bed	388
+  wtc11-targets.bed	3649
+
+
+# get fasta; bedTools crashed twoBitToFa doesn't do bed12
+faToTwoBit ../../grch38/reference/lrgasp_grch38_sirvs.fasta.gz lrgasp_grch38_sirvs.tmp.2bit
+bedToGenePred wtc11-targets.bed wtc11-targets.tmp.gp
+
+getRnaPred -keepMasking -genomeSeqs=lrgasp_grch38_sirvs.tmp.2bit -includeCoords none ./wtc11-targets.tmp.gp  all wtc11-targets.fa
+rm *.tmp.*
+samtools faidx wtc11-targets.fa
+
+
+cat ../../grch38/sequencing/221116-basecalled-260bps/pass/*.fastq > wtc11.ont.tmp/fastq
+(time nice minimap2 -ax map-ont -t 32 wtc11-targets.fa wtc11.ont.fastq | samtools sort -o BAM >../align/ont-rna-wtc11-targets.bam)>&log&
+
+
+** amplicons target
+cd reference
+tawk '$3==1{print ">" $1 " " $2;print $9}' ../../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv  >wtc11-amplicons.fa
+samtools faidx wtc11-targets.fa
+(time nice minimap2 -ax map-ont -t 32 wtc11-amplicons.fa wtc11.ont.fastq | samtools sort -O BAM >../align/ont-rna-wtc11-amplicons.bam)>&log&
+real	11m28.550s
+nice samtools index -@ 32 ont-rna-wtc11-amplicons.bam 
+
+E::hts_idx_push] NO_COOR reads not in a single block at the end 159 -1
+[E::sam_index] Read '758d5ab9-487f-4f4f-8a2d-ad780445f23c' with ref_name='WSB1+1', ref_length=354, flags=16, pos=245 cannot be indexed
+samtools index: failed to create index for "ont-rna-wtc11-amplicons.bam": No such file or directory
+
