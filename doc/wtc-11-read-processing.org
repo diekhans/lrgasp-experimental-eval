@@ -135,3 +135,12 @@ E::hts_idx_push] NO_COOR reads not in a single block at the end 159 -1
 [E::sam_index] Read '758d5ab9-487f-4f4f-8a2d-ad780445f23c' with ref_name='WSB1+1', ref_length=354, flags=16, pos=245 cannot be indexed
 samtools index: failed to create index for "ont-rna-wtc11-amplicons.bam": No such file or directory
 
+
+** cd analyze
+../bin/ampSupport 0 0 &
+../bin/ampSupport 1 1 &
+../bin/ampSupport 2 2 &
+../bin/ampSupport 4 4 &
+../bin/ampSupport 8 8 &
+../bin/ampSupport 16 16 &
+../bin/ampSupport 32 32 &

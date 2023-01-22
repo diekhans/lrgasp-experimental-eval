@@ -1,0 +1,22 @@
+#!/bin/bash
+set -beEu -o pipefail
+
+if [ $# != 2 ] ; then
+    echo "wrong # args $0 maxEndDiff maxIndelBases" >&2
+    exit 1
+fi
+
+maxEndDiff=$1
+maxIndelBases=$2
+
+mydir=$(dirname $(which $0))
+transcriptomeAlignAnalyze=${mydir}/../../../bin/transcriptomeAlignAnalyze
+bam=${mydir}/../align/ont-rna-wtc11-amplicons.bam
+
+outTsv=ont-rna-wtc11.end=${maxEndDiff}-indel=${maxIndelBases}.tsv
+outTmpTsv=$outTsv.tmp
+
+${transcriptomeAlignAnalyze} --maxEndDiff=${maxEndDiff} --maxIndelBases=${maxIndelBases} \
+                             ${bam} ${outTmpTsv} 
+
+mv -f $outTmpTsv $outTsv

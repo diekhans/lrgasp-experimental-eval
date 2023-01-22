@@ -1,0 +1,7 @@
+hub LRGASP_EVAL
+shortLabel LRGASP Expr Eval
+longLabel LRGASP Expr Eval
+genomesFile genomes.txt
+email markd@ucsc.edu
+descriptionUrl empty.html
+
