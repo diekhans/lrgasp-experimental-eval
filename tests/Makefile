@@ -16,8 +16,9 @@ testHES2+A_limits: output/HES2+A-amplicons.bam
 	diff expected/$@.stats.tsv output/$@.stats.tsv
 
 testAll_limits: output/HES2+A-amplicons.bam
-	${transcriptomeAlignAnalyze} --readStatsTsv=output/$@.rstats.tsv --maxIndelBases=1 --maxEndsDiff=1 --maxIndelBases=2 $< output/$@.stats.tsv
+	${transcriptomeAlignAnalyze} --readStatsTsv=output/$@.rstats.tsv --filteredBam=output/$@.filt.bam --maxIndelBases=1 --maxEndsDiff=1 --maxIndelBases=2 $< output/$@.stats.tsv
 	diff expected/$@.stats.tsv output/$@.stats.tsv
+	samtools index output/$@.filt.bam
 
 testRate_limits: output/HES2+A-amplicons.bam
 	${transcriptomeAlignAnalyze} --readStatsTsv=output/$@.rstats.tsv --maxIndelBaseRate=0.005 --maxEndsDiff=1 --maxIndelBases=2 $< output/$@.stats.tsv

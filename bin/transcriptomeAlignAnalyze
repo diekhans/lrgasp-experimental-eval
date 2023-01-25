@@ -21,6 +21,8 @@ def parseArgs():
                         help="""maximum indel bases rate""")
     parser.add_argument("--readStatsTsv",
                         help="""output per-read statistics to this file""")
+    parser.add_argument("--filteredBam",
+                        help="""output BAMs passing the filter""")
     parser.add_argument("transBam",
                         help="""alignment to transcriptome BAM""")
     parser.add_argument("statsTsv",
@@ -86,13 +88,15 @@ def filterReadStats(rstats, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
         return False
     return True
 
-def collectReadsStats(bamFh, target, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
+def collectReadsStats(bamFh, target, filteredBamFh, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     # recs are AlignedSegment
     readsStats = []
     for aln in bamFh.fetch(reference=target):
         rstats = computeReadStats(aln)
         if filterReadStats(rstats, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
             readsStats.append(rstats)
+            if filteredBamFh is not None:
+                filteredBamFh.write(aln)
     return readsStats
 
 def readStatsOpen(readStatsTsv):
@@ -139,32 +143,36 @@ def writeTargetStats(target, readsStats, maxEndsDiff, maxIndelBases, maxIndelBas
                    minEndsDiff, minIndelBases, minIndelBases,
                    maxEndsDiff, maxIndelBases, maxIndelBaseRate)
 
-def processTarget(bamFh, target, readStatsFh, statsFh,
+def processTarget(bamFh, target, readStatsFh, statsFh, filteredBamFh,
                   maxEndsDiff, maxIndelBases, maxIndelBaseRate):
-    readsStats = collectReadsStats(bamFh, target, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
+    readsStats = collectReadsStats(bamFh, target, filteredBamFh, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
     if readStatsFh is not None:
         readStatsWrite(target, readsStats, readStatsFh)
     writeTargetStats(target, readsStats, maxEndsDiff, maxIndelBases, maxIndelBaseRate, statsFh)
 
-def processTargets(bamFh, target, readStatsFh, statsFh,
+def processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh,
                    maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     targets = (target,) if target is not None else bamFh.references
     for atarget in targets:
-        processTarget(bamFh, atarget, readStatsFh, statsFh, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
+        processTarget(bamFh, atarget, readStatsFh, statsFh, filteredBamFh, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
 
-def transcriptomeAlignAnalyze(transBam, statsTsv, target, readStatsTsv,
+def transcriptomeAlignAnalyze(transBam, statsTsv, target, readStatsTsv, filteredBam,
                               maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     with pysam.AlignmentFile(transBam) as bamFh:
         readStatsFh = readStatsOpen(readStatsTsv) if readStatsTsv is not None else None
+        filteredBamFh = pysam.AlignmentFile(filteredBam, 'wb', template=bamFh) if filteredBam is not None else None
+
         with open(statsTsv, 'w') as statsFh:
             writeTargetHeader(statsFh)
-            processTargets(bamFh, target, readStatsFh, statsFh,
+            processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh,
                            maxEndsDiff, maxIndelBases, maxIndelBaseRate)
         if readStatsFh is not None:
             readStatsFh.close()
+        if filteredBamFh is not None:
+            filteredBamFh.close()
 
 def main(opts):
-    transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.target, opts.readStatsTsv,
+    transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.target, opts.readStatsTsv, opts.filteredBam,
                               opts.maxEndsDiff, opts.maxIndelBases, opts.maxIndelBaseRate)
 
 main(parseArgs())
