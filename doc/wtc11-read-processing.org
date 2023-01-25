@@ -44,7 +44,7 @@ real	15m28.798s
 ** bedtools bamToBed -bed12
 does not create unique names, which breaks any other tool
 ** genome tools to convert bedtools BED
-bedhttp://genometools.org/pub/
+ http://genometools.org/pub/
 gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
 Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
 
@@ -97,50 +97,63 @@ warning: the multi-feature with ID "07c60a84-d098-43b2-8acf-df6c6a830444" on lin
 * generate transcriptome of targeted loci
 cd grch38-transcriptome/reference
 
-** WTC11_consolidated target
-bigBedToBed http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed WTC11_consolidated.bed&
-bzip2 WTC11_consolidated.bed 
-bigBedToBed https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/targets.bb targets.bed
-
-overlapSelect targets.bed WTC11_consolidated.bed.bz2 wtc11-targets.bed
-overlapSelect -statsOutput targets.bed WTC11_consolidated.bed.bz2 wtc11-targets.stats.tsv
-
-  WTC11_consolidated.bed	548786	
-  targets.bed	388
-  wtc11-targets.bed	3649
-
-
-# get fasta; bedTools crashed twoBitToFa doesn't do bed12
-faToTwoBit ../../grch38/reference/lrgasp_grch38_sirvs.fasta.gz lrgasp_grch38_sirvs.tmp.2bit
-bedToGenePred wtc11-targets.bed wtc11-targets.tmp.gp
-
-getRnaPred -keepMasking -genomeSeqs=lrgasp_grch38_sirvs.tmp.2bit -includeCoords none ./wtc11-targets.tmp.gp  all wtc11-targets.fa
-rm *.tmp.*
-samtools faidx wtc11-targets.fa
-
-
-cat ../../grch38/sequencing/221116-basecalled-260bps/pass/*.fastq > wtc11.ont.tmp/fastq
-(time nice minimap2 -ax map-ont -t 32 wtc11-targets.fa wtc11.ont.fastq | samtools sort -o BAM >../align/ont-rna-wtc11-targets.bam)>&log&
-
-
-** amplicons target
+* amplicons target
 cd reference
 tawk '$3==1{print ">" $1 " " $2;print $9}' ../../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv  >wtc11-amplicons.fa
 samtools faidx wtc11-targets.fa
-(time nice minimap2 -ax map-ont -t 32 wtc11-amplicons.fa wtc11.ont.fastq | samtools sort -O BAM >../align/ont-rna-wtc11-amplicons.bam)>&log&
+
+** ONT alignments
+cd align
+(time nice minimap2 -ax map-ont -t 32 ../reference/wtc11-amplicons.fa ../sequencing/wtc11.ont.fastq | samtools sort -O BAM >ont-rna-wtc11-amplicons.bam)>&log&
 real	11m28.550s
 nice samtools index -@ 32 ont-rna-wtc11-amplicons.bam 
 
-E::hts_idx_push] NO_COOR reads not in a single block at the end 159 -1
-[E::sam_index] Read '758d5ab9-487f-4f4f-8a2d-ad780445f23c' with ref_name='WSB1+1', ref_length=354, flags=16, pos=245 cannot be indexed
-samtools index: failed to create index for "ont-rna-wtc11-amplicons.bam": No such file or directory
+** PB align
+(time nice minimap2 -ax map-hifi -t 32 ../reference/wtc11-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-amplicons.bam)>&log&
+nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam 
 
+** combine
+samtools merge -O BAM -o pb+ont-rna-wtc11-amplicons.bam ont-rna-wtc11-amplicons.bam pb-rna-wtc11-amplicons.bam &
+nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam 
 
 ** cd analyze
-../bin/ampSupport 0 0 &
-../bin/ampSupport 1 1 &
-../bin/ampSupport 2 2 &
-../bin/ampSupport 4 4 &
-../bin/ampSupport 8 8 &
-../bin/ampSupport 16 16 &
-../bin/ampSupport 32 32 &
+../bin/ampSupport ont 0 0 -1 &
+../bin/ampSupport ont 1 1 -1 &
+../bin/ampSupport ont 2 2 -1 &
+../bin/ampSupport ont 4 4 -1 &
+../bin/ampSupport ont 8 8 -1 &
+../bin/ampSupport ont 16 16 -1 &
+../bin/ampSupport ont 32 32 -1 &
+
+../bin/ampSupport ont 0 -1 0.002 &
+../bin/ampSupport ont 1 -1 0.005 &
+../bin/ampSupport ont 2 -1 0.008 &
+
+../../../bin/transcriptomeSummary ont-rna-wtc11.end=*.tsv >ont-summary.tsv
+
+
+../bin/ampSupport pb 0 0 -1 &
+../bin/ampSupport pb 1 1 -1 &
+../bin/ampSupport pb 2 2 -1 &
+../bin/ampSupport pb 4 4 -1 &
+../bin/ampSupport pb 8 8 -1 &
+../bin/ampSupport pb 0 -1 0.002 &
+../bin/ampSupport pb 1 -1 0.005 &
+../bin/ampSupport pb 2 -1 0.008 &
+
+../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv
+
+../bin/ampSupport pb+ont 0 0 -1 &
+../bin/ampSupport pb+ont 1 1 -1 &
+../bin/ampSupport pb+ont 2 2 -1 &
+../bin/ampSupport pb+ont 4 4 -1 &
+../bin/ampSupport pb+ont 8 8 -1 &
+../bin/ampSupport pb+ont 0 -1 0.002 &
+../bin/ampSupport pb+ont 1 -1 0.005 &
+../bin/ampSupport pb+ont 2 -1 0.008 &
+
+../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv
+
+
+
+tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/wtc11-support.tar.gz analyze

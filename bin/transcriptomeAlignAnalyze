@@ -13,10 +13,12 @@ def parseArgs():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--target",
                         help="""only analyze this target name""")
-    parser.add_argument("--maxEndDiff", type=int, default=None,
-                        help="""maximum variation in eds""")
+    parser.add_argument("--maxEndsDiff", type=int, default=None,
+                        help="""maximum variation in ends""")
     parser.add_argument("--maxIndelBases", type=int, default=None,
                         help="""maximum indel bases""")
+    parser.add_argument("--maxIndelBaseRate", type=float, default=None,
+                        help="""maximum indel bases rate""")
     parser.add_argument("--readStatsTsv",
                         help="""output per-read statistics to this file""")
     parser.add_argument("transBam",
@@ -35,8 +37,8 @@ class AlignStats(namedtuple("AlignStats",
                              "qDels",
                              "qDelBases",
                              "tDels",
-                             "tDelBases")
-                            )):
+                             "tDelBases",
+                             "indelBaseRate"))):
     pass
 
 def fmtCigar(cigar):
@@ -52,35 +54,44 @@ def debugDump(aln, rstats, fh=sys.stderr):
     fh.write('\n')
 
 def computeReadStats(aln):
+    # soft clipped is handled by end filters
     baseCnts, blkCnts = aln.get_cigar_stats()
+    alnBases = baseCnts[pysam.CMATCH] + baseCnts[pysam.CEQUAL] + baseCnts[pysam.CDIFF]
+    qDels = blkCnts[pysam.CDEL] + blkCnts[pysam.CREF_SKIP]
+    qDelBases = baseCnts[pysam.CDEL] + baseCnts[pysam.CREF_SKIP]
+    tDels = blkCnts[pysam.CINS]
+    tDelBases = baseCnts[pysam.CINS]
+    indelBaseRate = (qDelBases + tDelBases) / (alnBases + qDelBases + tDelBases)
 
     return AlignStats(qName=aln.query_name,
                       qSize=aln.query_length,
                       strand=('-' if aln.flag & pysam.FREVERSE else '+'),
                       qStartOff=aln.reference_start - aln.query_alignment_start,
                       qEndOff=aln.reference_end - aln.query_alignment_end,
-                      alnBases=baseCnts[pysam.CMATCH] + baseCnts[pysam.CEQUAL] + baseCnts[pysam.CDIFF],
-                      qDels=blkCnts[pysam.CDEL] + blkCnts[pysam.CREF_SKIP] + blkCnts[pysam.CSOFT_CLIP],
-                      qDelBases=baseCnts[pysam.CDEL] + baseCnts[pysam.CREF_SKIP] + baseCnts[pysam.CSOFT_CLIP],
-                      tDels=blkCnts[pysam.CINS],
-                      tDelBases=baseCnts[pysam.CINS]
-                      )
+                      alnBases=alnBases,
+                      qDels=qDels,
+                      qDelBases=qDelBases,
+                      tDels=tDels,
+                      tDelBases=tDelBases,
+                      indelBaseRate=round(indelBaseRate, 4))
 
-def filterReadStats(rstats, maxEndDiff, maxIndelBases):
+def filterReadStats(rstats, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     if rstats.strand == '-':
         return False
-    if (maxEndDiff is not None) and ((abs(rstats.qStartOff) > maxEndDiff) or (abs(rstats.qEndOff) > maxEndDiff)):
+    if (maxEndsDiff is not None) and ((abs(rstats.qStartOff) > maxEndsDiff) or (abs(rstats.qEndOff) > maxEndsDiff)):
         return False
     if (maxIndelBases is not None) and ((rstats.qDelBases + rstats.tDelBases) > maxIndelBases):
         return False
+    if (maxIndelBaseRate is not None) and ((rstats.indelBaseRate) > maxIndelBaseRate):
+        return False
     return True
 
-def collectReadsStats(bamFh, target, maxEndDiff, maxIndelBases):
+def collectReadsStats(bamFh, target, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     # recs are AlignedSegment
     readsStats = []
     for aln in bamFh.fetch(reference=target):
         rstats = computeReadStats(aln)
-        if filterReadStats(rstats, maxEndDiff, maxIndelBases):
+        if filterReadStats(rstats, maxEndsDiff, maxIndelBases, maxIndelBaseRate):
             readsStats.append(rstats)
     return readsStats
 
@@ -94,37 +105,66 @@ def readStatsWrite(target, readsStats, readStatsFh):
         fileOps.prRowv(readStatsFh, target, *rstats)
 
 def writeTargetHeader(statsFh):
-    fileOps.prRowv(statsFh, "target", "numSupports", "maxEndDiff", "maxIndelBases")
+    fileOps.prRowv(statsFh, "target", "numSupports", "minEndsDiff", "minIndelBases", "minIndelBaseRate", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
 
-def writeTargetStats(target, readsStats, maxEndDiff, maxIndelBases, statsFh):
-     fileOps.prRowv(statsFh, target, len(readsStats), maxEndDiff, maxIndelBases)
+def maxOffset(rs):
+    "maximum offset from 0, maintaining strand"
+    if abs(rs.qStartOff) >= abs(rs.qEndOff):
+        return rs.qStartOff
+    else:
+        return rs.qEndOff
+
+def minOrNone(vals):
+    if len(vals) == 0:
+        return None
+    minVal = sys.maxsize
+    for val in vals:
+        if abs(val) < minVal:
+            minVal = val
+    return minVal
+
+def calcMinStats(readsStats):
+    # minimum ends offset is annoying due to negatives, here the min is the max of the
+    # of the individual mins ignoring the sign
+
+    minEndsDiff = minOrNone([maxOffset(rs) for rs in readsStats])
+    minIndelBases = minOrNone([rs.qDelBases + rs.tDelBases for rs in readsStats])
+    minIndelBaseRate = minOrNone([rs.indelBaseRate for rs in readsStats])
+
+    return (minEndsDiff, minIndelBases, minIndelBaseRate)
+
+def writeTargetStats(target, readsStats, maxEndsDiff, maxIndelBases, maxIndelBaseRate, statsFh):
+    minEndsDiff, minIndelBases, minIndelBaseRate = calcMinStats(readsStats)
+    fileOps.prRowv(statsFh, target, len(readsStats),
+                   minEndsDiff, minIndelBases, minIndelBases,
+                   maxEndsDiff, maxIndelBases, maxIndelBaseRate)
 
 def processTarget(bamFh, target, readStatsFh, statsFh,
-                  maxEndDiff, maxIndelBases):
-    readsStats = collectReadsStats(bamFh, target, maxEndDiff, maxIndelBases)
+                  maxEndsDiff, maxIndelBases, maxIndelBaseRate):
+    readsStats = collectReadsStats(bamFh, target, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
     if readStatsFh is not None:
         readStatsWrite(target, readsStats, readStatsFh)
-    writeTargetStats(target, readsStats, maxEndDiff, maxIndelBases, statsFh)
+    writeTargetStats(target, readsStats, maxEndsDiff, maxIndelBases, maxIndelBaseRate, statsFh)
 
 def processTargets(bamFh, target, readStatsFh, statsFh,
-                   maxEndDiff, maxIndelBases):
+                   maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     targets = (target,) if target is not None else bamFh.references
     for atarget in targets:
-        processTarget(bamFh, atarget, readStatsFh, statsFh, maxEndDiff, maxIndelBases)
+        processTarget(bamFh, atarget, readStatsFh, statsFh, maxEndsDiff, maxIndelBases, maxIndelBaseRate)
 
 def transcriptomeAlignAnalyze(transBam, statsTsv, target, readStatsTsv,
-                              maxEndDiff, maxIndelBases):
+                              maxEndsDiff, maxIndelBases, maxIndelBaseRate):
     with pysam.AlignmentFile(transBam) as bamFh:
         readStatsFh = readStatsOpen(readStatsTsv) if readStatsTsv is not None else None
         with open(statsTsv, 'w') as statsFh:
             writeTargetHeader(statsFh)
             processTargets(bamFh, target, readStatsFh, statsFh,
-                           maxEndDiff, maxIndelBases)
+                           maxEndsDiff, maxIndelBases, maxIndelBaseRate)
         if readStatsFh is not None:
             readStatsFh.close()
 
 def main(opts):
     transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.target, opts.readStatsTsv,
-                              opts.maxEndDiff, opts.maxIndelBases)
+                              opts.maxEndsDiff, opts.maxIndelBases, opts.maxIndelBaseRate)
 
 main(parseArgs())

@@ -1,0 +1,9 @@
+target	qName	qSize	strand	qStartOff	qEndOff	alnBases	qDels	qDelBases	tDels	tDelBases	indelBaseRate
+HES2+A	48aed548-00de-40ce-b18f-d91d9fdccefc	317	+	0	1	317	1	1	0	0	0.0031
+HES2+A	eafa0d84-6e0b-4b55-b631-d72322d06ecc	317	+	0	1	317	1	1	0	0	0.0031
+HES2+A	a4299656-82fc-4383-873f-92396d9a7938	318	+	0	0	318	0	0	0	0	0.0
+HES2+A	62e09b5f-533d-4f4d-b30a-3e25d05fedec	318	+	0	0	318	0	0	0	0	0.0
+HES2+A	cf2566d6-a9c5-467f-be51-298860acbaa4	317	+	0	1	317	1	1	0	0	0.0031
+HES2+A	ae7b47b1-5796-4b78-9606-301606340b3c	317	+	0	1	317	1	1	0	0	0.0031
+HES2+A	1cabb3f5-5813-4476-a14a-599b056df6b8	318	+	0	0	318	0	0	0	0	0.0
+HES2+A	e9f6f028-37d1-4e27-9599-c0e664dbada5	317	+	0	1	317	1	1	0	0	0.0031

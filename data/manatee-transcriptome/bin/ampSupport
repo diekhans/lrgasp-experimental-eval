@@ -1,22 +1,21 @@
 #!/bin/bash
 set -beEu -o pipefail
 
-if [ $# != 4 ] ; then
-    echo "wrong # args $0 prot maxEndsDiff maxIndelBases maxIndelBaseRate" >&2
+if [ $# != 3 ] ; then
+    echo "wrong # args $0 maxEndsDiff maxIndelBases maxIndelBaseRate" >&2
     echo "Filters of -1 are omitted" >&2
     exit 1
 fi
 
-prot=$1 ; shift
-maxEndsDiff=$1 ; shift
-maxIndelBases=$1 ; shift
-maxIndelBaseRate=$1 ; shift
+maxEndsDiff=$1
+maxIndelBases=$2
+maxIndelBaseRate=$3
 
 mydir=$(dirname $(which $0))
 transcriptomeAlignAnalyze=${mydir}/../../../bin/transcriptomeAlignAnalyze
-bam=${mydir}/../align/${prot}-rna-wtc11-amplicons.bam
+bam=${mydir}/../align/pb-rna-manatee-amplicons.bam
 
-outTsv="${prot}-rna-wtc11.end=${maxEndsDiff}-indel=${maxIndelBases}-indelRate=${maxIndelBaseRate}.tsv"
+outTsv="pb-rna-manatee.end=${maxEndsDiff}-indel=${maxIndelBases}-indelRate=${maxIndelBaseRate}.tsv"
 outTmpTsv=$outTsv.tmp
 
 opts=""
