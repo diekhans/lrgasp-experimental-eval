@@ -41,3 +41,6 @@ nice samtools index -@ 32 pb-rna-manatee-amplicons.bam
 
 ../../../bin/transcriptomeSummary pb-rna-manatee.end=*.tsv >summary.tsv
 tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/manatee-support.tar.gz analyze
+
+
+http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt

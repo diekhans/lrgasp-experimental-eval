@@ -196,3 +196,10 @@ use bin/mkTranscriptomeBams to fill in trackDb
 ../../../bin/transcriptomeFilterCmp --first pb-rna-wtc11.sim=*.tsv >pb.cmp.tsv &
 ../../../bin/transcriptomeFilterCmp --first pb+ont-rna-wtc11.sim=*.tsv >pb+ont.cmp.tsv &
 
+* manual review
+
+cut -f 1-5 pb+ont.cmp.tsv | tawk '{st=($3==1.0) ? "perfect" : "??"; print $0, st, ""}' > ../../../doc/wtc11-pd+ont-manual-review.tsv
+
+* browser
+bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_hub/hub.txt hg38 targets.bed dir
+

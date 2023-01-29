@@ -1,0 +1,169 @@
+target	numSupports	maxSimilarity	minEndsDiff	minIndelBases	status	review
+ALG6+1	31743	0.9973	-1	2	no	bad models, intron 3' at chr1:63,411,128-63,411,194 has GT-AT splice site (U12?), supported by WTC-11 reads. GENCODE and RefSeq.  Model seemed to have force GT-AG 6 bases upstream
+ANAPC16+1	733	1.0	0	0	perfect	
+ANKMY2+1	0	0.0	0	0	no	no alignments
+APMAP+1	248	1.0	0	0	perfect	
+ARL11+A	9086	1.0	0	0	perfect	
+ARPC2+1	2127	1.0	0	0	perfect	
+ASNS+1	442	1.0	0	0	perfect	
+ASNSD1+1	2244	1.0	0	0	perfect	
+B2M+1	6509	1.0	0	0	perfect	
+B3GAT2+A	1377	1.0	0	0	perfect	
+B3GAT2+B	106	1.0	0	0	perfect	
+BGN+A	6317	1.0	0	0	perfect	
+BGN+B	1464	1.0	0	0	perfect	
+BGN+C	2	1.0	0	0	perfect	
+BTG2+A	1	0.9962	8	0	good	intron chain confirmed
+BTG2+B	0	0.0	0	0	no	TM_000002801666_1_ZXJ has ~50 base non-intron gap.  Bad model, should not have been included
+C22orf42+A	35	1.0	0	0	perfect	
+C22orf42+C	1	1.0	0	0	perfect	
+C22orf42+D	174	0.9396	-21	0	no	no read contains exon at chr22:32,150,766-32,150,821
+CALB1+1	17	1.0	0	0	perfect	
+CALM2+1	4087	1.0	0	0	perfect	
+CC2D2A+1	41	1.0	0	0	perfect	
+CCDC106+1	3	1.0	0	0	perfect	
+CCL26+1	10951	1.0	0	0	perfect	
+CD200+1	4	1.0	0	0	perfect	
+CD24+1	3	0.9997	1	1	good	intron chain confirmed [has reads claiming wrong strand]
+CENPK+1	1648	1.0	0	0	perfect	
+CERCAM+1	149	1.0	0	0	perfect	
+CERNA1+1	155	1.0	0	0	perfect	
+CIBAR1+1	4	1.0	0	0	perfect	
+CNN1+1	2456	1.0	0	0	perfect	
+CSDC2+A	2	1.0	0	0	perfect	
+CSDC2+B	0	0.0	0	0	??	IGV
+CSDC2+C	1334	0.9338	-33	3	??	IGV
+CSDC2+D	4	1.0	0	0	perfect	
+CYB5B+1	311	0.9724	11	0	okay	One read confirms; most reads have extra exon [has reads claiming wrong strand]
+CYSRT1+A	0	0.0	0	0	??	IGV
+CYSRT1+B	1422	1.0	0	0	perfect	
+CYSRT1+C	0	0.0	0	0	??	IGV
+DEGS2+A	6161	1.0	0	0	perfect	
+DEGS2+B	1	0.9042	86	0	??	IGV
+DEGS2+C	1	1.0	0	0	perfect	
+DGAT2+A	8990	1.0	0	0	perfect	
+DGAT2+D	1	0.9965	-1	0	??	IGV
+DGUOK+1	37	1.0	0	0	perfect	
+DLX4+A	2266	1.0	0	0	perfect	
+DLX4+B	1	0.9312	92	92	??	IGV
+DNLZ+C	1	0.9949	2	2	??	IGV
+DPP3+1	16	1.0	0	0	perfect	
+DUSP4+A	115	1.0	0	0	perfect	
+DUSP4+B	70	1.0	0	0	perfect	
+DUSP4+C	1989	1.0	0	0	perfect	
+DUSP6+1	955	1.0	0	0	perfect	
+EFHD2+1	4265	1.0	0	0	perfect	
+EIF4G1+1	7	1.0	0	0	perfect	
+ENG+1	2718	1.0	0	0	perfect	
+ENO1+1	6	1.0	0	0	perfect	
+FAM241A+A	1	0.9958	1	1	okay	two reads confirm [has reads claiming wrong strand]
+FAM241A+B	1	0.9825	5	1	good	many reads confirm [has reads claiming wrong strand]
+FBXL16+1	8	1.0	0	0	perfect	
+FRZB+A	3091	1.0	0	0	perfect	
+GABPA+1	1	1.0	0	0	perfect	
+GFRA3+A	160	1.0	0	0	perfect	
+GFRA3+B	1742	1.0	0	0	perfect	
+GFRA3+C	83	1.0	0	0	perfect	
+GPR3+A	821	1.0	0	0	perfect	
+GPR3+C	1	0.9907	2	4	??	
+HBEGF+A	547	0.9416	-45	0	??	
+HBEGF+B	0	0.0	0	0	??	
+HBEGF+C	0	0.0	0	0	??	
+HBEGF+D	0	0.0	0	0	??	
+HES2+A	1497	1.0	0	0	perfect	
+HES2+B	4222	1.0	0	0	perfect	
+HNRNPH2+1	825	1.0	0	0	perfect	
+HSPA9+1	8	1.0	0	0	perfect	
+HSPB11+1	1345	1.0	0	0	perfect	
+ID3+1	2	0.9928	3	3	??	
+IFFO2+A	583	0.9498	-42	0	??	
+IFFO2+B	250	1.0	0	0	perfect	
+IFFO2+C	0	0.0	0	0	??	
+IFFO2+D	102	0.941	-45	53	??	
+IFIT5+A	0	0.0	0	0	??	
+IFIT5+B	74	1.0	0	0	perfect	
+IGF2BP3+1	3166	0.996	0	7	??	
+ITGA7+1	2	0.9959	19	3	??	
+KLF10+1	1803	1.0	0	0	perfect	
+KLF10+2	10714	1.0	0	0	perfect	
+LBX2+A	0	0.0	0	0	??	
+LBX2+B	80	0.9568	-93	104	??	
+LBX2+C	294	0.9378	-14	35	??	
+LDHA+1	0	0.0	0	0	??	
+LRFN3+1	3241	1.0	0	0	perfect	
+LRRC42+1	3	1.0	0	0	perfect	
+MAL2+1	32	1.0	0	0	perfect	
+MICOS13+1	6	1.0	0	0	perfect	
+MPZL3+B	3	1.0	0	0	perfect	
+MRPS17+1	513	1.0	0	0	perfect	
+MRPS28+1	1069	1.0	0	0	perfect	
+MRPS34+1	98	1.0	0	0	perfect	
+MSC+A	32	1.0	0	0	perfect	
+MTHFS+1	1822	1.0	0	0	perfect	
+NACC2+1	8	0.996	1	0	??	
+NEK2+2	6793	1.0	0	0	perfect	
+NEUROG3+A	3140	1.0	0	0	perfect	
+NEUROG3+B	148	1.0	0	0	perfect	
+NODAL+1	3837	1.0	0	0	perfect	
+NUDC+1	1034	1.0	0	0	perfect	
+NUDT21+1	1936	1.0	0	0	perfect	
+PDLIM1+1	28916	1.0	0	0	perfect	
+PID1+A	0	0.0	0	0	??	
+PID1+B	26	1.0	0	0	perfect	
+PIN4+1	9793	1.0	0	0	perfect	
+PLAC9+A	5452	1.0	0	0	perfect	
+PLAC9+B	97	1.0	0	0	perfect	
+PLLP+A	1175	1.0	0	0	perfect	
+PLLP+B	2665	1.0	0	0	perfect	
+PLLP+C	778	1.0	0	0	perfect	
+PLLP+D	3090	1.0	0	0	perfect	
+PLLP+E	5989	1.0	0	0	perfect	
+PLLP+F	3474	1.0	0	0	perfect	
+POMGNT2+A	2430	1.0	0	0	perfect	
+POMGNT2+B	3	0.9557	-31	1	??	
+POMGNT2+C	11	1.0	0	0	perfect	
+PSMC1+1	8498	1.0	0	0	perfect	
+PSMD2+1	9	1.0	0	0	perfect	
+PYM1+1	111	1.0	0	0	perfect	
+QTRT1+1	12702	1.0	0	0	perfect	
+RASL11B+1	10792	1.0	0	0	perfect	
+RERG+A	211	1.0	0	0	perfect	
+RERG+B	3	1.0	0	0	perfect	
+RGS4+A	2453	1.0	0	0	perfect	
+RGS4+B	3	0.9522	25	0	??	
+RHCG+A	0	0.0	0	0	??	
+RND2+1	514	1.0	0	0	perfect	
+RPL37+1	149	1.0	0	0	perfect	
+RPL39L+1	6973	1.0	0	0	perfect	
+RPS11+1	1681	1.0	0	0	perfect	
+RPSA+1	6730	1.0	0	0	perfect	
+RUVBL2+1	757	1.0	0	0	perfect	
+SAC3D1+1	3317	1.0	0	0	perfect	
+SDHC+1	4495	1.0	0	0	perfect	
+SGPP1+A	14	1.0	0	0	perfect	
+SLC38A3+A	1001	1.0	0	0	perfect	
+SLC38A3+B	8	1.0	0	0	perfect	
+SLC46A1+1	12	1.0	0	0	perfect	
+SLC9B1+1	16318	1.0	0	0	perfect	
+SNHG3+1	156	0.9977	-1	1	??	
+SORD+1	12	0.9372	-15	0	??	
+SPRING1+1	48	1.0	0	0	perfect	
+SYT4+A	57	1.0	0	0	perfect	
+TAGLN2+1	11085	1.0	0	0	perfect	
+TEX264+1	21175	1.0	0	0	perfect	
+THBS4+1	666	1.0	0	0	perfect	
+TIFA+A	1	0.9927	4	4	??	
+TIMM22+1	285	1.0	0	0	perfect	
+TMEM167B+1	2172	1.0	0	0	perfect	
+TNPO3+1	3635	1.0	0	0	perfect	
+UBE2E1+1	172	1.0	0	0	perfect	
+USF1+1	2028	1.0	0	0	perfect	
+WSB1+1	386	1.0	0	0	perfect	
+XPO7+1	1905	1.0	0	0	perfect	
+XRCC6+1	10	1.0	0	0	perfect	
+ZBTB45+1	15	0.9744	52	0	??	
+ZDHHC8+1	3	1.0	0	0	perfect	
+ZNF148+1	1293	1.0	0	0	perfect	
+ZNF622+1	41032	1.0	0	0	perfect	
+ZNF749+1	524	1.0	0	0	perfect	
+ZSCAN21+1	1	0.9016	-54	13	??	
