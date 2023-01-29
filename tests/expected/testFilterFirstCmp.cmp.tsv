@@ -1,2 +1,2 @@
 target	numSupports	maxSimilarity	minEndsDiff	minIndelBases	minIndelBaseRate	filter_minSimilarity	filter_maxEndsDiff	filter_maxIndelBases	filter_maxIndelBaseRate
-HES2+A	8	1.0	0	0	0.0		1	2	2
+HES2+A	8	1.0	0	0	0.0		1	2	2.0

@@ -33,6 +33,11 @@ samtools fasta lrgasp-validation-ont-grch38-brooks.bam | faSize -detailed stdin 
 total 4880899
 uniq  4880899
 
+* align PB reads to genome
+cd align
+(time nice minimap2 -t 64 -ax splice /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > lrgasp-validation-pb-grch38-brooks.bam)>&log&
+
+nice samtools merge -@ 64 -O BAM -o lrgasp-validation-pb+ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-pb-grch38-brooks.bam  &
 
 * introns
 ../bin/runIntronProspector ../align/lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.juncs.tsv  lrgasp-validation-ont-grch38-brooks.juncs.bed >&log &
@@ -129,8 +134,6 @@ nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam
 ../bin/ampSupport ont 1 -1 0.005 &
 ../bin/ampSupport ont 2 -1 0.008 &
 
-../../../bin/transcriptomeSummary ont-rna-wtc11.end=*.tsv >ont-summary.tsv
-
 
 ../bin/ampSupport pb 0 0 -1 &
 ../bin/ampSupport pb 1 1 -1 &
@@ -141,7 +144,6 @@ nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam
 ../bin/ampSupport pb 1 -1 0.005 &
 ../bin/ampSupport pb 2 -1 0.008 &
 
-../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv
 
 ../bin/ampSupport pb+ont 0 0 -1 &
 ../bin/ampSupport pb+ont 1 1 -1 &
@@ -152,8 +154,45 @@ nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam
 ../bin/ampSupport pb+ont 1 -1 0.005 &
 ../bin/ampSupport pb+ont 2 -1 0.008 &
 
-../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv
+../../../bin/transcriptomeSummary ont-rna-wtc11.end=*.tsv >ont-summary.tsv &
+../../../bin/transcriptomeSummary pb-rna-wtc11.end=*.tsv >pb-summary.tsv &
+../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv &
 
 
 
 tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/wtc11-support.tar.gz analyze
+
+* debugging
+../../../bin/transcriptomeAlignAnalyze --target=BTG2+B --minSimilarity=0.1 --readStatsTsv=debug.sim=0.1.rstats.tsv --filteredBam=debug.sim=0.1.bam ../align/ont-rna-wtc11-amplicons.bam debug.sim=0.1.tsv &
+* manual analysis:
+cd man-analyze
+../bin/manAmpSupport ont 1.0&
+../bin/manAmpSupport ont 0.99&
+../bin/manAmpSupport ont 0.98&
+../bin/manAmpSupport ont 0.95&
+../bin/manAmpSupport ont 0.90&
+
+../bin/manAmpSupport pb 1.0&
+../bin/manAmpSupport pb 0.99&
+../bin/manAmpSupport pb 0.98&
+../bin/manAmpSupport pb 0.95&
+../bin/manAmpSupport pb 0.90&
+
+../bin/manAmpSupport pb+ont 1.0&
+../bin/manAmpSupport pb+ont 0.99&
+../bin/manAmpSupport pb+ont 0.98&
+../bin/manAmpSupport pb+ont 0.95&
+../bin/manAmpSupport pb+ont 0.90&
+
+../../../bin/transcriptomeSummary ont-rna-wtc11.sim=*.tsv >ont-summary.tsv &
+../../../bin/transcriptomeSummary pb-rna-wtc11.sim=*.tsv >pb-summary.tsv &
+../../../bin/transcriptomeSummary pb+ont-rna-wtc11.sim=*.tsv >pb+ont-summary.tsv &
+
+
+ln -f *.bam* ../../../hub/hg38/
+use bin/mkTranscriptomeBams to fill in trackDb
+
+../../../bin/transcriptomeFilterCmp --first ont-rna-wtc11.sim=*.tsv >ont.cmp.tsv &
+../../../bin/transcriptomeFilterCmp --first pb-rna-wtc11.sim=*.tsv >pb.cmp.tsv &
+../../../bin/transcriptomeFilterCmp --first pb+ont-rna-wtc11.sim=*.tsv >pb+ont.cmp.tsv &
+

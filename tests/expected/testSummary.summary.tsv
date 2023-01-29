@@ -1,0 +1,2 @@
+numSupported	numTargets	resultsFile	filter_maxEndsDiff	filter_maxIndelBases	filter_maxIndelBaseRate
+1	1	expected/testAll_limits.stats.tsv	1	2	2.0

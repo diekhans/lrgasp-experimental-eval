@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+import sys
+from os import path as osp
+import argparse
+import re
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+
+def parseArgs():
+    desc = """generate trackDb"""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("bamFiles", nargs='+',
+                        help="""bam files""")
+    return parser.parse_args()
+
+trackTmpl = """
+track {track}
+type bam
+visibility hide
+shortLabel {label}
+longLabel {label}
+bigDataUrl {bam}
+priority pri
+html ../empty.html
+
+"""
+
+def mkTrackDb(bamFile, pri):
+    label = osp.basename(osp.splitext(bamFile)[0])
+    track = re.sub("[.=+-]", '_', label)
+    print(trackTmpl.format(track=track, label=label, bam=bamFile, pri=pri))
+
+def mkTranscriptomeBams(bamFiles):
+    pri = 110
+    for bamFile in bamFiles:
+        mkTrackDb(bamFile, pri)
+        pri += 1
+
+mkTranscriptomeBams(parseArgs().bamFiles)

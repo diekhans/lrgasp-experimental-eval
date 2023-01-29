@@ -22,18 +22,19 @@ def intOrNone(v):
 def countStats(statsTsv, fh):
     typeMap = {"minIndelBaseRate": floatOrNone,
                "filter_maxIndelBaseRate": floatOrNone,
+               "maxSimilarity": float,
+               "filter_minSimilarity": floatOrNone,
                "target": str
     }
     recs = [r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)]
     rec0 = recs[0]
 
     numSupported = len([r for r in recs if r.numSupports > 0])
-    fileOps.prRowv(fh, statsTsv, rec0.filter_maxEndsDiff, rec0.filter_maxIndelBases, rec0.filter_maxIndelBaseRate,
-                   numSupported, len(recs))
+    fileOps.prRowv(fh, numSupported, len(recs), statsTsv, rec0.filter_maxEndsDiff, rec0.filter_maxIndelBases, rec0.filter_maxIndelBaseRate)
 
 def transcriptomeSummary(statsTsvs):
     fh = sys.stdout
-    fileOps.prRowv(fh, "resultsFile", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate", "numSupported", "numTargets")
+    fileOps.prRowv(fh, "numSupported", "numTargets", "resultsFile", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
     for statsTsv in statsTsvs:
         countStats(statsTsv, fh)
 

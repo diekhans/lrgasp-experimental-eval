@@ -3,20 +3,196 @@ include ../trackDb/juju.trackDb.txt
 
 track lrgasp_validation_ont_grch38_brooks_bam
 type bam
-visibility pack
+visibility hide
 shortLabel Validation ONT (BAM)
 longLabel Validation ONT (BAM)
 bigDataUrl lrgasp-validation-ont-grch38-brooks.bam
 priority 100
 html ../empty.html
 
+track lrgasp_validation_pb_grch38_brooks_bam
+type bam
+visibility hide
+shortLabel Validation PB (BAM)
+longLabel Validation PB (BAM)
+bigDataUrl lrgasp-validation-pb-grch38-brooks.bam
+priority 100
+html ../empty.html
+
 track lrgasp_validation_ont_grch38_brooks_bed
 type bigBed 12 .
-visibility pack
+visibility hide
 shortLabel Validation ONT (BED)
 longLabel Validation ONT (BED)
 color 10,100,85
 bigDataUrl lrgasp-validation-ont-grch38-brooks.bb
-priority 101
+priority 102
 filterText.name *
 html ../empty.html
+
+
+
+track ont_rna_wtc11_sim_0_90_genome
+type bam
+visibility hide
+shortLabel ont-rna-wtc11.sim=0.90.genome
+longLabel ont-rna-wtc11.sim=0.90.genome
+bigDataUrl ont-rna-wtc11.sim=0.90.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track ont_rna_wtc11_sim_0_95_genome
+type bam
+visibility hide
+shortLabel ont-rna-wtc11.sim=0.95.genome
+longLabel ont-rna-wtc11.sim=0.95.genome
+bigDataUrl ont-rna-wtc11.sim=0.95.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track ont_rna_wtc11_sim_0_98_genome
+type bam
+visibility hide
+shortLabel ont-rna-wtc11.sim=0.98.genome
+longLabel ont-rna-wtc11.sim=0.98.genome
+bigDataUrl ont-rna-wtc11.sim=0.98.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track ont_rna_wtc11_sim_0_99_genome
+type bam
+visibility hide
+shortLabel ont-rna-wtc11.sim=0.99.genome
+longLabel ont-rna-wtc11.sim=0.99.genome
+bigDataUrl ont-rna-wtc11.sim=0.99.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track ont_rna_wtc11_sim_1_0_genome
+type bam
+visibility hide
+shortLabel ont-rna-wtc11.sim=1.0.genome
+longLabel ont-rna-wtc11.sim=1.0.genome
+bigDataUrl ont-rna-wtc11.sim=1.0.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_ont_rna_wtc11_sim_0_90_genome
+type bam
+visibility hide
+shortLabel pb+ont-rna-wtc11.sim=0.90.genome
+longLabel pb+ont-rna-wtc11.sim=0.90.genome
+bigDataUrl pb+ont-rna-wtc11.sim=0.90.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_ont_rna_wtc11_sim_0_95_genome
+type bam
+visibility hide
+shortLabel pb+ont-rna-wtc11.sim=0.95.genome
+longLabel pb+ont-rna-wtc11.sim=0.95.genome
+bigDataUrl pb+ont-rna-wtc11.sim=0.95.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_ont_rna_wtc11_sim_0_98_genome
+type bam
+visibility hide
+shortLabel pb+ont-rna-wtc11.sim=0.98.genome
+longLabel pb+ont-rna-wtc11.sim=0.98.genome
+bigDataUrl pb+ont-rna-wtc11.sim=0.98.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_ont_rna_wtc11_sim_0_99_genome
+type bam
+visibility hide
+shortLabel pb+ont-rna-wtc11.sim=0.99.genome
+longLabel pb+ont-rna-wtc11.sim=0.99.genome
+bigDataUrl pb+ont-rna-wtc11.sim=0.99.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_ont_rna_wtc11_sim_1_0_genome
+type bam
+visibility hide
+shortLabel pb+ont-rna-wtc11.sim=1.0.genome
+longLabel pb+ont-rna-wtc11.sim=1.0.genome
+bigDataUrl pb+ont-rna-wtc11.sim=1.0.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_rna_wtc11_sim_0_90_genome
+type bam
+visibility hide
+shortLabel pb-rna-wtc11.sim=0.90.genome
+longLabel pb-rna-wtc11.sim=0.90.genome
+bigDataUrl pb-rna-wtc11.sim=0.90.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_rna_wtc11_sim_0_95_genome
+type bam
+visibility hide
+shortLabel pb-rna-wtc11.sim=0.95.genome
+longLabel pb-rna-wtc11.sim=0.95.genome
+bigDataUrl pb-rna-wtc11.sim=0.95.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_rna_wtc11_sim_0_98_genome
+type bam
+visibility hide
+shortLabel pb-rna-wtc11.sim=0.98.genome
+longLabel pb-rna-wtc11.sim=0.98.genome
+bigDataUrl pb-rna-wtc11.sim=0.98.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_rna_wtc11_sim_0_99_genome
+type bam
+visibility hide
+shortLabel pb-rna-wtc11.sim=0.99.genome
+longLabel pb-rna-wtc11.sim=0.99.genome
+bigDataUrl pb-rna-wtc11.sim=0.99.genome.bam
+priority pri
+html ../empty.html
+
+
+
+track pb_rna_wtc11_sim_1_0_genome
+type bam
+visibility hide
+shortLabel pb-rna-wtc11.sim=1.0.genome
+longLabel pb-rna-wtc11.sim=1.0.genome
+bigDataUrl pb-rna-wtc11.sim=1.0.genome.bam
+priority pri
+html ../empty.html
+
+

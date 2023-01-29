@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+import sys
+from os import path as osp
+import argparse
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """compare all filterings to find out were support kicks in"""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--first", action="store_true",
+                        help="""only save the first supporting one, or any if none support""")
+    parser.add_argument("statsTsvs", nargs='+',
+                        help="""output statistics to analyze""")
+    return parser.parse_args()
+
+def floatOrNone(v):
+    return float(v) if v != "" else None
+
+def intOrNone(v):
+    return int(v) if v != "" else None
+
+def loadStats(statsTsv):
+    typeMap = {"minIndelBaseRate": floatOrNone,
+               "filter_maxIndelBaseRate": floatOrNone,
+               "maxSimilarity": floatOrNone,
+               "filter_minSimilarity": floatOrNone,
+               "target": str
+    }
+    return {r.target:r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)}
+
+def loadAllStats(statsTsvs):
+    allStats = [loadStats(s) for  s in statsTsvs]
+    targets = sorted(set([t for s in allStats for t in s.keys()]))
+    return allStats, targets
+
+def reportTargetAll(targetStats, fh):
+    for stats in sorted(targetStats, key=lambda s: s.numSupports):
+        fileOps.prRow(fh, stats.getRow())
+
+def reportTargetFirst(targetStats, fh):
+    for stats in sorted(targetStats, key=lambda s: s.numSupports):
+        if stats.numSupports > 0:
+            fileOps.prRow(fh, stats.getRow())
+            return
+    # none with support
+    fileOps.prRow(fh, stats.getRow())
+
+def reportTarget(targetStats, first, fh):
+    if first:
+        reportTargetFirst(targetStats, fh)
+    else:
+        reportTargetAll(targetStats, fh)
+
+def transcriptomeFilterCmp(statsTsvs, first):
+    fh = sys.stdout
+    allStats, targets = loadAllStats(statsTsvs)
+    fileOps.prRowv(fh, "target", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
+                   "filter_minSimilarity", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
+    for target in targets:
+        reportTarget([s[target] for s in allStats], first, fh)
+
+def main(opts):
+    transcriptomeFilterCmp(opts.statsTsvs, opts.first)
+
+main(parseArgs())

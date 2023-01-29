@@ -1,1 +1,11 @@
 include ../trackDb/juju.trackDb.txt 
+
+track rna-manatee-genome_bam
+type bam
+visibility hide
+shortLabel Validation PB (BAM)
+longLabel Validation PB (BAM)
+bigDataUrl pb-rna-manatee-genome.bam
+priority 101
+html ../empty.html
+
