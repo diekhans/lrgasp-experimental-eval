@@ -31,22 +31,22 @@ CERNA1+1	155	1.0	0	0	perfect
 CIBAR1+1	4	1.0	0	0	perfect	
 CNN1+1	2456	1.0	0	0	perfect	
 CSDC2+A	2	1.0	0	0	perfect	
-CSDC2+B	0	0.0	0	0	??	IGV
-CSDC2+C	1334	0.9338	-33	3	??	IGV
+CSDC2+B	0	0.0	0	0	no	Nothing observed that supports
+CSDC2+C	1334	0.9338	-33	3	no	Nothing observed that supports
 CSDC2+D	4	1.0	0	0	perfect	
 CYB5B+1	311	0.9724	11	0	okay	One read confirms; most reads have extra exon [has reads claiming wrong strand]
-CYSRT1+A	0	0.0	0	0	??	IGV
+CYSRT1+A	0	0.0	0	0	no	Nothing observed that supports
 CYSRT1+B	1422	1.0	0	0	perfect	
-CYSRT1+C	0	0.0	0	0	??	IGV
+CYSRT1+C	0	0.0	0	0	no	Nothing observed that supports
 DEGS2+A	6161	1.0	0	0	perfect	
-DEGS2+B	1	0.9042	86	0	??	IGV
+DEGS2+B	1	0.9042	86	0	okay	read a8b0928f-a489-4578-8d0b-4ae57144d388 confirms
 DEGS2+C	1	1.0	0	0	perfect	
 DGAT2+A	8990	1.0	0	0	perfect	
-DGAT2+D	1	0.9965	-1	0	??	IGV
+DGAT2+D	1	0.9965	-1	0	no	read m64152e_230121_000958/54985650/ccs does not validate splice junction
 DGUOK+1	37	1.0	0	0	perfect	
 DLX4+A	2266	1.0	0	0	perfect	
-DLX4+B	1	0.9312	92	92	??	IGV
-DNLZ+C	1	0.9949	2	2	??	IGV
+DLX4+B	1	0.9312	92	92	no	no read covering 3rd exon
+DNLZ+C	1	0.9949	2	2	okay	39b13598-2dd7-4414-a8bb-87fd69c86130 validates splice junction and primers
 DPP3+1	16	1.0	0	0	perfect	
 DUSP4+A	115	1.0	0	0	perfect	
 DUSP4+B	70	1.0	0	0	perfect	
@@ -65,31 +65,31 @@ GFRA3+A	160	1.0	0	0	perfect
 GFRA3+B	1742	1.0	0	0	perfect	
 GFRA3+C	83	1.0	0	0	perfect	
 GPR3+A	821	1.0	0	0	perfect	
-GPR3+C	1	0.9907	2	4	??	
-HBEGF+A	547	0.9416	-45	0	??	
-HBEGF+B	0	0.0	0	0	??	
-HBEGF+C	0	0.0	0	0	??	
-HBEGF+D	0	0.0	0	0	??	
+GPR3+C	1	0.9907	2	4	no	not an intron, gap is TT-AG TM_000000729301_1_ZXJ
+HBEGF+A	547	0.9416	-45	0	no	no read validate all SJs
+HBEGF+B	0	0.0	0	0	no	no read validate all SJs
+HBEGF+C	0	0.0	0	0	no	no read validate SJ
+HBEGF+D	0	0.0	0	0	no	no overlapping reads	
 HES2+A	1497	1.0	0	0	perfect	
 HES2+B	4222	1.0	0	0	perfect	
 HNRNPH2+1	825	1.0	0	0	perfect	
 HSPA9+1	8	1.0	0	0	perfect	
 HSPB11+1	1345	1.0	0	0	perfect	
-ID3+1	2	0.9928	3	3	??	
-IFFO2+A	583	0.9498	-42	0	??	
+ID3+1	2	0.9928	3	3	good	multiple reads validate intron chain
+IFFO2+A	583	0.9498	-42	0	no	no reads cover 5' exon
 IFFO2+B	250	1.0	0	0	perfect	
-IFFO2+C	0	0.0	0	0	??	
-IFFO2+D	102	0.941	-45	53	??	
-IFIT5+A	0	0.0	0	0	??	
+IFFO2+C	0	0.0	0	0	no	no reads cover 5' exon
+IFFO2+D	102	0.941	-45	53	no	no reads validate SJ, which is CA-AG; not an intron
+IFIT5+A	0	0.0	0	0	no	no reads cover 5' exon
 IFIT5+B	74	1.0	0	0	perfect	
-IGF2BP3+1	3166	0.996	0	7	??	
-ITGA7+1	2	0.9959	19	3	??	
+IGF2BP3+1	3166	0.996	0	7	??	large number of exons, hard to validated manually
+ITGA7+1	2	0.9959	19	3	okay	validated by one read
 KLF10+1	1803	1.0	0	0	perfect	
 KLF10+2	10714	1.0	0	0	perfect	
-LBX2+A	0	0.0	0	0	??	
-LBX2+B	80	0.9568	-93	104	??	
-LBX2+C	294	0.9378	-14	35	??	
-LDHA+1	0	0.0	0	0	??	
+LBX2+A	0	0.0	0	0	no	no reads validate 1st amplicon intron
+LBX2+B	80	0.9568	-93	104	no	no reads validate 1st amplicon intron
+LBX2+C	294	0.9378	-14	35	no	no reads validate 1st amplicon intron
+LDHA+1	0	0.0	0	0	no	no reads validate 1st amplicon intron
 LRFN3+1	3241	1.0	0	0	perfect	
 LRRC42+1	3	1.0	0	0	perfect	
 MAL2+1	32	1.0	0	0	perfect	
@@ -100,7 +100,7 @@ MRPS28+1	1069	1.0	0	0	perfect
 MRPS34+1	98	1.0	0	0	perfect	
 MSC+A	32	1.0	0	0	perfect	
 MTHFS+1	1822	1.0	0	0	perfect	
-NACC2+1	8	0.996	1	0	??	
+NACC2+1	8	0.996	1	0	??	multiple reads support the amplicon intron
 NEK2+2	6793	1.0	0	0	perfect	
 NEUROG3+A	3140	1.0	0	0	perfect	
 NEUROG3+B	148	1.0	0	0	perfect	
@@ -108,7 +108,7 @@ NODAL+1	3837	1.0	0	0	perfect
 NUDC+1	1034	1.0	0	0	perfect	
 NUDT21+1	1936	1.0	0	0	perfect	
 PDLIM1+1	28916	1.0	0	0	perfect	
-PID1+A	0	0.0	0	0	??	
+PID1+A	0	0.0	0	0	no	reads contain exon not in amplico
 PID1+B	26	1.0	0	0	perfect	
 PIN4+1	9793	1.0	0	0	perfect	
 PLAC9+A	5452	1.0	0	0	perfect	
@@ -120,7 +120,7 @@ PLLP+D	3090	1.0	0	0	perfect
 PLLP+E	5989	1.0	0	0	perfect	
 PLLP+F	3474	1.0	0	0	perfect	
 POMGNT2+A	2430	1.0	0	0	perfect	
-POMGNT2+B	3	0.9557	-31	1	??	
+POMGNT2+B	3	0.9557	-31	1	good	multiple reads support amplicon
 POMGNT2+C	11	1.0	0	0	perfect	
 PSMC1+1	8498	1.0	0	0	perfect	
 PSMD2+1	9	1.0	0	0	perfect	
@@ -130,8 +130,8 @@ RASL11B+1	10792	1.0	0	0	perfect
 RERG+A	211	1.0	0	0	perfect	
 RERG+B	3	1.0	0	0	perfect	
 RGS4+A	2453	1.0	0	0	perfect	
-RGS4+B	3	0.9522	25	0	??	
-RHCG+A	0	0.0	0	0	??	
+RGS4+B	3	0.9522	25	0	good	multiple reads support amplicon
+RHCG+A	0	0.0	0	0	no	no reads support 1st amplicon exon
 RND2+1	514	1.0	0	0	perfect	
 RPL37+1	149	1.0	0	0	perfect	
 RPL39L+1	6973	1.0	0	0	perfect	
@@ -145,14 +145,14 @@ SLC38A3+A	1001	1.0	0	0	perfect
 SLC38A3+B	8	1.0	0	0	perfect	
 SLC46A1+1	12	1.0	0	0	perfect	
 SLC9B1+1	16318	1.0	0	0	perfect	
-SNHG3+1	156	0.9977	-1	1	??	
-SORD+1	12	0.9372	-15	0	??	
+SNHG3+1	156	0.9977	-1	1	good	multiple reads covering amplicon
+SORD+1	12	0.9372	-15	0	good	multiple reads covering amplicon
 SPRING1+1	48	1.0	0	0	perfect	
 SYT4+A	57	1.0	0	0	perfect	
 TAGLN2+1	11085	1.0	0	0	perfect	
 TEX264+1	21175	1.0	0	0	perfect	
 THBS4+1	666	1.0	0	0	perfect	
-TIFA+A	1	0.9927	4	4	??	
+TIFA+A	1	0.9927	4	4	good	multiple reads covering amplicon
 TIMM22+1	285	1.0	0	0	perfect	
 TMEM167B+1	2172	1.0	0	0	perfect	
 TNPO3+1	3635	1.0	0	0	perfect	
@@ -161,9 +161,9 @@ USF1+1	2028	1.0	0	0	perfect
 WSB1+1	386	1.0	0	0	perfect	
 XPO7+1	1905	1.0	0	0	perfect	
 XRCC6+1	10	1.0	0	0	perfect	
-ZBTB45+1	15	0.9744	52	0	??	
+ZBTB45+1	15	0.9744	52	0	ok	supported by one read
 ZDHHC8+1	3	1.0	0	0	perfect	
 ZNF148+1	1293	1.0	0	0	perfect	
 ZNF622+1	41032	1.0	0	0	perfect	
 ZNF749+1	524	1.0	0	0	perfect	
-ZSCAN21+1	1	0.9016	-54	13	??	
+ZSCAN21+1	1	0.9016	-54	13	no	no read covers first two amplicon exons
