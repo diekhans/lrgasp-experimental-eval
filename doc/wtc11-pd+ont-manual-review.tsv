@@ -82,7 +82,7 @@ IFFO2+C	0	0.0	0	0	no	no reads cover 5' exon
 IFFO2+D	102	0.941	-45	53	no	no reads validate SJ, which is CA-AG; not an intron
 IFIT5+A	0	0.0	0	0	no	no reads cover 5' exon
 IFIT5+B	74	1.0	0	0	perfect	
-IGF2BP3+1	3166	0.996	0	7	??	large number of exons, hard to validated manually
+IGF2BP3+1	3166	0.996	0	7	ok	large number of exons, hard to validated manually, but look positive
 ITGA7+1	2	0.9959	19	3	okay	validated by one read
 KLF10+1	1803	1.0	0	0	perfect	
 KLF10+2	10714	1.0	0	0	perfect	
@@ -100,7 +100,7 @@ MRPS28+1	1069	1.0	0	0	perfect
 MRPS34+1	98	1.0	0	0	perfect	
 MSC+A	32	1.0	0	0	perfect	
 MTHFS+1	1822	1.0	0	0	perfect	
-NACC2+1	8	0.996	1	0	??	multiple reads support the amplicon intron
+NACC2+1	8	0.996	1	0	good	multiple reads support the amplicon intron
 NEK2+2	6793	1.0	0	0	perfect	
 NEUROG3+A	3140	1.0	0	0	perfect	
 NEUROG3+B	148	1.0	0	0	perfect	
