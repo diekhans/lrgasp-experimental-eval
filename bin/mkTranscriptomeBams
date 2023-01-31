@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
 from os import path as osp
 import argparse
 import re
-from pycbio.sys import fileOps
-from pycbio.tsv import TsvReader
-
 
 def parseArgs():
     desc = """generate trackDb"""

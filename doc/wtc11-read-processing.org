@@ -33,71 +33,19 @@ samtools fasta lrgasp-validation-ont-grch38-brooks.bam | faSize -detailed stdin 
 total 4880899
 uniq  4880899
 
+
+
 * align PB reads to genome
 cd align
 (time nice minimap2 -t 64 -ax splice /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > lrgasp-validation-pb-grch38-brooks.bam)>&log&
 
 nice samtools merge -@ 64 -O BAM -o lrgasp-validation-pb+ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-pb-grch38-brooks.bam  &
 
-* introns
-../bin/runIntronProspector ../align/lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.juncs.tsv  lrgasp-validation-ont-grch38-brooks.juncs.bed >&log &
-
-real	15m28.798s
-
-* Failed conversion tools:
-** bedops doesn't work, creates bed6+, not bed12, needs recompiled
-** bedtools bamToBed -bed12
-does not create unique names, which breaks any other tool
-** genome tools to convert bedtools BED
- http://genometools.org/pub/
-gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
-Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
-
-* convert to other formats
-
-bamToBed -bed12 -i lrgasp-validation-ont-grch38-brooks.bam | csort -k1,1 -k2,2n >lrgasp-validation-ont-grch38-brooks.bed
-bedToBigBed -type=bed12 -sizesIs2Bit lrgasp-validation-ont-grch38-brooks.bed https://hgdownload.soe.ucsc.edu/gbdb/hg38/hg38.2bit lrgasp-validation-ont-grch38-brooks.bb
-
-*  try using http://genometools.org/pub/
-
-gt bed_to_gff3 lrgasp-validation-ont-grch38-brooks.bed >  lrgasp-validation-ont-grch38-brooks.gff3
-Assertion failed: (start <= end), function gt_feature_node_new, file src/extended/feature_node.c, line 241.
-This is a bug, please report it at
-https://github.com/genometools/genometools/issues
-Please make sure you are running the latest release which can be found at
-http://genometools.org/pub/
-You can check your version number with `gt -version`.
-Aborted
-
-tawk '$2>=$3 {print $0}' ../align/lrgasp-validation-ont-grch38-brooks.bed >bad.bed
-
-
-
-* to-gff3 with cupcake
-conda activate SQANTI3.env
-
-(time ./runSamToGff3 lrgasp-validation-ont-grch38-brooks.sam )>&log&
-
-# get GFF3 but can't convert to bed
-gff2bed<  lrgasp-validation-ont-grch38-brooks.gff3 > tmp.bed
-Error on line 25323 in -. Genomic end coordinate is less than (or equal to) start coordinate.
-
-but that doesn't actually seem to be the line; if that gene is pulled out in
-a record, it doesn't fail
-
-gt gff3validator lrgasp-validation-ont-grch38-brooks.gff3 >&log
-   gt gff3validator: error: range (14356,14662) of feature on line 3 in file "lrgasp-validation-ont-grch38-brooks.gff3"
-is not contained in range (1,307) of corresponding sequence region on line 2
-
-fgrep -v '##sequence-region' lrgasp-validation-ont-grch38-brooks.gff3 | gt gff3validator  >&log
-
-warning: the multi-feature with ID "fa03753c-8aac-4f94-98b2-bf1913fa7bfa" on line 192 in file "stdin" has a different strand than its counterpart on line 70 (possible in rare cases)
-warning: the multi-feature with ID "fa03753c-8aac-4f94-98b2-bf1913fa7bfa.exon1" on line 193 in file "stdin" has a different strand than its counterpart on line 71 (possible in rare cases)
-warning: the multi-feature with ID "8d0e1b32-d4a4-4767-88eb-051983c1ac43" on line 282 in file "stdin" has a different strand than its counterpart on line 38 (possible in rare cases)
-warning: the multi-feature with ID "8d0e1b32-d4a4-4767-88eb-051983c1ac43.exon1" on line 283 in file "stdin" has a different strand than its counterpart on line 39 (possible in rare cases)
-warning: the multi-feature with ID "07c60a84-d098-43b2-8acf-df6c6a830444" on line 427 in file "stdin" has a different strand than its counterpart on line 420 (possible in rare cases)
-
-# try making something gff3ToGenePred likes
+* make tabix BEDs
+bamToBed -bed12 -i lrgasp-validation-ont-grch38-brooks.bam  | bgzip >lrgasp-validation-ont-grch38-brooks.bed.gz
+bamToBed -bed12 -i lrgasp-validation-pb-grch38-brooks.bam  | bgzip >lrgasp-validation-pb-grch38-brooks.bed.gz 
+tabix -p bed lrgasp-validation-ont-grch38-brooks.bed.gz&
+tabix -p bed lrgasp-validation-pb-grch38-brooks.bed.gz&
 
 * generate transcriptome of targeted loci
 cd grch38-transcriptome/reference

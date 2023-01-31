@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from os import path as osp
 import re
 from collections import namedtuple
 import argparse

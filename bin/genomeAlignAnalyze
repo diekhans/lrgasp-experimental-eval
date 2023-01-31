@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+from collections import defaultdict
+import argparse
+import pysam
+from pycbio.sys import fileOps
+from pycbio.hgdata.bed import Bed, BedTable
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """count the number of reads that validated an amplicon intron chain. """
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("jujuIsoformsTsv",
+                        help="""isoforms.tsv with targets and transcripts""")
+    parser.add_argument("ampliconBed",
+                        help="""bed with targets transcript with amplicons in thick """)
+    parser.add_argument("readBedGz",
+                        help="""create with 'bedtools bamtobed -bed12' and  tabix""")
+    parser.add_argument("statsTsv",
+                        help="""output statistics to this file""")
+    opts = parser.parse_args()
+    return opts
+
+def loadJuJuDesigns(jujuIsoformsTsv):
+    # target_id primer_id pri track transcript_id amplicon_coords amplicon_len amplicon_exons amplicon
+    designs = defaultdict(list)
+    for row in TsvReader(jujuIsoformsTsv, typeMap={"pri": int}):
+        designs[row.target_id].append(row)
+    return designs
+
+def getThickIntronChain(bed):
+    chain = []
+    prevBlk = None
+    for blk in bed.blocks:
+        if (blk.start < bed.thickEnd) and (blk.end > bed.thickStart):
+            if prevBlk is not None:
+                chain.append((prevBlk.end, blk.start))
+            prevBlk = blk
+    return tuple(chain)
+
+def countCupports(ampliconBed, ampliconChain, readBedFh):
+    supportCnt = 0
+    for line in readBedFh.fetch(reference=ampliconBed.chrom, start=ampliconBed.start, end=ampliconBed.end):
+        readBed = Bed.parse(line.split('\t'))
+        readChain = getThickIntronChain(readBed)
+        if readChain == ampliconChain:
+            supportCnt += 1
+    return supportCnt
+
+def processTargetTrans(tdesign, ampliconBedTbl, readBedFh, statsFh):
+    ampliconBed = ampliconBedTbl.getByName(tdesign.transcript_id)[0]
+    ampliconChain = getThickIntronChain(ampliconBed)
+    supportCnt = countCupports(ampliconBed, ampliconChain, readBedFh)
+    fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
+
+
+def processTargets(designs, ampliconBedTbl, readBedFh, statsFh):
+    for targetId in sorted(designs.keys()):
+        for tdesign in designs[targetId]:
+            if tdesign.pri == 1:
+                processTargetTrans(tdesign, ampliconBedTbl, readBedFh, statsFh)
+
+def genomeAlignAnalyze(jujuIsoformsTsv, ampliconBed, readBedGz, statsTsv):
+    designs = loadJuJuDesigns(jujuIsoformsTsv)
+    ampliconBedTbl = BedTable(ampliconBed, nameIdx=True)
+    readBedFh = pysam.TabixFile(readBedGz)
+    with open(statsTsv, 'w') as statsFh:
+        fileOps.prRowv(statsFh, "target_id", "transcript_id", "chain_supports")
+        processTargets(designs, ampliconBedTbl, readBedFh, statsFh)
+
+def main(opts):
+    genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.ampliconBed, opts.readBedGz, opts.statsTsv)
+
+main(parseArgs())

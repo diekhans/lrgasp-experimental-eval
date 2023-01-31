@@ -19,18 +19,6 @@ bigDataUrl lrgasp-validation-pb-grch38-brooks.bam
 priority 100
 html ../empty.html
 
-track lrgasp_validation_ont_grch38_brooks_bed
-type bigBed 12 .
-visibility hide
-shortLabel Validation ONT (BED)
-longLabel Validation ONT (BED)
-color 10,100,85
-bigDataUrl lrgasp-validation-ont-grch38-brooks.bb
-priority 102
-filterText.name *
-html ../empty.html
-
-
 
 track ont_rna_wtc11_sim_0_90_genome
 type bam

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from os import path as osp
 import argparse
 from pycbio.sys import fileOps
 from pycbio.tsv import TsvReader
@@ -26,12 +25,11 @@ def loadStats(statsTsv):
                "filter_maxIndelBaseRate": floatOrNone,
                "maxSimilarity": floatOrNone,
                "filter_minSimilarity": floatOrNone,
-               "target": str
-    }
-    return {r.target:r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)}
+               "target": str}
+    return {r.target: r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)}
 
 def loadAllStats(statsTsvs):
-    allStats = [loadStats(s) for  s in statsTsvs]
+    allStats = [loadStats(s) for s in statsTsvs]
     targets = sorted(set([t for s in allStats for t in s.keys()]))
     return allStats, targets
 

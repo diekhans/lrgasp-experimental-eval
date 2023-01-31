@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from os import path as osp
 import argparse
 from pycbio.sys import fileOps
 from pycbio.tsv import TsvReader
@@ -24,8 +23,7 @@ def countStats(statsTsv, fh):
                "filter_maxIndelBaseRate": floatOrNone,
                "maxSimilarity": float,
                "filter_minSimilarity": floatOrNone,
-               "target": str
-    }
+               "target": str}
     recs = [r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)]
     rec0 = recs[0]
 
