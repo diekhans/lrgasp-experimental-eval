@@ -137,7 +137,7 @@ def readStatsWrite(target, readsStats, readStatsFh):
         fileOps.prRowv(readStatsFh, target, *rstats)
 
 def writeTargetHeader(statsFh):
-    fileOps.prRowv(statsFh, "target", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
+    fileOps.prRowv(statsFh, "target", "transcript", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
                    "filter_minSimilarity", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
 
 def maxOffset(rs):
@@ -170,7 +170,12 @@ def calcReadsStats(readsStats):
     return (maxSimilarity, minEndsDiff, minIndelBases, minIndelBaseRate)
 
 def writeTargetStats(target, readsStats, filters, statsFh):
-    fileOps.prRowv(statsFh, target, len(readsStats),
+    # manatee has targetId/transcriptId
+    tparts = target.split('/')
+    targetId = tparts[0]
+    transId = tparts[1] if len(tparts) > 1 else None
+
+    fileOps.prRowv(statsFh, targetId, transId, len(readsStats),
                    *calcReadsStats(readsStats),
                    filters.minSimilarity, filters.maxEndsDiff, filters.maxIndelBases, filters.maxIndelBases)
 

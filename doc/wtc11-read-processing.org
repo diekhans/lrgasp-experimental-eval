@@ -1,6 +1,9 @@
 * 2022-12-14 hub
 https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hub.txt
 
+* WARMING
+bamToBed -bed12 does not do the right thing with the U21 reference deletion case
+
 ** data/grch38/sequencing
 * Angela:
 Our ONT amplicon sequencing for validation should be available here:
@@ -25,27 +28,24 @@ para try -batch=b1
 
 # combine into BAM
  
-nice samtools merge --output-fmt BAM --threads 32 -c -p  lrgasp-validation-ont-grch38-brooks.bam tmp/*.sam
+nice samtools merge --output-fmt BAM --threads 32 -c -p  ont-rna-wtc11-genome.bam tmp/*.sam
 
 # check id unqiueness
-samtools fasta lrgasp-validation-ont-grch38-brooks.bam | faSize -detailed stdin | cut -f 1 sort | twc -l
+samtools fasta ont-rna-wtc11-genome.bam | faSize -detailed stdin | cut -f 1 sort | twc -l
 
 total 4880899
 uniq  4880899
 
-
+# didn't really need to split it up.
 
 * align PB reads to genome
 cd align
-(time nice minimap2 -t 64 -ax splice /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > lrgasp-validation-pb-grch38-brooks.bam)>&log&
+(time nice minimap2 -t 64 -ax splice /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&log&
 
-nice samtools merge -@ 64 -O BAM -o lrgasp-validation-pb+ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-pb-grch38-brooks.bam  &
+nice samtools merge -@ 64 -O BAM -o pb+ont-grch38-brooks.bam lrgasp-validation-ont-grch38-brooks.bam lrgasp-validation-pb-rna-wtc11-genome.bam  &
 
-* make tabix BEDs
-bamToBed -bed12 -i lrgasp-validation-ont-grch38-brooks.bam  | bgzip >lrgasp-validation-ont-grch38-brooks.bed.gz
-bamToBed -bed12 -i lrgasp-validation-pb-grch38-brooks.bam  | bgzip >lrgasp-validation-pb-grch38-brooks.bed.gz 
-tabix -p bed lrgasp-validation-ont-grch38-brooks.bed.gz&
-tabix -p bed lrgasp-validation-pb-grch38-brooks.bed.gz&
+* control alignment of amplicons to genome
+(time nice minimap2 -t 64 -ax splice /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-genome.bam)>&log&
 
 * generate transcriptome of targeted loci
 cd grch38-transcriptome/reference
@@ -69,80 +69,47 @@ nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam
 samtools merge -O BAM -o pb+ont-rna-wtc11-amplicons.bam ont-rna-wtc11-amplicons.bam pb-rna-wtc11-amplicons.bam &
 nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam 
 
-** cd analyze
-../bin/ampSupport ont 0 0 -1 &
-../bin/ampSupport ont 1 1 -1 &
-../bin/ampSupport ont 2 2 -1 &
-../bin/ampSupport ont 4 4 -1 &
-../bin/ampSupport ont 8 8 -1 &
-../bin/ampSupport ont 16 16 -1 &
-../bin/ampSupport ont 32 32 -1 &
-
-../bin/ampSupport ont 0 -1 0.002 &
-../bin/ampSupport ont 1 -1 0.005 &
-../bin/ampSupport ont 2 -1 0.008 &
+* control alignment of amplicons to amplicons
+cd control/grch38-transcriptome/
+(time nice minimap2 -t 64 -ax splice ../reference/wtc11-amplicons.fa   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-amplicon.bam)>&log&
 
 
-../bin/ampSupport pb 0 0 -1 &
-../bin/ampSupport pb 1 1 -1 &
-../bin/ampSupport pb 2 2 -1 &
-../bin/ampSupport pb 4 4 -1 &
-../bin/ampSupport pb 8 8 -1 &
-../bin/ampSupport pb 0 -1 0.002 &
-../bin/ampSupport pb 1 -1 0.005 &
-../bin/ampSupport pb 2 -1 0.008 &
-
-
-../bin/ampSupport pb+ont 0 0 -1 &
-../bin/ampSupport pb+ont 1 1 -1 &
-../bin/ampSupport pb+ont 2 2 -1 &
-../bin/ampSupport pb+ont 4 4 -1 &
-../bin/ampSupport pb+ont 8 8 -1 &
-../bin/ampSupport pb+ont 0 -1 0.002 &
-../bin/ampSupport pb+ont 1 -1 0.005 &
-../bin/ampSupport pb+ont 2 -1 0.008 &
-
-../../../bin/transcriptomeSummary ont-rna-wtc11.end=*.tsv >ont-summary.tsv &
-../../../bin/transcriptomeSummary pb-rna-wtc11.end=*.tsv >pb-summary.tsv &
-../../../bin/transcriptomeSummary pb+ont-rna-wtc11.end=*.tsv >pb+ont-summary.tsv &
-
-
-
-tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/wtc11-support.tar.gz analyze
 
 * debugging
 ../../../bin/transcriptomeAlignAnalyze --target=BTG2+B --minSimilarity=0.1 --readStatsTsv=debug.sim=0.1.rstats.tsv --filteredBam=debug.sim=0.1.bam ../align/ont-rna-wtc11-amplicons.bam debug.sim=0.1.tsv &
-* manual analysis:
-cd man-analyze
-../bin/manAmpSupport ont 1.0&
-../bin/manAmpSupport ont 0.99&
-../bin/manAmpSupport ont 0.98&
-../bin/manAmpSupport ont 0.95&
-../bin/manAmpSupport ont 0.90&
+* analysis
+cd analyze
+../bin/simAmpSupport ont 1.0&
+../bin/simAmpSupport ont 0.99&
+../bin/simAmpSupport ont 0.98&
+../bin/simAmpSupport ont 0.95&
+../bin/simAmpSupport ont 0.90&
 
-../bin/manAmpSupport pb 1.0&
-../bin/manAmpSupport pb 0.99&
-../bin/manAmpSupport pb 0.98&
-../bin/manAmpSupport pb 0.95&
-../bin/manAmpSupport pb 0.90&
+../bin/simAmpSupport pb 1.0&
+../bin/simAmpSupport pb 0.99&
+../bin/simAmpSupport pb 0.98&
+../bin/simAmpSupport pb 0.95&
+../bin/simAmpSupport pb 0.90&
 
-../bin/manAmpSupport pb+ont 1.0&
-../bin/manAmpSupport pb+ont 0.99&
-../bin/manAmpSupport pb+ont 0.98&
-../bin/manAmpSupport pb+ont 0.95&
-../bin/manAmpSupport pb+ont 0.90&
+../bin/simAmpSupport pb+ont 1.0&
+../bin/simAmpSupport pb+ont 0.99&
+../bin/simAmpSupport pb+ont 0.98&
+../bin/simAmpSupport pb+ont 0.95&
+../bin/simAmpSupport pb+ont 0.90&
 
 ../../../bin/transcriptomeSummary ont-rna-wtc11.sim=*.tsv >ont-summary.tsv &
 ../../../bin/transcriptomeSummary pb-rna-wtc11.sim=*.tsv >pb-summary.tsv &
 ../../../bin/transcriptomeSummary pb+ont-rna-wtc11.sim=*.tsv >pb+ont-summary.tsv &
 
 
-ln -f *.bam* ../../../hub/hg38/
-use bin/mkTranscriptomeBams to fill in trackDb
-
 ../../../bin/transcriptomeFilterCmp --first ont-rna-wtc11.sim=*.tsv >ont.cmp.tsv &
 ../../../bin/transcriptomeFilterCmp --first pb-rna-wtc11.sim=*.tsv >pb.cmp.tsv &
 ../../../bin/transcriptomeFilterCmp --first pb+ont-rna-wtc11.sim=*.tsv >pb+ont.cmp.tsv &
+
+ln -f *.bam* ../../../hub/hg38/
+
+cd hub/hg38
+../../bin/mkBamsTrackDb *rna-wtc11*.bam >filtered.trackDb.txt
 
 * manual review
 
@@ -155,3 +122,22 @@ cut -f 1-5 pb+ont.cmp.tsv | tawk '{st=($3==1.0) ? "perfect" : "??"; print $0, st
 * browser
 bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_hub/hub.txt hg38 targets.bed dir
 
+* check intron chains
+cd data/grch38/analyze
+../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/ont-rna-wtc11-genome.bed.gz ont-rna-wtc11.intron-chains.tsv &
+../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/pb-rna-wtc11-genome.bed.gz pb-rna-wtc11.intron-chains.tsv &
+../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/pb+ont-rna-wtc11-genome.bed.gz pb+ont-rna-wtc11.intron-chains.tsv &
+
+
+
+tar -zcf ~/public_html/lrgasp/experimental-eval/wtc11-intron-chains.tar.gz grch38/analyze/
+
+* final summary
+cd grch38-transcriptome/analyze
+
+../../../bin/summarizeSupport ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.tsv *-wtc11.sim=*.tsv >wtc11-support.tsv
+
+cp wtc11-support.tsv ~/public_html/lrgasp/experimental-eval/
+
+* debug
+../../../bin/genomeAlignAnalyze --target=ALG6+1 ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/pb-rna-wtc11-genome.bed.gz debug.tsv &

@@ -4,18 +4,21 @@ from collections import defaultdict
 import argparse
 import pysam
 from pycbio.sys import fileOps
-from pycbio.hgdata.bed import Bed, BedTable
+from pycbio.hgdata.bed import BedTable
+from pycbio.hgdata.cigar import Cigar
 from pycbio.tsv import TsvReader
 
 def parseArgs():
     desc = """count the number of reads that validated an amplicon intron chain. """
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--target",
+                        help="""only analyze this target name""")
     parser.add_argument("jujuIsoformsTsv",
                         help="""isoforms.tsv with targets and transcripts""")
-    parser.add_argument("ampliconBed",
+    parser.add_argument("targetsBed",
                         help="""bed with targets transcript with amplicons in thick """)
-    parser.add_argument("readBedGz",
-                        help="""create with 'bedtools bamtobed -bed12' and  tabix""")
+    parser.add_argument("readsBam",
+                        help="""genome BAM""")
     parser.add_argument("statsTsv",
                         help="""output statistics to this file""")
     opts = parser.parse_args()
@@ -26,6 +29,7 @@ def loadJuJuDesigns(jujuIsoformsTsv):
     designs = defaultdict(list)
     for row in TsvReader(jujuIsoformsTsv, typeMap={"pri": int}):
         designs[row.target_id].append(row)
+    designs.default_factory = None
     return designs
 
 def getThickIntronChain(bed):
@@ -38,37 +42,61 @@ def getThickIntronChain(bed):
             prevBlk = blk
     return tuple(chain)
 
-def countCupports(ampliconBed, ampliconChain, readBedFh):
+def getReadChain(aln):
+    # don't allow target insertion to be adjacent to a intron like the ALG6 U12 example
+    # 65M 4013N 6D 58M
+    tNext = aln.reference_start
+    chain = []
+    cigar = Cigar(aln.cigarstring)
+    for i in range(len(cigar)):
+        run = cigar[i]
+        if run.intron and (not cigar[i - 1].tinsert) and (not cigar[i + 1].tinsert):
+            chain.append((tNext, tNext + run.count))
+        if run.consumesTarget:
+            tNext += run.count
+    return tuple(chain)
+
+def countSupports(targetsBed, ampliconChain, readsBamFh):
     supportCnt = 0
-    for line in readBedFh.fetch(reference=ampliconBed.chrom, start=ampliconBed.start, end=ampliconBed.end):
-        readBed = Bed.parse(line.split('\t'))
-        readChain = getThickIntronChain(readBed)
+    for aln in readsBamFh.fetch(reference=targetsBed.chrom, start=targetsBed.start, end=targetsBed.end):
+        readChain = getReadChain(aln)
         if readChain == ampliconChain:
             supportCnt += 1
     return supportCnt
 
-def processTargetTrans(tdesign, ampliconBedTbl, readBedFh, statsFh):
-    ampliconBed = ampliconBedTbl.getByName(tdesign.transcript_id)[0]
-    ampliconChain = getThickIntronChain(ampliconBed)
-    supportCnt = countCupports(ampliconBed, ampliconChain, readBedFh)
+def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh):
+    targetsBeds = targetsBedTbl.getByName(tdesign.transcript_id)
+    if len(targetsBeds) == 0:
+        raise Exception(f"no target BED found for {tdesign.transcript_id}")
+    targetsBed = targetsBeds[0]
+    ampliconChain = getThickIntronChain(targetsBed)
+    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh)
     fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
 
 
-def processTargets(designs, ampliconBedTbl, readBedFh, statsFh):
-    for targetId in sorted(designs.keys()):
-        for tdesign in designs[targetId]:
-            if tdesign.pri == 1:
-                processTargetTrans(tdesign, ampliconBedTbl, readBedFh, statsFh)
+def processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh):
+    for tdesign in designs[targetId]:
+        if tdesign.pri == 1:
+            processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh)
 
-def genomeAlignAnalyze(jujuIsoformsTsv, ampliconBed, readBedGz, statsTsv):
+def processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target=None):
+    targets = [target] if target is not None else sorted(designs.keys())
+    for targetId in targets:
+        try:
+            processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh)
+        except Exception as ex:
+            raise Exception(f"target {targetId} failed") from ex
+
+def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, statsTsv, target):
     designs = loadJuJuDesigns(jujuIsoformsTsv)
-    ampliconBedTbl = BedTable(ampliconBed, nameIdx=True)
-    readBedFh = pysam.TabixFile(readBedGz)
+    targetsBedTbl = BedTable(targetsBed, nameIdx=True)
+    readsBamFh = pysam.AlignmentFile(readsBam)
     with open(statsTsv, 'w') as statsFh:
         fileOps.prRowv(statsFh, "target_id", "transcript_id", "chain_supports")
-        processTargets(designs, ampliconBedTbl, readBedFh, statsFh)
+        processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target)
 
 def main(opts):
-    genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.ampliconBed, opts.readBedGz, opts.statsTsv)
+    genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.targetsBed, opts.readsBam, opts.statsTsv,
+                       opts.target)
 
 main(parseArgs())

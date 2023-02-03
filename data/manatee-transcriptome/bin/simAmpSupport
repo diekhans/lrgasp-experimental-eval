@@ -2,8 +2,7 @@
 set -beEu -o pipefail
 
 if [ $# != 2 ] ; then
-    echo "wrong # args $0 prot minSimilarity" >&2
-    echo "Filters of -1 are omitted" >&2
+    echo "wrong # args: $0 prot minSimilarity" >&2
     exit 1
 fi
 
@@ -12,10 +11,10 @@ minSimilarity=$1 ; shift
 
 mydir=$(dirname $(which $0))
 transcriptomeAlignAnalyze=${mydir}/../../../bin/transcriptomeAlignAnalyze
-bam=${mydir}/../align/${prot}-rna-wtc11-amplicons.bam
-genomeBam=${mydir}/../../grch38/align/lrgasp-validation-${prot}-grch38-brooks.bam
+bam=${mydir}/../align/${prot}-rna-manatee-amplicons.bam
+genomeBam=${mydir}/../../manatee/align/${prot}-rna-manatee-genome.bam
 
-outBase="${prot}-rna-wtc11.sim=${minSimilarity}"
+outBase="${prot}-rna-manatee.sim=${minSimilarity}"
 outTsv=${outBase}.tsv
 outRstatsTsv=${outBase}.rstats.tsv
 outTmpTsv=${outTsv}.tmp
@@ -33,7 +32,7 @@ mv -f $outTmpTsv $outTsv
 
 outGenomeBam=${outBase}.genome.bam
 java -jar ${MED_OPT}/share/picard/picard.jar FilterSamReads \
-   I=${genomeBam} O=${outGenomeBam} READ_LIST_FILE=${outReads} FILTER=includeReadList VERBOSITY
+   I=${genomeBam} O=${outGenomeBam} READ_LIST_FILE=${outReads} FILTER=includeReadList
 
 samtools index ${outGenomeBam}
 

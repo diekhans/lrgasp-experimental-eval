@@ -9,9 +9,14 @@ Just a reminder that that is not a direct link to your data, but to be used to c
 cd data/pb-sequencing-mixed/
 azcopy copy --recursive 'https://stcjuly2022.blob.core.windows.net/st183-lrgasp?sv=2021-10-04&st=2023-01-22T23%3A40%3A10Z&se=2023-02-28T23%3A40%3A00Z&sr=c&sp=rl&sig=4e0Nr2YiYuNyLpgaDPUxIJdwjL%2B%2BUbyOx2%2BUOtL4swc%3D' .
 
+
 * align reads to genome
 cd align
 (time nice minimap2 -t 64 -ax splice  ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&log&
+
+(time nice minimap2 -t 64 -ax splice  ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&log&
+
+
 
 * amplicon target
 
@@ -24,23 +29,34 @@ cd align
 (time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&log&
 nice samtools index -@ 32 pb-rna-manatee-amplicons.bam 
 
+# control self-align
+(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&log&
+nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam 
+
 
 
 ** cd analyze
-../bin/ampSupport 0 0 -1 &
-../bin/ampSupport 1 1 -1 &
-../bin/ampSupport 2 2 -1 &
-../bin/ampSupport 4 4 -1 &
-../bin/ampSupport 8 8 -1 &
-../bin/ampSupport 16 16 -1 &
-../bin/ampSupport 32 32 -1 &
+for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do (../bin/simAmpSupport $plat $sim &; done ; done
 
-../bin/ampSupport 0 -1 0.002 &
-../bin/ampSupport 1 -1 0.005 &
-../bin/ampSupport 2 -1 0.008 &
+../../../bin/transcriptomeSummary pb-rna-manatee.*.tsv >pb-summary.tsv
 
-../../../bin/transcriptomeSummary pb-rna-manatee.end=*.tsv >summary.tsv
 tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/manatee-support.tar.gz analyze
 
-
 http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt
+
+ln -f *.bam* ../../../hub/manatee/
+
+cd hub/manatee
+../../bin/mkBamsTrackDb pb-*rna-manatee.sim**.bam >filtered.trackDb.txt
+
+
+
+* check intron chains
+cd data/manatee/analyze
+../../../bin/genomeAlignAnalyze ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed ../align/pb-rna-manatee-genome.bed.gz pb-rna-manatee.intron-chains.tsv &
+
+* final summary
+cd manatee-transcriptome/analyze
+
+../../../bin/summarizeSupport ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.tsv *-manatee.sim=*.tsv >manatee-support.tsv
+

@@ -1,10 +1,12 @@
 .emacs.bak/
 
-data/**/
-!data/**/bin
+data/*/
+!data/*/bin
 
 hub/hg38/*
 !hub/hg38/*.txt
 
 hub/manatee/*
 !hub/manatee/*.txt
+
+filtered.trackDb.txt

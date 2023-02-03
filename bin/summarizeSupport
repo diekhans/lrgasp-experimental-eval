@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+
+import sys
+import os.path as osp
+import argparse
+from collections import defaultdict
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """generate summary table of support"""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--genomeStatsTsv", action="append",
+                        help="""genome statistics files""")
+    parser.add_argument("jujuIsoformsTsv",
+                        help="""isoforms.tsv with targets and transcripts""")
+    parser.add_argument("transStatsTsvs", nargs='+',
+                        help="""transcriptome statistics at different similarity filters
+                        expacts files to start with 'platform-'""")
+    opts = parser.parse_args()
+    if opts.genomeStatsTsv is None:
+        parser.error("need at least one --genomeStatsTsv")
+    return opts
+
+def floatOrNone(v):
+    return float(v) if v != "" else None
+
+def intOrNone(v):
+    return int(v) if v != "" else None
+
+def loadJuJuDesigns(jujuIsoformsTsv):
+    # target_id primer_id pri track transcript_id amplicon_coords amplicon_len amplicon_exons amplicon
+    designs = defaultdict(list)
+    for row in TsvReader(jujuIsoformsTsv, typeMap={"pri": int}):
+        designs[row.target_id].append(row)
+    designs.default_factory = None
+    return designs
+
+def parseStatsPlatform(statsTsv):
+    parts = osp.basename(statsTsv).split('-')
+    if len(parts) < 2:
+        raise Exception("can't parse platform from: " + statsTsv)
+    return parts[0]
+
+def loadGenomeStats(statsTsv):
+    platform = parseStatsPlatform(statsTsv)
+    typeMap = {"chain_supports": int}
+    return {(platform, r.target_id, r.transcript_id): r for r in TsvReader(statsTsv, typeMap=typeMap)}
+
+def loadAllGenomeStats(statsTsvs):
+    allStats = {}
+    for statsTsv in statsTsvs:
+        allStats.update(loadGenomeStats(statsTsv))
+    return allStats
+
+def loadTransStats(designs, statsTsv):
+    typeMap = {"minIndelBaseRate": floatOrNone,
+               "filter_maxIndelBaseRate": floatOrNone,
+               "maxSimilarity": floatOrNone,
+               "filter_minSimilarity": floatOrNone,
+               "target": str,
+               "transcript": str}
+    platform = parseStatsPlatform(statsTsv)
+    transStats = {}
+    for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone):
+        if r.transcript == "":
+            r.transcript = designs[r.target][0].transcript_id
+        transStats[(platform, r.target, r.transcript)] = r
+    return transStats
+
+def loadTransAllStat(designs, statsTsvs):
+    transStatsByMinSim = defaultdict(dict)
+    for st in statsTsvs:
+        s = loadTransStats(designs, st)
+        entry = next(iter(s.values()))
+        transStatsByMinSim[entry.filter_minSimilarity].update(s)
+    transStatsByMinSim.default_factory = None
+    return transStatsByMinSim
+
+def getPlatforms(genomeStats, transStatsByMinSim):
+    # (platform, target, transcript_id)
+    keys = set([k[0] for k in genomeStats.keys()])
+    for ts in transStatsByMinSim.values():
+        keys |= set([k[0] for k in ts.keys()])
+    # shortest name first
+    return sorted(keys, key=lambda k: len(k))
+
+def getTargetsTranses(genomeStats, transStatsByMinSim):
+    # (platform, target, transcript_id)
+    keys = set([k[1:] for k in genomeStats.keys()])
+    for ts in transStatsByMinSim.values():
+        keys |= set([k[1:] for k in ts.keys()])
+    return sorted(keys)
+
+def writeHeader(fh, similarities):
+    hdr = ["target", "transcript", "platform", "chain_supports"]
+    for s in similarities:
+        hdr.append("sim_" + str(int(s * 100)))
+    fileOps.prRow(fh, hdr)
+
+def reportTargetPlatform(fh, genomeStats, transStatsByMinSim, platform,
+                         targetTrans, similarities):
+    key = (platform,) + targetTrans
+    row = [targetTrans[0], targetTrans[1], platform, genomeStats[key].chain_supports]
+    for sim in similarities:
+        try:
+            row.append(transStatsByMinSim[sim][key].numSupports)
+        except KeyError as ex:
+            raise Exception(f"not found: platform={platform} sim={sim} key={key}") from ex
+    fileOps.prRow(fh, row)
+
+def reportTarget(fh, genomeStats, transStatsByMinSim, platforms,
+                 targetTrans, similarities):
+    for platform in platforms:
+        reportTargetPlatform(fh, genomeStats, transStatsByMinSim, platform,
+                             targetTrans, similarities)
+
+def genReports(fh, genomeStats, transStatsByMinSim, platforms,
+               targetsTranses, similarities):
+    writeHeader(fh, similarities)
+    for targetTrans in targetsTranses:
+        reportTarget(fh, genomeStats, transStatsByMinSim, platforms,
+                     targetTrans, similarities)
+
+def transcriptomeFilterCmp(jujuIsoformsTsv, genomeStatsTsvs, transStatsTsvs):
+    fh = sys.stdout
+
+    designs = loadJuJuDesigns(jujuIsoformsTsv)
+    genomeStats = loadAllGenomeStats(genomeStatsTsvs)
+    transStatsByMinSim = loadTransAllStat(designs, transStatsTsvs)
+    platforms = getPlatforms(genomeStats, transStatsByMinSim)
+    targetsTranses = getTargetsTranses(genomeStats, transStatsByMinSim)
+    similarities = sorted(transStatsByMinSim.keys(), reverse=True)
+    genReports(fh, genomeStats, transStatsByMinSim, platforms,
+               targetsTranses, similarities)
+
+
+def main(opts):
+    transcriptomeFilterCmp(opts.jujuIsoformsTsv, opts.genomeStatsTsv, opts.transStatsTsvs)
+
+main(parseArgs())

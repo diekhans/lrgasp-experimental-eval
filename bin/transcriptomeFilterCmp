@@ -54,7 +54,7 @@ def reportTarget(targetStats, first, fh):
 def transcriptomeFilterCmp(statsTsvs, first):
     fh = sys.stdout
     allStats, targets = loadAllStats(statsTsvs)
-    fileOps.prRowv(fh, "target", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
+    fileOps.prRowv(fh, "target", "transcript", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
                    "filter_minSimilarity", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
     for target in targets:
         reportTarget([s[target] for s in allStats], first, fh)

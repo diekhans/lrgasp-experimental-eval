@@ -1,5 +1,5 @@
 target	numSupports	maxSimilarity	minEndsDiff	minIndelBases	status	review
-ALG6+1	31743	0.9973	-1	2	no	bad models, intron 3' at chr1:63,411,128-63,411,194 has GT-AT splice site (U12?), supported by WTC-11 reads. GENCODE and RefSeq.  Model seemed to have force GT-AG 6 bases upstream
+ALG6+1	31743	0.9973	-1	2	no	bad models, intron 3' at chr1:63,411,128-63,411,194 has GT-AT splice site (U12), supported by WTC-11 reads. GENCODE and RefSeq.  Model seemed to have force GT-AG 6 bases upstream by calling intron + target-insertion
 ANAPC16+1	733	1.0	0	0	perfect	
 ANKMY2+1	0	0.0	0	0	no	no alignments
 APMAP+1	248	1.0	0	0	perfect	

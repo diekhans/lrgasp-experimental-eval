@@ -5,7 +5,3 @@ https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+o
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.95.genome.bam
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.90.genome.bam
 
-* check intron chains
-bedtools bamtobed -bed12 <pb+ont-rna-wtc11.sim=1.0.genome.bam |head
-
-bedToCdsBed 
