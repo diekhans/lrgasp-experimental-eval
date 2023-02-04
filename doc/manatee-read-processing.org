@@ -12,9 +12,11 @@ azcopy copy --recursive 'https://stcjuly2022.blob.core.windows.net/st183-lrgasp?
 
 * align reads to genome
 cd align
-(time nice minimap2 -t 64 -ax splice  ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&log&
+(time nice minimap2 -t 64 -ax splice -p map-hifi ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&pb.log&
 
-(time nice minimap2 -t 64 -ax splice  ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&log&
+(time nice minimap2 -t 64 -ax splice -p map-hifi ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&cntl.log&
+samtools index
+ln -f *.bam* ../../../hub/manatee/
 
 
 
@@ -26,17 +28,19 @@ tawk '$3==1{print ">" $1 "/" $5 " " $2;print $9}' ../../../../primers/primer-des
 samtools faidx manatee-amplicons.fa
 
 cd align
-(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&log&
+(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&pb.log&
 nice samtools index -@ 32 pb-rna-manatee-amplicons.bam 
 
 # control self-align
-(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&log&
+(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&cntl.log&
 nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam 
 
 
 
 ** cd analyze
-for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do (../bin/simAmpSupport $plat $sim &; done ; done
+for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
+   ../bin/simAmpSupport $plat $sim &
+done ; done >&log
 
 ../../../bin/transcriptomeSummary pb-rna-manatee.*.tsv >pb-summary.tsv
 
@@ -47,16 +51,28 @@ http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt
 ln -f *.bam* ../../../hub/manatee/
 
 cd hub/manatee
-../../bin/mkBamsTrackDb pb-*rna-manatee.sim**.bam >filtered.trackDb.txt
+../../bin/mkBamsTrackDb *rna-manatee*.bam >filtered.trackDb.txt
+bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt manatee targets.bed dir
 
 
 
 * check intron chains
 cd data/manatee/analyze
-../../../bin/genomeAlignAnalyze ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed ../align/pb-rna-manatee-genome.bed.gz pb-rna-manatee.intron-chains.tsv &
+for prot in pb cntl ; do
+../../../bin/genomeAlignAnalyze ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed ../align/${prot}-rna-manatee-genome.bam --supportBam=${prot}.tmp.bam ${prot}-rna-manatee.intron-chains.tsv &
+done >&log
+
+for prot in pb cntl ; do
+   samtools sort ${prot}.tmp.bam > ${prot}-rna-manatee.intron-chains.bam &
+done
+rm *.tmp.bam
+for prot in pb cntl ; do
+   samtools index ${prot}-rna-manatee.intron-chains.bam &
+done
 
 * final summary
 cd manatee-transcriptome/analyze
 
-../../../bin/summarizeSupport ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.tsv *-manatee.sim=*.tsv >manatee-support.tsv
+../../../bin/summarizeSupport ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.tsv --genomeStatsTsv=../../manatee/analyze/cntl-rna-manatee.intron-chains.tsv *-manatee.sim=*.tsv >manatee-support.tsv
 
+cp manatee-support.tsv ~/public_html/lrgasp/experimental-eval/  

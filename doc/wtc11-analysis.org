@@ -5,3 +5,11 @@ https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+o
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.95.genome.bam
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.90.genome.bam
 
+
+* ALG6+1
+All models are bad. Intron 3' end at chr1:63,411,128-63,411,194 has GT-AT
+splice site.  This is a documented U12 intron, but with a very rare splicing
+pattern.  Supported by WTC-11 reads. GENCODE and RefSeq.  Models and minimap2
+seemed to have force GT-AG 6 bases upstream by calling an intron +
+target-insertion (D).
+

@@ -192,23 +192,21 @@ def processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredR
     for atarget in targets:
         processTarget(bamFh, atarget, readStatsFh, statsFh, filteredBamFh, filteredReadsFh, filters)
 
+def transcriptomeAlignAnalyzeFh(bamFh, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
+                                filters):
+    readStatsFh = readStatsOpen(readStatsTsv) if readStatsTsv is not None else None
+    filteredReadsFh = open(filteredReads, 'w') if filteredReads is not None else None
+    filteredBamFh = pysam.AlignmentFile(filteredBam, 'wb', template=bamFh) if filteredBam is not None else None
+
+    with open(statsTsv, 'w') as statsFh:
+        writeTargetHeader(statsFh)
+        processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredReadsFh, filters)
+
 def transcriptomeAlignAnalyze(transBam, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
                               filters):
     with pysam.AlignmentFile(transBam) as bamFh:
-        readStatsFh = readStatsOpen(readStatsTsv) if readStatsTsv is not None else None
-        filteredBamFh = pysam.AlignmentFile(filteredBam, 'wb', template=bamFh) if filteredBam is not None else None
-        filteredReadsFh = open(filteredReads, 'w') if filteredReads is not None else None
-
-        with open(statsTsv, 'w') as statsFh:
-            writeTargetHeader(statsFh)
-            processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredReadsFh,
-                           filters)
-        if readStatsFh is not None:
-            readStatsFh.close()
-        if filteredBamFh is not None:
-            filteredBamFh.close()
-        if filteredReadsFh is not None:
-            filteredReadsFh.close()
+        transcriptomeAlignAnalyzeFh(bamFh, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
+                                    filters)
 
 def main(opts):
     transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.target, opts.readStatsTsv, opts.filteredBam,

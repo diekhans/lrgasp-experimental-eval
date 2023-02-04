@@ -58,12 +58,8 @@ testHES2+A_introns: mkdirs ${hes2GenomeBam}
 	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
-testHES2+A_introns: mkdirs ${hes2GenomeBam}
-	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
-	diff expected/$@.tsv output/$@.tsv
-
-testALG6+1_introns: mkdirs ${hes2GenomeBam}
-	${genomeAlignAnalyze} input/ALG6+1.isoforms.tsv input/ALG6+1.targets.bed ${hes2GenomeBam} output/$@.tsv
+testALG6+1_introns: mkdirs ${alg6GenomeBam}
+	${genomeAlignAnalyze} input/ALG6+1.isoforms.tsv input/ALG6+1.targets.bed ${alg6GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
 testSummarizeSupport: mkdirs

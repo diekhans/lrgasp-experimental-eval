@@ -23,9 +23,16 @@ html ../empty.html
 
 """
 
-def mkTrackDb(bamFile, pri):
+def mkLabel(bamFile):
     label = osp.basename(osp.splitext(bamFile)[0])
-    track = re.sub("[.=+-]", '_', label)
+    # pb-rna-manatee.sim=1.0.genome -> pb-rna-manatee sim=1.0 genome
+    label = re.sub("([^0-9])[.]([^0-9])", "\\1 \\2", label)
+    label = re.sub("([0-9])[.]([^0-9])", "\\1 \\2", label)
+    return label
+
+def mkTrackDb(bamFile, pri):
+    label = mkLabel(bamFile)
+    track = re.sub("[.=+-]", '_', osp.basename(osp.splitext(bamFile)[0]))
     print(trackTmpl.format(track=track, label=label, bam=bamFile, pri=pri))
 
 def mkTranscriptomeBams(bamFiles):

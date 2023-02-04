@@ -82,8 +82,8 @@ def getPlatforms(genomeStats, transStatsByMinSim):
     keys = set([k[0] for k in genomeStats.keys()])
     for ts in transStatsByMinSim.values():
         keys |= set([k[0] for k in ts.keys()])
-    # shortest name first
-    return sorted(keys, key=lambda k: len(k))
+    # shortest name first, except cntl last
+    return sorted(keys, key=lambda k: 1000 if k == "cntl" else len(k))
 
 def getTargetsTranses(genomeStats, transStatsByMinSim):
     # (platform, target, transcript_id)

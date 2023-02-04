@@ -4,8 +4,8 @@ include ../trackDb/juju.trackDb.txt
 track lrgasp_validation_ont_grch38_brooks_bam
 type bam
 visibility hide
-shortLabel Validation ONT (BAM)
-longLabel Validation ONT (BAM)
+shortLabel Validation ONT
+longLabel Validation ONT
 bigDataUrl ont-rna-wtc11-genome.bam
 priority 100
 html ../empty.html
@@ -13,10 +13,19 @@ html ../empty.html
 track lrgasp_validation_pb_grch38_brooks_bam
 type bam
 visibility hide
-shortLabel Validation PB (BAM)
-longLabel Validation PB (BAM)
+shortLabel Validation PB
+longLabel Validation PB
 bigDataUrl pb-rna-wtc11-genome.bam
-priority 100
+priority 101
+html ../empty.html
+
+track lrgasp_validation_cntl_grch38_brooks_bam
+type bam
+visibility hide
+shortLabel Validation Control
+longLabel Validation Control
+bigDataUrl cntl-rna-wtc11-genome.bam
+priority 102
 html ../empty.html
 
 include filtered.trackDb.txt
