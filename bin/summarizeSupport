@@ -5,13 +5,19 @@ import os.path as osp
 import argparse
 from collections import defaultdict
 from pycbio.sys import fileOps
+from pycbio.sys.symEnum import SymEnum
 from pycbio.tsv import TsvReader
+
+class FilterType(SymEnum):
+    indels = 1
+    similarity = 2
 
 def parseArgs():
     desc = """generate summary table of support"""
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--genomeStatsTsv", action="append",
                         help="""genome statistics files""")
+    parser.add_argument("filterType", type=FilterType, choices=FilterType)
     parser.add_argument("jujuIsoformsTsv",
                         help="""isoforms.tsv with targets and transcripts""")
     parser.add_argument("transStatsTsvs", nargs='+',
@@ -68,74 +74,88 @@ def loadTransStats(designs, statsTsv):
         transStats[(platform, r.target, r.transcript)] = r
     return transStats
 
-def loadTransAllStat(designs, statsTsvs):
-    transStatsByMinSim = defaultdict(dict)
+def getFilterValue(filterType, entry):
+    if filterType == FilterType.indels:
+        return entry.filter_maxIndelBases
+    else:
+        return entry.filter_minSimilarity
+
+def loadTransAllStat(designs, filterType, statsTsvs):
+    transStatsByFilter = defaultdict(dict)
     for st in statsTsvs:
         s = loadTransStats(designs, st)
         entry = next(iter(s.values()))
-        transStatsByMinSim[entry.filter_minSimilarity].update(s)
-    transStatsByMinSim.default_factory = None
-    return transStatsByMinSim
+        transStatsByFilter[getFilterValue(filterType, entry)].update(s)
+    transStatsByFilter.default_factory = None
+    return transStatsByFilter
 
-def getPlatforms(genomeStats, transStatsByMinSim):
+def getPlatforms(genomeStats, transStatsByFilter):
     # (platform, target, transcript_id)
     keys = set([k[0] for k in genomeStats.keys()])
-    for ts in transStatsByMinSim.values():
+    for ts in transStatsByFilter.values():
         keys |= set([k[0] for k in ts.keys()])
     # shortest name first, except cntl last
     return sorted(keys, key=lambda k: 1000 if k == "cntl" else len(k))
 
-def getTargetsTranses(genomeStats, transStatsByMinSim):
+def getTargetsTranses(genomeStats, transStatsByFilter):
     # (platform, target, transcript_id)
     keys = set([k[1:] for k in genomeStats.keys()])
-    for ts in transStatsByMinSim.values():
+    for ts in transStatsByFilter.values():
         keys |= set([k[1:] for k in ts.keys()])
     return sorted(keys)
 
-def writeHeader(fh, similarities):
+def writeHeader(fh, filterType, filterValues):
     hdr = ["target", "transcript", "platform", "chain_supports"]
-    for s in similarities:
-        hdr.append("sim_" + str(int(s * 100)))
+    if filterType == FilterType.indels:
+        for s in filterValues:
+            hdr.append("indel_" + str(s))
+    else:
+        for s in filterValues:
+            hdr.append("sim_" + str(int(s * 100)))
     fileOps.prRow(fh, hdr)
 
-def reportTargetPlatform(fh, genomeStats, transStatsByMinSim, platform,
-                         targetTrans, similarities):
+def reportTargetPlatform(fh, genomeStats, transStatsByFilter, platform,
+                         targetTrans, filterValues):
     key = (platform,) + targetTrans
     row = [targetTrans[0], targetTrans[1], platform, genomeStats[key].chain_supports]
-    for sim in similarities:
+    for sim in filterValues:
         try:
-            row.append(transStatsByMinSim[sim][key].numSupports)
+            row.append(transStatsByFilter[sim][key].numSupports)
         except KeyError as ex:
             raise Exception(f"not found: platform={platform} sim={sim} key={key}") from ex
     fileOps.prRow(fh, row)
 
-def reportTarget(fh, genomeStats, transStatsByMinSim, platforms,
-                 targetTrans, similarities):
+def reportTarget(fh, genomeStats, transStatsByFilter, platforms,
+                 targetTrans, filterValues):
     for platform in platforms:
-        reportTargetPlatform(fh, genomeStats, transStatsByMinSim, platform,
-                             targetTrans, similarities)
+        reportTargetPlatform(fh, genomeStats, transStatsByFilter, platform,
+                             targetTrans, filterValues)
 
-def genReports(fh, genomeStats, transStatsByMinSim, platforms,
-               targetsTranses, similarities):
-    writeHeader(fh, similarities)
+def genReports(fh, filterType, genomeStats, transStatsByFilter, platforms,
+               targetsTranses, filterValues):
+    writeHeader(fh, filterType, filterValues)
     for targetTrans in targetsTranses:
-        reportTarget(fh, genomeStats, transStatsByMinSim, platforms,
-                     targetTrans, similarities)
+        reportTarget(fh, genomeStats, transStatsByFilter, platforms,
+                     targetTrans, filterValues)
 
-def transcriptomeFilterCmp(jujuIsoformsTsv, genomeStatsTsvs, transStatsTsvs):
+def transcriptomeFilterCmp(filterType, jujuIsoformsTsv, genomeStatsTsvs, transStatsTsvs):
     fh = sys.stdout
 
     designs = loadJuJuDesigns(jujuIsoformsTsv)
     genomeStats = loadAllGenomeStats(genomeStatsTsvs)
-    transStatsByMinSim = loadTransAllStat(designs, transStatsTsvs)
-    platforms = getPlatforms(genomeStats, transStatsByMinSim)
-    targetsTranses = getTargetsTranses(genomeStats, transStatsByMinSim)
-    similarities = sorted(transStatsByMinSim.keys(), reverse=True)
-    genReports(fh, genomeStats, transStatsByMinSim, platforms,
-               targetsTranses, similarities)
+    transStatsByFilter = loadTransAllStat(designs, filterType, transStatsTsvs)
+    platforms = getPlatforms(genomeStats, transStatsByFilter)
+    targetsTranses = getTargetsTranses(genomeStats, transStatsByFilter)
+    if filterType == FilterType.indels:
+        filterValues = sorted(transStatsByFilter.keys(), reverse=False)
+    else:
+        filterValues = sorted(transStatsByFilter.keys(), reverse=True)
+    genReports(fh, filterType, genomeStats, transStatsByFilter, platforms,
+               targetsTranses, filterValues)
 
 
 def main(opts):
-    transcriptomeFilterCmp(opts.jujuIsoformsTsv, opts.genomeStatsTsv, opts.transStatsTsvs)
+    transcriptomeFilterCmp(opts.filterType, opts.jujuIsoformsTsv, opts.genomeStatsTsv,
+                           opts.transStatsTsvs)
 
 main(parseArgs())

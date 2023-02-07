@@ -14,6 +14,7 @@ test: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
 	testSimilarity99 testSimilarity95 \
 	testSummary testFilterCmp testFilterFirstCmp \
 	testHES2+A_introns testALG6+1_introns \
+	testHES2+A_introns_indel \
 	testSummarizeSupport
 
 testHES2+A: ${hes2AmpliconsBam}
@@ -58,13 +59,17 @@ testHES2+A_introns: mkdirs ${hes2GenomeBam}
 	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
+testHES2+A_introns_indel: mkdirs ${hes2GenomeBam}
+	${genomeAlignAnalyze} --maxIndelBases=2 input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
+	diff expected/$@.tsv output/$@.tsv
+
 testALG6+1_introns: mkdirs ${alg6GenomeBam}
 	${genomeAlignAnalyze} input/ALG6+1.isoforms.tsv input/ALG6+1.targets.bed ${alg6GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
 testSummarizeSupport: mkdirs
 	cp expected/testHES2+A_introns.tsv output/pb-genome.tsv
-	${summarizeSupport} input/HES2+A.isoforms.tsv --genomeStatsTsv=output/pb-genome.tsv expected/pb-testSimilarity95.stats.tsv expected/pb-testSimilarity99.stats.tsv >output/$@.tsv
+	${summarizeSupport} similarity input/HES2+A.isoforms.tsv --genomeStatsTsv=output/pb-genome.tsv expected/pb-testSimilarity95.stats.tsv expected/pb-testSimilarity99.stats.tsv >output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
 ${hes2AmpliconsBam}: input/HES2+A.amplicon.sam mkdirs

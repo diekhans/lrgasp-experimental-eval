@@ -13,3 +13,6 @@ pattern.  Supported by WTC-11 reads. GENCODE and RefSeq.  Models and minimap2
 seemed to have force GT-AG 6 bases upstream by calling an intron +
 target-insertion (D).
 
+
+
+Error querying alignments for: pb+ont-rna-wtc11.sim=0.98.genome.bam Error message: Unknown BAM index file type: CRAI in null

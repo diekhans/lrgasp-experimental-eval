@@ -2,18 +2,22 @@
 set -beEu -o pipefail
 
 if [ $# != 2 ] ; then
-    echo "wrong # args: $0 prot minSimilarity" >&2
+    echo "wrong # args $0 prot maxIndelBases" >&2
     exit 1
 fi
 
 prot=$1 ; shift
-minSimilarity=$1 ; shift
+maxIndelBases=$1 ; shift
+maxEndsDiff=${maxIndelBases}
 
 mydir=$(dirname $(which $0))
 inBam=${mydir}/../align/${prot}-rna-wtc11-amplicons.bam
 genomeBam=${mydir}/../../grch38/align/${prot}-rna-wtc11-genome.bam
 
-outBase="${prot}-rna-wtc11.sim=${minSimilarity}"
-filtOpts="--minSimilarity=${minSimilarity}"
+outBase="${prot}-rna-wtc11.indel=${maxIndelBases}"
+filtOpts="--maxEndsDiff=${maxEndsDiff} --maxIndelBases=${maxIndelBases}"
+
 
 source ${mydir}/ampSupportCommon.sh
+
+

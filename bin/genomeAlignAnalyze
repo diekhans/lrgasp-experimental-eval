@@ -3,7 +3,7 @@
 from collections import defaultdict
 import argparse
 import pysam
-import subprocess
+import pipettor
 from pycbio.sys import fileOps
 from pycbio.hgdata.bed import BedTable
 from pycbio.hgdata.cigar import Cigar
@@ -14,6 +14,8 @@ def parseArgs():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--target",
                         help="""only analyze this target name""")
+    parser.add_argument("--maxIndelBases", type=int, default=None,
+                        help="""maximum indel bases filter""")
     parser.add_argument("--supportBam",
                         help="""output BAMs of those supporting the chain""")
     parser.add_argument("jujuIsoformsTsv",
@@ -60,56 +62,72 @@ def getReadChain(aln):
             tNext += run.count
     return tuple(chain)
 
-def countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh):
+def filterAlign(aln, maxIndelBases):
+    if maxIndelBases is None:
+        return True
+    baseCnts, blkCnts = aln.get_cigar_stats()
+    qDelBases = baseCnts[pysam.CDEL]
+    tDelBases = baseCnts[pysam.CINS]
+    return (qDelBases + tDelBases) <= maxIndelBases
+
+def alnSupports(aln, ampliconChain, maxIndelBases):
+    if not filterAlign(aln, maxIndelBases):
+        return False
+    readChain = getReadChain(aln)
+    return readChain == ampliconChain
+
+def countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh, maxIndelBases):
     supportCnt = 0
     for aln in readsBamFh.fetch(reference=targetsBed.chrom, start=targetsBed.start, end=targetsBed.end):
-        readChain = getReadChain(aln)
-        if readChain == ampliconChain:
+        if alnSupports(aln, ampliconChain, maxIndelBases):
             supportCnt += 1
             if supportBamFh is not None:
                 supportBamFh.write(aln)
     return supportCnt
 
-def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh):
+def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases):
     targetsBeds = targetsBedTbl.getByName(tdesign.transcript_id)
     if len(targetsBeds) == 0:
         raise Exception(f"no target BED found for {tdesign.transcript_id}")
     targetsBed = targetsBeds[0]
     ampliconChain = getThickIntronChain(targetsBed)
-    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh)
+    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh, maxIndelBases)
     fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
 
 
-def processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh):
+def processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases):
     for tdesign in designs[targetId]:
         if tdesign.pri == 1:
-            processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh)
+            processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases)
 
-def processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target=None, supportBamFh=None):
+def processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target=None, supportBamFh=None, maxIndelBases=None):
     targets = [target] if target is not None else sorted(designs.keys())
     for targetId in targets:
         try:
-            processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh)
+            processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases)
         except Exception as ex:
             raise Exception(f"target {targetId} failed") from ex
 
-def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, statsTsv, target, supportBam):
+def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, statsTsv, target, supportBam, maxIndelBases):
     designs = loadJuJuDesigns(jujuIsoformsTsv)
     targetsBedTbl = BedTable(targetsBed, nameIdx=True)
     readsBamFh = pysam.AlignmentFile(readsBam)
+    supportBamSortFh = None
     supportBamFh = None
     if supportBam is not None:
-        supportBamFh = pysam.AlignmentFile(supportBam, 'wb', template=readsBamFh)
+        supportBamSortFh = pipettor.Popen(["samtools", "sort"], "w", stdout=supportBam)
+        supportBamFh = pysam.AlignmentFile(supportBamSortFh, 'wb', template=readsBamFh)
 
     with open(statsTsv, 'w') as statsFh:
         fileOps.prRowv(statsFh, "target_id", "transcript_id", "chain_supports")
-        processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target, supportBamFh)
+        processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target, supportBamFh, maxIndelBases)
 
     if supportBam is not None:
         supportBamFh.close()
+        supportBamSortFh.close()
 
 def main(opts):
     genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.targetsBed, opts.readsBam, opts.statsTsv,
-                       opts.target, opts.supportBam)
+                       opts.target, opts.supportBam, opts.maxIndelBases)
 
 main(parseArgs())
