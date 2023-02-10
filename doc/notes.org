@@ -23,6 +23,7 @@ https://docs.google.com/spreadsheets/d/15B8oCs_SnOgBL6UGkD7IpjGNZgb3TZS6et_UbFtC
 
 ** number of aligned reads >= 50% coverage
 
+
 * highlight zero control cells
 
 =and($2:$2=TODAY(),INDIRECT("R"&ROW()&"C"&COLUMN(),FALSE)="")
