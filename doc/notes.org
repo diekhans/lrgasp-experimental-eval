@@ -22,3 +22,26 @@ from gloria
 https://docs.google.com/spreadsheets/d/15B8oCs_SnOgBL6UGkD7IpjGNZgb3TZS6et_UbFtCgYo/edit#gid=0
 
 ** number of aligned reads >= 50% coverage
+
+* highlight zero control cells
+
+=and($2:$2=TODAY(),INDIRECT("R"&ROW()&"C"&COLUMN(),FALSE)="")
+
+
+
+
+If I want to check if current cell is empty this is working for me:
+
+=ISBLANK(INDIRECT(ADDRESS(ROW(),COLUMN())))
+
+You will also need to enable "Iterative Calculations". Please go to File > Spreadsheet Settings and enable on Calculation tab Iterative Calculation – 
+alexopoulos7
+Jul 12, 2018 at 10:47
+1
+I used ; instead of , to separate parameters – 
+piertoni
+Oct 15, 2021 at 8:19
+
+=INDIRECT("A1")
+
+=INDIRECT("C"&ROW())

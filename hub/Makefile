@@ -7,7 +7,7 @@ twoBit_manatee = ../../primers/primer-design/data/manatee/manatee.2bit
 
 genomes = hg38 manatee
 
-all: build
+all: 
 	hubCheck ${hubUrl}
 
 build: ${genomes:%=build_%}

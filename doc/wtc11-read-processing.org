@@ -27,7 +27,7 @@ para freeBatch -batch=b1
 para create -ram=32g -batch=b1 jobs.para
 para try -batch=b1
 
-# combine into BAM
+y# combine into BAM
  
 nice samtools merge --output-fmt BAM --threads 32 -c -p  ont-rna-wtc11-genome.bam tmp/*.sam
 
@@ -43,12 +43,15 @@ uniq  4880899
 
 * align PB reads to genome
 cd align
-(time nice minimap2 -t 64 -ax splice -p map-hifi /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&log&
+(time nice minimap2 -t 64 -ax splice:hq /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&log&
 
 nice samtools merge -@ 64 -O BAM -o pb+ont-rna-wtc11-genome.bam pb-rna-wtc11-genome.bam ont-rna-wtc11-genome.bam >&log&
 
 * control alignment of amplicons to genome
-(time nice minimap2 -t 64 -ax splice -p map-hifi /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-genome.bam)>&cntl.log&
+(time nice minimap2 -t 64 -ax splice:hq /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-genome.bam)>&cntl.log&
+
+for f in *.bam ; do samtools index $f & done
+ln -f *.bam* ../../../hub/hg38/
 
 * generate transcriptome of targeted loci
 cd grch38-transcriptome/reference
@@ -73,39 +76,21 @@ nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam
 
 * control alignment of amplicons to amplicons
 cd control/grch38-transcriptome/
-(time nice minimap2 -t 64 -ax splice -p map-hifi ../reference/wtc11-amplicons.fa   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-amplicons.bam)>&log&
+(time nice minimap2 -t 64 -ax splice ../reference/wtc11-amplicons.fa   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-amplicons.bam)>&log&
 
 
+* intron chain with indel=2 filter
+cd data/grch38/analyze
+for prot in pb ont pb+ont cntl ; do
+   ../../../bin/genomeAlignAnalyze --maxIndelBases=2 ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/${prot}-rna-wtc11-genome.bam --supportBam=${prot}-rna-wtc11.intron-chains.indel=2.bam ${prot}-rna-wtc11.intron-chains.indel=2.tsv  &
+done >&2.log
 
-* debugging
-../../../bin/transcriptomeAlignAnalyze --target=BTG2+B --minSimilarity=0.1 --readStatsTsv=debug.sim=0.1.rstats.tsv --filteredBam=debug.sim=0.1.bam ../align/ont-rna-wtc11-amplicons.bam debug.sim=0.1.tsv &
-* analysis (OLD)
-cd analyze
-for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb ont pb+ont cntl ; do
-   nice ../bin/simAmpSupport ${plat} ${sim}&
-done ; done >&log   
-
-../../../bin/transcriptomeSummary cntl-wtc11.sim=*.tsv >ont-summary.tsv &
-../../../bin/transcriptomeSummary ont-rna-wtc11.sim=*.tsv >ont-summary.tsv &
-../../../bin/transcriptomeSummary pb-rna-wtc11.sim=*.tsv >pb-summary.tsv &
-../../../bin/transcriptomeSummary pb+ont-rna-wtc11.sim=*.tsv >pb+ont-summary.tsv &
-
-
-../../../bin/transcriptomeFilterCmp --first ont-rna-wtc11.sim=*.tsv >ont.cmp.tsv &
-../../../bin/transcriptomeFilterCmp --first pb-rna-wtc11.sim=*.tsv >pb.cmp.tsv &
-../../../bin/transcriptomeFilterCmp --first pb+ont-rna-wtc11.sim=*.tsv >pb+ont.cmp.tsv &
-
+for prot in pb ont pb+ont cntl ; do
+   samtools index ${prot}-rna-wtc11.intron-chains.indel=2.bam &
+done
 ln -f *.bam* ../../../hub/hg38/
 
-
-
-* 
-* -------------
-
-
-* intron chain no indel filter
-cd grch38/analyze
-
+* intron chain ( no indel filter)
 cd data/grch38/analyze
 for prot in pb ont pb+ont cntl ; do
    ../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/${prot}-rna-wtc11-genome.bam --supportBam=${prot}-rna-wtc11.intron-chains.indel=any.bam ${prot}-rna-wtc11.intron-chains.indel=any.tsv  &
@@ -113,19 +98,6 @@ done >&log
 
 for prot in pb ont pb+ont cntl ; do
    samtools index ${prot}-rna-wtc11.intron-chains.indel=any.bam &
-done
-ln -f *.bam* ../../../hub/hg38/
-
-* intron chain with indel=2 filter
-cd grch38/analyze
-
-cd data/grch38/analyze
-for prot in pb ont pb+ont cntl ; do
-   ../../../bin/genomeAlignAnalyze --maxIndelBases=2 ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/${prot}-rna-wtc11-genome.bam --supportBam=${prot}-rna-wtc11.intron-chains.indel=2.bam ${prot}-rna-wtc11.intron-chains.indel=2.tsv  &
-done >&2.log
-
-for prot in pb ont pb+ont cntl ; do
-   samtools index -@ 32 ${prot}-rna-wtc11.intron-chains.indel=2.bam &
 done
 ln -f *.bam* ../../../hub/hg38/
 
@@ -149,10 +121,46 @@ bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validatio
 ** cd grch38-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=2.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=2.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=2.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv *-wtc11.indel=*.tsv >wtc11-support.indel.tsv
 ln -f *.bam* ../../../hub/hg38/
- cp wtc11-support.indel.tsv ~/public_html/lrgasp/experimental-eval/
+ cp wtc11-support.indel.tsv  ../../../analyze/
 
 ** cd grch38-transcriptome/analyze.sim
 ../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
 ln -f *.bam* ../../../hub/hg38/
 
  cp wtc11-support.sim.tsv ~/public_html/lrgasp/experimental-eval/
+ cp wtc11-support.sim.tsv ../../../analyze/
+
+
+* experiment with different alignments on controls.
+** data/grch38/cntl-expr1.tmp  genome alignments
+
+*** minimap2 splice;hg
+(nice minimap2 -t 64 -ax splice:hq  /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-mm-splicehq.bam) >&1.log&
+samtools index cntl-mm-splicehq.bam 
+../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed cntl-mm-splicehq.bam --supportBam=cntl-mm-splicehq.support.bam cntl-mm-splicehq.support.tsv
+
+tmlr join -j target_id,transcript_id --rp sphq_ -f ../analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv cntl-mm-splicehq.support.tsv >cntl-mm-cmp.tsv
+tmlr filter '$chain_supports !=$sphq_chain_supports' cntl-mm-cmp.tsv > cntl-mm-cmp.diff.tsv
+
+# only adds IGF2BP3+1
+
+*** blat
+blat -fine -ooc=/hive/data/genomes/hg38/jkStuff/hg38.11.ooc -q=rna  ../reference/lrgasp_grch38_sirvs.fasta.gz ../../grch38-transcriptome/reference/wtc11-amplicons.fa cntl-blat.raw.psl &
+pslCDnaFilter -maxAligns=1 cntl-blat.raw.psl  cntl-blat.filt1.psl
+  cntl-blat.filt1.psl	168
+# psl2sam.pl doesn't flag introns, so tools don't work; just look at stats
+
+faSize -detailed ../../grch38-transcriptome/reference/wtc11-amplicons.fa >wtc11-amplicons.sizes
+pslStats -tsv -queryStats -queries=wtc11-amplicons.sizes cntl-blat.filt1.psl cntl-blat.filt1.qstats
+
+# pull out the imprefect ones
+tmlr filter '$minIdent < 1.0 ||  $minQCover < 1.0' cntl-blat.filt1.qstats  >cntl-blat.filt1.imperfect.qstats
+pslSelect -queries=<(cut -f 1 cntl-blat.filt1.imperfect.qstats) cntl-blat.filt1.psl  cntl-blat.filt1.imperfect.psl 
+    cntl-blat.filt1.imperfect.psl	21
+pslFmt cntl-blat.filt1.imperfect.psl  > cntl-blat.filt1.imperfect.txt
+
+# imperfect aligments are a small number of bases unaligned at the start/end
+
+
+* spreadsheet coloring
+oocustom format formula: =mod(row()-2,4)=0
