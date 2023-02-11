@@ -163,4 +163,8 @@ pslFmt cntl-blat.filt1.imperfect.psl  > cntl-blat.filt1.imperfect.txt
 
 
 * spreadsheet coloring
-oocustom format formula: =mod(row()-2,4)=0
+column D (plotform) is hidden and can't un-hide for some reason, so it is duplicated as row E
+custom format formulas:
+=and(mod(row()-2,8) <= 3,$F1:K1=0)
+=and(mod(row()-2,8) > 3,$F1:K1=0)
+=mod(row()-2,8) <= 3

@@ -110,3 +110,9 @@ bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validatio
 
  cp manatee-support.sim.tsv ~/public_html/lrgasp/experimental-eval/
  cp manatee-support.sim.tsv ../../../analyze/
+
+* spreadsheet coloring
+custom format formulas:
+=and(mod(row()-2,4) <= 1,$E1:K1=0)
+=and(mod(row()-2,4) > 1,$E1:K1=0)
+=mod(row()-2,2)=0
