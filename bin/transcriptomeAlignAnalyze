@@ -35,14 +35,15 @@ def parseArgs():
     parser.add_argument("statsTsv",
                         help="""output statistics to this file""")
     opts = parser.parse_args()
-    opts.filters = Filters(maxEndsDiff=opts.maxEndsDiff,
+    opts.filters = Filters(target=opts.target,
+                           maxEndsDiff=opts.maxEndsDiff,
                            maxIndelBases=opts.maxIndelBases,
                            maxIndelBaseRate=opts.maxIndelBaseRate,
                            minSimilarity=opts.minSimilarity)
     return opts
 
 
-class Filters(namedtuple("Filters", ("maxEndsDiff", "maxIndelBases",
+class Filters(namedtuple("Filters", ("target", "maxEndsDiff", "maxIndelBases",
                                      "maxIndelBaseRate", "minSimilarity"))):
     __slots__ = ()
 
@@ -187,13 +188,13 @@ def processTarget(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredRe
         readStatsWrite(target, readsStats, readStatsFh)
     writeTargetStats(target, readsStats, filters, statsFh)
 
-def processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredReadsFh,
+def processTargets(bamFh, readStatsFh, statsFh, filteredBamFh, filteredReadsFh,
                    filters):
-    targets = (target,) if target is not None else bamFh.references
+    targets = (filters.target,) if filters.target is not None else bamFh.references
     for atarget in targets:
         processTarget(bamFh, atarget, readStatsFh, statsFh, filteredBamFh, filteredReadsFh, filters)
 
-def transcriptomeAlignAnalyzeFh(bamFh, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
+def transcriptomeAlignAnalyzeFh(bamFh, statsTsv, readStatsTsv, filteredBam, filteredReads,
                                 filters):
     readStatsFh = readStatsOpen(readStatsTsv) if readStatsTsv is not None else None
     filteredReadsFh = open(filteredReads, 'w') if filteredReads is not None else None
@@ -201,16 +202,16 @@ def transcriptomeAlignAnalyzeFh(bamFh, statsTsv, target, readStatsTsv, filteredB
 
     with open(statsTsv, 'w') as statsFh:
         writeTargetHeader(statsFh)
-        processTargets(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredReadsFh, filters)
+        processTargets(bamFh, readStatsFh, statsFh, filteredBamFh, filteredReadsFh, filters)
 
-def transcriptomeAlignAnalyze(transBam, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
+def transcriptomeAlignAnalyze(transBam, statsTsv, readStatsTsv, filteredBam, filteredReads,
                               filters):
     with pysam.AlignmentFile(transBam) as bamFh:
-        transcriptomeAlignAnalyzeFh(bamFh, statsTsv, target, readStatsTsv, filteredBam, filteredReads,
+        transcriptomeAlignAnalyzeFh(bamFh, statsTsv, readStatsTsv, filteredBam, filteredReads,
                                     filters)
 
 def main(opts):
-    transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.target, opts.readStatsTsv, opts.filteredBam,
+    transcriptomeAlignAnalyze(opts.transBam, opts.statsTsv, opts.readStatsTsv, opts.filteredBam,
                               opts.filteredReads, opts.filters)
 
 main(parseArgs())

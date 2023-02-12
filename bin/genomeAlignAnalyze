@@ -4,6 +4,7 @@ from collections import defaultdict
 import argparse
 import pysam
 import pipettor
+from collections import namedtuple
 from pycbio.sys import fileOps
 from pycbio.hgdata.bed import BedTable
 from pycbio.hgdata.cigar import Cigar
@@ -27,7 +28,15 @@ def parseArgs():
     parser.add_argument("statsTsv",
                         help="""output statistics to this file""")
     opts = parser.parse_args()
+    opts.filters = Filters(target=opts.target,
+                           maxIndelBases=opts.maxIndelBases)
+
     return opts
+
+class Filters(namedtuple("Filters", ("target",
+                                     "maxIndelBases"))):
+    __slots__ = ()
+
 
 def loadJuJuDesigns(jujuIsoformsTsv):
     # target_id primer_id pri track transcript_id amplicon_coords amplicon_len amplicon_exons amplicon
@@ -62,53 +71,53 @@ def getReadChain(aln):
             tNext += run.count
     return tuple(chain)
 
-def filterAlign(aln, maxIndelBases):
-    if maxIndelBases is None:
+def filterAlign(aln, filters):
+    if filters.maxIndelBases is None:
         return True
     baseCnts, blkCnts = aln.get_cigar_stats()
     qDelBases = baseCnts[pysam.CDEL]
     tDelBases = baseCnts[pysam.CINS]
-    return (qDelBases + tDelBases) <= maxIndelBases
+    return (qDelBases + tDelBases) <= filters.maxIndelBases
 
-def alnSupports(aln, ampliconChain, maxIndelBases):
-    if not filterAlign(aln, maxIndelBases):
+def alnSupports(aln, ampliconChain, filters):
+    if not filterAlign(aln, filters):
         return False
     readChain = getReadChain(aln)
     return readChain == ampliconChain
 
-def countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh, maxIndelBases):
+def countSupports(targetsBed, ampliconChain, readsBamFh, filters, supportBamFh):
     supportCnt = 0
     for aln in readsBamFh.fetch(reference=targetsBed.chrom, start=targetsBed.start, end=targetsBed.end):
-        if alnSupports(aln, ampliconChain, maxIndelBases):
+        if alnSupports(aln, ampliconChain, filters):
             supportCnt += 1
             if supportBamFh is not None:
                 supportBamFh.write(aln)
     return supportCnt
 
-def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases):
+def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh):
     targetsBeds = targetsBedTbl.getByName(tdesign.transcript_id)
     if len(targetsBeds) == 0:
         raise Exception(f"no target BED found for {tdesign.transcript_id}")
     targetsBed = targetsBeds[0]
     ampliconChain = getThickIntronChain(targetsBed)
-    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh, supportBamFh, maxIndelBases)
+    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh, filters, supportBamFh)
     fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
 
 
-def processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases):
+def processTarget(targetId, designs, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh):
     for tdesign in designs[targetId]:
         if tdesign.pri == 1:
-            processTargetTrans(tdesign, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases)
+            processTargetTrans(tdesign, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh)
 
-def processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target=None, supportBamFh=None, maxIndelBases=None):
-    targets = [target] if target is not None else sorted(designs.keys())
+def processTargets(designs, targetsBedTbl, readsBamFh, filters, statsFh, target=None, supportBamFh=None):
+    targets = [filters.target] if filters.target is not None else sorted(designs.keys())
     for targetId in targets:
         try:
-            processTarget(targetId, designs, targetsBedTbl, readsBamFh, statsFh, supportBamFh, maxIndelBases)
+            processTarget(targetId, designs, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh)
         except Exception as ex:
             raise Exception(f"target {targetId} failed") from ex
 
-def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, statsTsv, target, supportBam, maxIndelBases):
+def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, filters, statsTsv, supportBam):
     designs = loadJuJuDesigns(jujuIsoformsTsv)
     targetsBedTbl = BedTable(targetsBed, nameIdx=True)
     readsBamFh = pysam.AlignmentFile(readsBam)
@@ -120,14 +129,14 @@ def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, statsTsv, target, 
 
     with open(statsTsv, 'w') as statsFh:
         fileOps.prRowv(statsFh, "target_id", "transcript_id", "chain_supports")
-        processTargets(designs, targetsBedTbl, readsBamFh, statsFh, target, supportBamFh, maxIndelBases)
+        processTargets(designs, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh)
 
     if supportBam is not None:
         supportBamFh.close()
         supportBamSortFh.close()
 
 def main(opts):
-    genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.targetsBed, opts.readsBam, opts.statsTsv,
-                       opts.target, opts.supportBam, opts.maxIndelBases)
+    genomeAlignAnalyze(opts.jujuIsoformsTsv, opts.targetsBed, opts.readsBam, opts.filters,
+                       opts.statsTsv, opts.supportBam)
 
 main(parseArgs())
