@@ -16,6 +16,8 @@ def parseArgs():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--target",
                         help="""only analyze this target name""")
+    parser.add_argument("--filterStrand", action="store_true", default=False,
+                        help="""only keep positive-strand alignments""")
     parser.add_argument("--maxEndsDiff", type=int, default=None,
                         help="""maximum variation in ends filter""")
     parser.add_argument("--maxIndelBases", type=int, default=None,
@@ -36,6 +38,7 @@ def parseArgs():
                         help="""output statistics to this file""")
     opts = parser.parse_args()
     opts.filters = Filters(target=opts.target,
+                           filterStrand=opts.filterStrand,
                            maxEndsDiff=opts.maxEndsDiff,
                            maxIndelBases=opts.maxIndelBases,
                            maxIndelBaseRate=opts.maxIndelBaseRate,
@@ -43,7 +46,7 @@ def parseArgs():
     return opts
 
 
-class Filters(namedtuple("Filters", ("target", "maxEndsDiff", "maxIndelBases",
+class Filters(namedtuple("Filters", ("target", "filterStrand", "maxEndsDiff", "maxIndelBases",
                                      "maxIndelBaseRate", "minSimilarity"))):
     __slots__ = ()
 
@@ -103,7 +106,7 @@ def computeReadStats(targetLen, aln):
                       similarity=round(calcSimilarity(targetLen, aln, alnBases), 4))
 
 def filterReadStats(rstats, filters):
-    if rstats.strand == '-':
+    if filters.filterStrand and (rstats.strand == '-'):
         return False
     if (filters.maxEndsDiff is not None) and ((abs(rstats.qStartOff) > filters.maxEndsDiff) or (abs(rstats.qEndOff) > filters.maxEndsDiff)):
         return False
@@ -140,7 +143,7 @@ def readStatsWrite(target, readsStats, readStatsFh):
 
 def writeTargetHeader(statsFh):
     fileOps.prRowv(statsFh, "target", "transcript", "numSupports", "maxSimilarity", "minEndsDiff", "minIndelBases", "minIndelBaseRate",
-                   "filter_minSimilarity", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate")
+                   "filter_minSimilarity", "filter_maxEndsDiff", "filter_maxIndelBases", "filter_maxIndelBaseRate", "filter_strand")
 
 def maxOffset(rs):
     "maximum offset from 0, maintaining direction"
@@ -179,7 +182,8 @@ def writeTargetStats(target, readsStats, filters, statsFh):
 
     fileOps.prRowv(statsFh, targetId, transId, len(readsStats),
                    *calcReadsStats(readsStats),
-                   filters.minSimilarity, filters.maxEndsDiff, filters.maxIndelBases, filters.maxIndelBases)
+                   filters.minSimilarity, filters.maxEndsDiff, filters.maxIndelBases, filters.maxIndelBases,
+                   'Y' if filters.filterStrand else 'N')
 
 def processTarget(bamFh, target, readStatsFh, statsFh, filteredBamFh, filteredReadsFh,
                   filters):

@@ -13,7 +13,7 @@ all: test
 
 test: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
 	testSimilarity99 testSimilarity95 testANKMY2Sim \
-	testANKMY2Indel \
+	testANKMY2Indel testANKMY2Strand \
 	testSummary testFilterCmp testFilterFirstCmp \
 	testHES2+A_introns testALG6+1_introns \
 	testHES2+A_introns_indel \
@@ -53,6 +53,10 @@ testANKMY2Indel: ${ankmy2AmplicaonBam}
 	${transcriptomeAlignAnalyze} --maxIndelBases=10 $< output/pb-$@.stats.tsv
 	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
 
+testANKMY2Strand: ${ankmy2AmplicaonBam}
+	${transcriptomeAlignAnalyze} --filterStrand --maxIndelBases=5 $< output/pb-$@.stats.tsv
+	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
+
 
 testSummary: mkdirs
 	${transcriptomeSummary} expected/testAll_limits.stats.tsv > output/$@.summary.tsv
@@ -84,19 +88,19 @@ testSummarizeSupport: mkdirs
 	${summarizeSupport} similarity input/HES2+A.isoforms.tsv --genomeStatsTsv=output/pb-genome.tsv expected/pb-testSimilarity95.stats.tsv expected/pb-testSimilarity99.stats.tsv >output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
-${hes2AmpliconsBam}: input/HES2+A.amplicon.sam mkdirs
+${hes2AmpliconsBam}: input/HES2+A.amplicon.sam | mkdirs
 	samtools view -O BAM $< >$@
 	samtools index $@
 
-${ankmy2AmplicaonBam}: input/ANKMY2+1.amplicon.sam mkdirs
+${ankmy2AmplicaonBam}: input/ANKMY2+1.amplicon.sam | mkdirs
 	samtools view -O BAM $< >$@
 	samtools index $@
 
-${hes2GenomeBam}: input/HES2+A.genome.sam mkdirs
+${hes2GenomeBam}: input/HES2+A.genome.sam | mkdirs
 	samtools view -b $< > $@
 	samtools index $@
 
-${alg6GenomeBam}: input/ALG6+1.genome.sam mkdirs
+${alg6GenomeBam}: input/ALG6+1.genome.sam | mkdirs
 	samtools view -b $< > $@
 	samtools index $@
 

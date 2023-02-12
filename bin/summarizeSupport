@@ -65,7 +65,8 @@ def loadTransStats(designs, statsTsv):
                "maxSimilarity": floatOrNone,
                "filter_minSimilarity": floatOrNone,
                "target": str,
-               "transcript": str}
+               "transcript": str,
+               "filter_strand": bool}
     platform = parseStatsPlatform(statsTsv)
     transStats = {}
     for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone):

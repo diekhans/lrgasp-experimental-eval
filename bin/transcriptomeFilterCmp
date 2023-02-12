@@ -25,7 +25,8 @@ def loadStats(statsTsv):
                "filter_maxIndelBaseRate": floatOrNone,
                "maxSimilarity": floatOrNone,
                "filter_minSimilarity": floatOrNone,
-               "target": str}
+               "target": str,
+               "filter_strand": bool}
     return {r.target: r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)}
 
 def loadAllStats(statsTsvs):

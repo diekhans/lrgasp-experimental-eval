@@ -23,7 +23,8 @@ def countStats(statsTsv, fh):
                "filter_maxIndelBaseRate": floatOrNone,
                "maxSimilarity": float,
                "filter_minSimilarity": floatOrNone,
-               "target": str}
+               "target": str,
+               "filter_strand": bool}
     recs = [r for r in TsvReader(statsTsv, typeMap=typeMap, defaultColType=intOrNone)]
     rec0 = recs[0]
 

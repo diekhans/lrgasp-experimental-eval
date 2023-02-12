@@ -1,2 +1,2 @@
-target	transcript	numSupports	maxSimilarity	minEndsDiff	minIndelBases	minIndelBaseRate	filter_minSimilarity	filter_maxEndsDiff	filter_maxIndelBases	filter_maxIndelBaseRate
-ANKMY2+1		1	0.8084	433	0	0.0			10	10
+target	transcript	numSupports	maxSimilarity	minEndsDiff	minIndelBases	minIndelBaseRate	filter_minSimilarity	filter_maxEndsDiff	filter_maxIndelBases	filter_maxIndelBaseRate	filter_strand
+ANKMY2+1		2	1.0	0	0	0.0			10	10	N
