@@ -31,7 +31,7 @@ nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam
 ln -s *.bam* ../../../hub/manatee-amplicons/
 
 
-** cd analyze
+** cd analyze.sim
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
    ../bin/simAmpSupport $plat $sim &
 done ; done >&log
@@ -86,12 +86,14 @@ for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
    ../bin/simAmpSupport $plat $sim &
 done ; done >&log
 ln -f *.bam* ../../../hub/manatee/
+cp manatee-support.sim.tsv ../../../analyze/
 
 * data/manatee-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb cntl ; do
    nice ../bin/indelAmpSupport ${plat} ${indel}&
 done; done >&log   
 ln -f *.bam* ../../../hub/manatee/
+cp manatee-support.indel.tsv ../../../analyze/
 
 * browser
 cd hub/manatee
@@ -103,13 +105,11 @@ bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validatio
 ** cd manatee-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.indel=2.tsv  --genomeStatsTsv=../../manatee/analyze/cntl-rna-manatee.intron-chains.indel=2.tsv *-manatee.indel=*.tsv >manatee-support.indel.tsv
 
- cp manatee-support.indel.tsv ~/public_html/lrgasp/experimental-eval/
-  cp manatee-support.indel.tsv ../../../analyze/
+ cp manatee-support.indel.tsv ../../../analyze/
 
 ** cd manatee-transcriptome/analyze.sim
 ../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.indel=any.tsv  --genomeStatsTsv=../../manatee/analyze/cntl-rna-manatee.intron-chains.indel=any.tsv *-manatee.sim=*.tsv >manatee-support.sim.tsv
 
- cp manatee-support.sim.tsv ~/public_html/lrgasp/experimental-eval/
  cp manatee-support.sim.tsv ../../../analyze/
 
 * spreadsheet coloring

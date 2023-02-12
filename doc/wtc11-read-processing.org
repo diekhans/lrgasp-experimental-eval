@@ -101,17 +101,18 @@ done >&log
 for prot in pb ont pb+ont cntl ; do
    samtools index ${prot}-rna-wtc11.intron-chains.indel=any.bam &
 done
-ln -f *.bam* ../../../hub/hg38/
 
 * data/grch38-transcriptome/grch38-transcriptome/analyze.sim
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb ont pb+ont cntl ; do
    nice ../bin/simAmpSupport ${plat} ${sim}&
 done ; done >&log   
+ln -f *.bam* ../../../hub/hg38/
 
 * data/grch38-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb ont pb+ont cntl ; do
    nice ../bin/indelAmpSupport ${plat} ${indel}&
 done; done >&log   
+ln -f *.bam* ../../../hub/hg38/
 
 * browser
 cd hub/hg38
@@ -122,14 +123,12 @@ bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validatio
 
 ** cd grch38-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=2.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=2.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=2.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv *-wtc11.indel=*.tsv >wtc11-support.indel.tsv
-ln -f *.bam* ../../../hub/hg38/
  cp wtc11-support.indel.tsv  ../../../analyze/
 
 ** cd grch38-transcriptome/analyze.sim
 ../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
 ln -f *.bam* ../../../hub/hg38/
 
- cp wtc11-support.sim.tsv ~/public_html/lrgasp/experimental-eval/
  cp wtc11-support.sim.tsv ../../../analyze/
 
 
