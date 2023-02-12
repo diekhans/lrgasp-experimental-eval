@@ -19,6 +19,7 @@ cd reference
 # have multiple amplicons for each target, so add transcript_id
 tawk '$3==1{print ">" $1 "/" $5 " " $2;print $9}' ../../../../primers/primer-design/hub/manatee/juju_designs.manatee.isoforms.tsv  >manatee-amplicons.fa
 samtools faidx manatee-amplicons.fa
+ln -s manatee-amplicons.fa* ../../../hub/manatee-amplicons/
 
 cd align
 (time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&pb.log&
@@ -27,7 +28,7 @@ nice samtools index -@ 32 pb-rna-manatee-amplicons.bam
 # control self-align
 (time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&cntl.log&
 nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam 
-
+ln -s *.bam* ../../../hub/manatee-amplicons/
 
 
 ** cd analyze

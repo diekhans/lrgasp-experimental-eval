@@ -59,7 +59,8 @@ cd grch38-transcriptome/reference
 * amplicons target
 cd reference
 tawk '$3==1{print ">" $1 " " $2;print $9}' ../../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv  >wtc11-amplicons.fa
-samtools faidx wtc11-targets.fa
+samtools faidx wtc11-amplicons.fa 
+ln wtc11-amplicons.fa* ../../../hub/wtc11-amplicons/
 
 ** ONT alignments
 cd align
@@ -73,6 +74,7 @@ nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam
 ** combine
 samtools merge -O BAM -o pb+ont-rna-wtc11-amplicons.bam ont-rna-wtc11-amplicons.bam pb-rna-wtc11-amplicons.bam &
 nice samtools index -@ 32 pb+ont-rna-wtc11-amplicons.bam 
+
 
 * control alignment of amplicons to amplicons
 cd control/grch38-transcriptome/
@@ -168,3 +170,8 @@ custom format formulas:
 =and(mod(row()-2,8) <= 3,$F1:K1=0)
 =and(mod(row()-2,8) > 3,$F1:K1=0)
 =mod(row()-2,8) <= 3
+
+* BUG:
+ANKMY2+1
+PB  m64152e_230121_000958/158206111/ccs
+seems to cover amplication, but zero are reported

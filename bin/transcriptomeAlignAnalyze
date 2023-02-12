@@ -65,9 +65,10 @@ class AlignStats(namedtuple("AlignStats",
 def fmtCigar(cigar):
     return re.sub("([A-Z])", "\\1 ", cigar).strip()
 
-def debugDump(aln, rstats, fh=sys.stderr):
-    for fld in ("target_name", "target_length", "target_start", "target_end"):
+def debugDump(bamFh, aln, rstats, fh=sys.stderr):
+    for fld in ("reference_name", "reference_start", "reference_end"):
         fileOps.prRowv(fh, fld, getattr(aln, fld))
+    fileOps.prRowv(fh, "reference_length", bamFh.get_reference_length(aln.reference_name))
     fileOps.prRowv(fh, "cigar", fmtCigar(aln.cigarstring))
 
     for fld in AlignStats._fields:

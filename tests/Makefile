@@ -5,13 +5,15 @@ genomeAlignAnalyze = ../bin/genomeAlignAnalyze
 summarizeSupport = ../bin/summarizeSupport
 
 hes2AmpliconsBam = output/HES2+A.amplicon.bam
+ankmy2AmplicaonBam = output/ANKMY2+1.amplicon
 hes2GenomeBam = output/HES2+A.genome.bam
 alg6GenomeBam = output/ALG6+A.genome.bam
 
 all: test
 
 test: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
-	testSimilarity99 testSimilarity95 \
+	testSimilarity99 testSimilarity95 testANKMY2Sim \
+	testANKMY2Indel \
 	testSummary testFilterCmp testFilterFirstCmp \
 	testHES2+A_introns testALG6+1_introns \
 	testHES2+A_introns_indel \
@@ -41,6 +43,16 @@ testSimilarity99: ${hes2AmpliconsBam}
 testSimilarity95: ${hes2AmpliconsBam}
 	${transcriptomeAlignAnalyze} --minSimilarity=0.95 $< output/pb-$@.stats.tsv
 	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
+
+# This didn't find a perfect match
+testANKMY2Sim: ${ankmy2AmplicaonBam}
+	${transcriptomeAlignAnalyze} --minSimilarity=0.10 $< output/pb-$@.stats.tsv
+	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
+
+testANKMY2Indel: ${ankmy2AmplicaonBam}
+	${transcriptomeAlignAnalyze} --maxIndelBases=10 $< output/pb-$@.stats.tsv
+	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
+
 
 testSummary: mkdirs
 	${transcriptomeSummary} expected/testAll_limits.stats.tsv > output/$@.summary.tsv
@@ -73,6 +85,10 @@ testSummarizeSupport: mkdirs
 	diff expected/$@.tsv output/$@.tsv
 
 ${hes2AmpliconsBam}: input/HES2+A.amplicon.sam mkdirs
+	samtools view -O BAM $< >$@
+	samtools index $@
+
+${ankmy2AmplicaonBam}: input/ANKMY2+1.amplicon.sam mkdirs
 	samtools view -O BAM $< >$@
 	samtools index $@
 
