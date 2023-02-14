@@ -11,44 +11,26 @@ You will likely need to be on the UCSC VPN to access.
 My student Brandon did the basecalling and set up the server. I asked him to put all the FASTQ file pass reads into one file. Here is what he said he did:
 "I've added a pass.fastq file into the 221116-basecalled-260bps directory, from running cat pass/*fastq >pass.fastq in order to merge all the passed fastq files"
 
-* data/grch38/sequencing/221116-basecalled-260bps
+** data/grch38/sequencing/221116-basecalled-260bps
 
-* align reads to genome
+* get targets without target regions (color 0,128,0)
+cd references
+tawk '$9=="0,128,0"'  ../../../hub/hg38/targets.bed >target-trans.bed
+
+* align ONT reads to genome
 cd align
-minimap2 -ax splice
-#  map-ont is the default
-
-find ../sequencing/221116-basecalled-260bps/pass/ -name '*.fastq'  |awk '{print "../bin/runMinimapOnt", $0, "{check out exists tmp/" gensub("^.*/", "", 1) ".sam}"}'  >jobs.para
-
-ssh to ku
-# must use 32gb of memory or get empty output
-
-para freeBatch -batch=b1
-para create -ram=32g -batch=b1 jobs.para
-para try -batch=b1
-
-y# combine into BAM
- 
-nice samtools merge --output-fmt BAM --threads 32 -c -p  ont-rna-wtc11-genome.bam tmp/*.sam
-
-# check id unqiueness
-samtools fasta ont-rna-wtc11-genome.bam | faSize -detailed stdin | cut -f 1 sort | twc -l
-
-total 4880899
-uniq  4880899
-
-# didn't really need to split it up.
-
-
-
-* align PB reads to genome
-cd align
-(time nice minimap2 -t 64 -ax splice:hq /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&log&
+(time nice minimap2 -t 64 -ax splice --junc-bed=../reference/target-trans.bed /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../sequencing/221116-basecalled-260bps/runid_7f2d5c3b79ee43d49f5db857aca2eaa618ab7879.fastq.gz  | samtools sort -O BAM > ont-rna-wtc11-genome.bam)>&ont.log&
 
 nice samtools merge -@ 64 -O BAM -o pb+ont-rna-wtc11-genome.bam pb-rna-wtc11-genome.bam ont-rna-wtc11-genome.bam >&log&
 
+* align PB reads to genome
+cd align
+(time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&pb.log&
+
+nice samtools merge -@ 64 -O BAM -o pb+ont-rna-wtc11-genome.bam pb-rna-wtc11-genome.bam ont-rna-wtc11-genome.bam >&cntl.log&
+
 * control alignment of amplicons to genome
-(time nice minimap2 -t 64 -ax splice:hq /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-genome.bam)>&cntl.log&
+(time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-genome.bam)>&cntl.log&
 
 for f in *.bam ; do samtools index $f & done
 ln -f *.bam* ../../../hub/hg38/
@@ -121,14 +103,13 @@ bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validatio
 
 * summaries
 
+** cd grch38-transcriptome/analyze.sim
+../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
+ cp wtc11-support.sim.tsv ../../../analyze/
 ** cd grch38-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=2.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=2.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=2.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv *-wtc11.indel=*.tsv >wtc11-support.indel.tsv
  cp wtc11-support.indel.tsv  ../../../analyze/
 
-** cd grch38-transcriptome/analyze.sim
-../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
-
- cp wtc11-support.sim.tsv ../../../analyze/
 
 *  cd analyze
  cp *-support.sim.* ~/public_html/lrgasp/experimental-eval/

@@ -9,12 +9,17 @@ Just a reminder that that is not a direct link to your data, but to be used to c
 cd data/pb-sequencing-mixed/
 azcopy copy --recursive 'https://stcjuly2022.blob.core.windows.net/st183-lrgasp?sv=2021-10-04&st=2023-01-22T23%3A40%3A10Z&se=2023-02-28T23%3A40%3A00Z&sr=c&sp=rl&sig=4e0Nr2YiYuNyLpgaDPUxIJdwjL%2B%2BUbyOx2%2BUOtL4swc%3D' .
 
+* get targets without target regions (color 0,128,0)
+cd references
+tawk '$9=="0,128,0"'  ../../../hub/manatee/targets.bed >target-trans.bed
 
 * align reads to genome
 cd align
-(time nice minimap2 -t 64 -ax splice:hq ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&pb.log&
+(time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&pb.log&
 
-(time nice minimap2 -t 64 -ax splice:hq ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&cntl.log&
+(time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&cntl.log&
+
+* align to amplicons
 cd reference
 # have multiple amplicons for each target, so add transcript_id
 tawk '$3==1{print ">" $1 "/" $5 " " $2;print $9}' ../../../../primers/primer-design/hub/manatee/juju_designs.manatee.isoforms.tsv  >manatee-amplicons.fa
