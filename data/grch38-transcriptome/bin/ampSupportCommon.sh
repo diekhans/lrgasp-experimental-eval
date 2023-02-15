@@ -18,9 +18,11 @@ transcriptomeAlignAnalyze=${mydir}/../../../bin/transcriptomeAlignAnalyze
 outTsv=${outBase}.tsv
 outTmpTsv=${outTsv}.tmp
 outReads=${outBase}.readids
+ampBam=${outBase}.amplicon.bam
 
-nice ${transcriptomeAlignAnalyze} ${filtOpts} ${inBam} ${outTmpTsv} --filteredReads=${outReads}
+nice ${transcriptomeAlignAnalyze} ${filtOpts} ${inBam} ${outTmpTsv} --filteredReads=${outReads} --filteredBam=${ampBam}
 mv -f $outTmpTsv $outTsv
+samtools index ${ampBam}
 
 outGenomeBam=${outBase}.genome.bam
 outGenomeBamTmp=${outGenomeBam}.tmp

@@ -37,10 +37,6 @@ ln -s *.bam* ../../../hub/manatee-amplicons/
 
 
 ** cd analyze.sim
-for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
-   ../bin/simAmpSupport $plat $sim &
-done ; done >&log
-
 ../../../bin/transcriptomeSummary pb-rna-manatee.*.tsv >pb-summary.tsv
 
 tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/manatee-support.tar.gz analyze
