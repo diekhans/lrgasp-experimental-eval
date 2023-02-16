@@ -36,16 +36,7 @@ nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam
 ln -s *.bam* ../../../hub/manatee-amplicons/
 
 
-** cd analyze.sim
-../../../bin/transcriptomeSummary pb-rna-manatee.*.tsv >pb-summary.tsv
-
-tar -zcf ~/public_html/gencode/lrgasp/experimental-eval/manatee-support.tar.gz analyze
-
-http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt
-
-ln -f *.bam* ../../../hub/manatee/
-
-cd hub/manatee
+* browser
 ../../bin/mkBamsTrackDb *rna-manatee*.bam >filtered.trackDb.txt
 bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt manatee targets.bed dir
 
@@ -86,14 +77,16 @@ ln -f *.bam* ../../../hub/manatee/
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
    ../bin/simAmpSupport $plat $sim &
 done ; done >&log
-ln -f *.bam* ../../../hub/manatee/
+ln -f *.genome.bam* ../../../hub/manatee/
+ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
 cp manatee-support.sim.tsv ../../../analyze/
 
 * data/manatee-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb cntl ; do
    nice ../bin/indelAmpSupport ${plat} ${indel}&
 done; done >&log   
-ln -f *.bam* ../../../hub/manatee/
+ln -f *.genome.bam* ../../../hub/manatee/
+ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
 cp manatee-support.indel.tsv ../../../analyze/
 
 * browser

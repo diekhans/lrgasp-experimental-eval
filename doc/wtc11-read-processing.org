@@ -88,13 +88,15 @@ done
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb ont pb+ont cntl ; do
    nice ../bin/simAmpSupport ${plat} ${sim}&
 done ; done >&log   
-ln -f *.bam* ../../../hub/hg38/
+ln -f *.genome.bam*  ../../../hub/hg38/
+ln -f *.amplicon.bam*  ../../../hub/wtc11-amplicons/
 
 * data/grch38-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb ont pb+ont cntl ; do
    nice ../bin/indelAmpSupport ${plat} ${indel}&
 done; done >&log   
-ln -f *.bam* ../../../hub/hg38/
+ln -f *.genome.bam*  ../../../hub/hg38/
+ln -f *.amplicon.bam*  ../../../hub/wtc11-amplicons/
 
 * browser
 cd hub/hg38
