@@ -5,6 +5,12 @@ https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+o
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.95.genome.bam
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.90.genome.bam
 
+* Gloria spread sheet
+https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hNMVA/edit#gid=0
+
+* JuJu spread sheet
+https://docs.google.com/spreadsheets/d/1Y3KhZoezR8Ti5mauYXQFxuwE04xmEgPPyxoJoRxuYuA/edit#gid=210377221
+
 
 * ALG6+1
 All models are bad. Intron 3' end at chr1:63,411,128-63,411,194 has GT-AT
@@ -13,6 +19,10 @@ pattern.  Supported by WTC-11 reads. GENCODE and RefSeq.  Models and minimap2
 seemed to have force GT-AG 6 bases upstream by calling an intron +
 target-insertion (D).
 
+* ARPC2+1 (287pb
+Lots of 100% amplicon support, but no chain support.
+Exon at chr2:218,217,459-218,217,545 is include in all chains, but not in target.
+How is it possible
 
 
-Error querying alignments for: pb+ont-rna-wtc11.sim=0.98.genome.bam Error message: Unknown BAM index file type: CRAI in null
+
