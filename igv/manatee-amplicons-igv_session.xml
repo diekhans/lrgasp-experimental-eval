@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/manatee-amplicons.fa" locus="GZMK_beg/FSM-11716:136-176" version="8">
+<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/manatee-amplicons.fa" locus="GZMK_beg/FSM-11716:135-176" version="8">
     <Resources>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/cntl-rna-manatee-amplicons.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/pb-rna-manatee-amplicons.bam" type="bam"/>
     </Resources>
-    <Panel height="2816" name="Panel1676586164884" width="1879">
+    <Panel height="49" name="FeaturePanel" width="1566">
+        <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
+    </Panel>
+    <Panel height="1710" name="Panel1676586164884" width="1566">
         <Track attributeKey="pb-rna-manatee-amplicons.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/pb-rna-manatee-amplicons.bam_coverage" name="pb-rna-manatee-amplicons.bam Coverage" snpThreshold="0.2" visible="true">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="4968.0" minimum="0.0" type="LINEAR"/>
         </Track>
@@ -13,7 +16,7 @@
             <RenderOptions/>
         </Track>
     </Panel>
-    <Panel height="218" name="Panel1676586191098" width="1879">
+    <Panel height="212" name="Panel1676586191098" width="1566">
         <Track attributeKey="cntl-rna-manatee-amplicons.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee-amplicons/cntl-rna-manatee-amplicons.bam_coverage" name="cntl-rna-manatee-amplicons.bam Coverage" snpThreshold="0.2" visible="true">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="10.0" minimum="0.0" type="LINEAR"/>
         </Track>
@@ -22,10 +25,7 @@
             <RenderOptions/>
         </Track>
     </Panel>
-    <Panel height="40" name="FeaturePanel" width="1879">
-        <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
-    </Panel>
-    <PanelLayout dividerFractions="0.0064516129032258064,0.7118279569892473,0.9516129032258065"/>
+    <PanelLayout dividerFractions="0.006369426751592357,0.06369426751592357,0.7696390658174098"/>
     <HiddenAttributes>
         <Attribute name="DATA FILE"/>
         <Attribute name="DATA TYPE"/>

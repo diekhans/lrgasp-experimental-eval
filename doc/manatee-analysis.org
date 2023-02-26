@@ -1,0 +1,3 @@
+* todo
+add in 98 sim
+better filter of amilicon alignments ?
