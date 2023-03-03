@@ -79,16 +79,13 @@ def filterAlign(aln, filters):
     tDelBases = baseCnts[pysam.CINS]
     return (qDelBases + tDelBases) <= filters.maxIndelBases
 
-def alnSupports(aln, ampliconChain, filters):
-    if not filterAlign(aln, filters):
-        return False
-    readChain = getReadChain(aln)
-    return readChain == ampliconChain
+def alnSupports(aln, ampliconChain):
+    return getReadChain(aln) == ampliconChain
 
 def countSupports(targetsBed, ampliconChain, readsBamFh, filters, supportBamFh):
     supportCnt = 0
     for aln in readsBamFh.fetch(reference=targetsBed.chrom, start=targetsBed.start, end=targetsBed.end):
-        if alnSupports(aln, ampliconChain, filters):
+        if filterAlign(aln, filters) and alnSupports(aln, ampliconChain):
             supportCnt += 1
             if supportBamFh is not None:
                 supportBamFh.write(aln)
