@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 from collections import defaultdict
 import argparse
 import pysam
@@ -10,6 +11,8 @@ from pycbio.hgdata.bed import BedTable
 from pycbio.hgdata.cigar import Cigar
 from pycbio.tsv import TsvReader
 
+trace = False
+
 def parseArgs():
     desc = """count the number of reads that validated an amplicon intron chain. """
     parser = argparse.ArgumentParser(description=desc)
@@ -19,6 +22,8 @@ def parseArgs():
                         help="""maximum indel bases filter""")
     parser.add_argument("--supportBam",
                         help="""output BAMs of those supporting the chain""")
+    parser.add_argument("--trace", action="store_true",
+                        help="""trace what happens to each read""")
     parser.add_argument("jujuIsoformsTsv",
                         help="""isoforms.tsv with targets and transcripts""")
     parser.add_argument("targetsBed",
@@ -30,7 +35,8 @@ def parseArgs():
     opts = parser.parse_args()
     opts.filters = Filters(target=opts.target,
                            maxIndelBases=opts.maxIndelBases)
-
+    global trace
+    trace = opts.trace
     return opts
 
 class Filters(namedtuple("Filters", ("target",
@@ -82,13 +88,33 @@ def filterAlign(aln, filters):
 def alnSupports(aln, ampliconChain):
     return getReadChain(aln) == ampliconChain
 
-def countSupports(targetsBed, ampliconChain, readsBamFh, filters, supportBamFh):
+def _tracealn(desc, aln, *extras):
+    print("  [" + desc + "]", aln.query_name, end=' ', file=sys.stderr)
+    if len(extras) > 0:
+        print(*extras, end=' ', file=sys.stderr)
+    print(file=sys.stderr)
+
+def countRead(ampliconChain, filters, aln, supportBamFh):
+    if not filterAlign(aln, filters):
+        if trace:
+            _tracealn("filtered", aln)
+        return 0
+    if not alnSupports(aln, ampliconChain):
+        if trace:
+            _tracealn("nosupport", aln, getReadChain(aln))
+        return 0
+    if trace:
+        _tracealn("supports", aln)
+    if supportBamFh is not None:
+        supportBamFh.write(aln)
+    return 1
+
+def countSupports(target_id, targetsBed, ampliconChain, readsBamFh, filters, supportBamFh):
+    if trace:
+        print("countSupport:", target_id, targetsBed.name, ampliconChain, file=sys.stderr)
     supportCnt = 0
     for aln in readsBamFh.fetch(reference=targetsBed.chrom, start=targetsBed.start, end=targetsBed.end):
-        if filterAlign(aln, filters) and alnSupports(aln, ampliconChain):
-            supportCnt += 1
-            if supportBamFh is not None:
-                supportBamFh.write(aln)
+        supportCnt += countRead(ampliconChain, filters, aln, supportBamFh)
     return supportCnt
 
 def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh):
@@ -97,7 +123,7 @@ def processTargetTrans(tdesign, targetsBedTbl, readsBamFh, filters, statsFh, sup
         raise Exception(f"no target BED found for {tdesign.transcript_id}")
     targetsBed = targetsBeds[0]
     ampliconChain = getThickIntronChain(targetsBed)
-    supportCnt = countSupports(targetsBed, ampliconChain, readsBamFh, filters, supportBamFh)
+    supportCnt = countSupports(tdesign.target_id, targetsBed, ampliconChain, readsBamFh, filters, supportBamFh)
     fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
 
 
@@ -106,7 +132,7 @@ def processTarget(targetId, designs, targetsBedTbl, readsBamFh, filters, statsFh
         if tdesign.pri == 1:
             processTargetTrans(tdesign, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh)
 
-def processTargets(designs, targetsBedTbl, readsBamFh, filters, statsFh, target=None, supportBamFh=None):
+def processTargets(designs, targetsBedTbl, readsBamFh, filters, statsFh, supportBamFh):
     targets = [filters.target] if filters.target is not None else sorted(designs.keys())
     for targetId in targets:
         try:
@@ -121,7 +147,7 @@ def genomeAlignAnalyze(jujuIsoformsTsv, targetsBed, readsBam, filters, statsTsv,
     supportBamSortFh = None
     supportBamFh = None
     if supportBam is not None:
-        supportBamSortFh = pipettor.Popen(["samtools", "sort"], "w", stdout=supportBam)
+        supportBamSortFh = pipettor.Popen(["samtools", "sort"], "wb", stdout=supportBam)
         supportBamFh = pysam.AlignmentFile(supportBamSortFh, 'wb', template=readsBamFh)
 
     with open(statsTsv, 'w') as statsFh:

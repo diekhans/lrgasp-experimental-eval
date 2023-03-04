@@ -65,24 +65,25 @@ cd control/grch38-transcriptome/
 
 * intron chain with indel=2 filter
 cd data/grch38/analyze
-for prot in pb ont pb+ont cntl ; do
+for prot in pb ont cntl ; do
    ../../../bin/genomeAlignAnalyze --maxIndelBases=2 ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/${prot}-rna-wtc11-genome.bam --supportBam=${prot}-rna-wtc11.intron-chains.indel=2.bam ${prot}-rna-wtc11.intron-chains.indel=2.tsv  &
 done >&2.log
 
-for prot in pb ont pb+ont cntl ; do
+for prot in pb ont cntl ; do
    samtools index ${prot}-rna-wtc11.intron-chains.indel=2.bam &
 done
 ln -f *.bam* ../../../hub/hg38/
 
 * intron chain ( no indel filter)
 cd data/grch38/analyze
-for prot in pb ont pb+ont cntl ; do
+for prot in pb ont cntl ; do
    ../../../bin/genomeAlignAnalyze ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed ../align/${prot}-rna-wtc11-genome.bam --supportBam=${prot}-rna-wtc11.intron-chains.indel=any.bam ${prot}-rna-wtc11.intron-chains.indel=any.tsv  &
 done >&log
 
-for prot in pb ont pb+ont cntl ; do
+for prot in pb ont cntl ; do
    samtools index ${prot}-rna-wtc11.intron-chains.indel=any.bam &
 done
+ln -f *.bam* ../../../hub/hg38/
 
 * data/grch38-transcriptome/grch38-transcriptome/analyze.sim
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb ont pb+ont cntl ; do

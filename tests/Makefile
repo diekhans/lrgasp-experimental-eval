@@ -72,8 +72,10 @@ testFilterFirstCmp: mkdirs
 	diff expected/$@.cmp.tsv output/$@.cmp.tsv
 
 testHES2+A_introns: mkdirs ${hes2GenomeBam}
-	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
+	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv --supportBam=output/$@.support.bam
+	samtools view output/$@.support.bam >output/$@.support.sam
 	diff expected/$@.tsv output/$@.tsv
+	diff expected/$@.support.sam output/$@.support.sam
 
 testHES2+A_introns_indel: mkdirs ${hes2GenomeBam}
 	${genomeAlignAnalyze} --maxIndelBases=2 input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
