@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/wtc11-amplicons.fa" locus="ARPC2+1:0-287" nextAutoscaleGroup="6" version="8">
+<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/wtc11-amplicons.fa" locus="ID3+1:0-210" nextAutoscaleGroup="6" version="8">
     <Resources>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11.indel=2.amplicon.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11.indel=2.amplicon.bam" type="bam"/>
@@ -7,7 +7,7 @@
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11-amplicons.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11-amplicons.bam" type="bam"/>
     </Resources>
-    <Panel height="20" name="FeaturePanel" width="1566">
+    <Panel height="227" name="FeaturePanel" width="1566">
         <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
     </Panel>
     <Panel height="101" name="Panel1676174090107" width="1566">
@@ -19,43 +19,43 @@
             <RenderOptions colorOption="READ_STRAND" sortOption="STRAND"/>
         </Track>
     </Panel>
-    <Panel height="3824" name="Panel1676174121205" width="1566">
+    <Panel height="4314" name="Panel1676174121205" width="1566">
         <Track _color="204,204,255" attributeKey="ont-rna-wtc11-amplicons.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11-amplicons.bam_coverage" name="ont-rna-wtc11-amplicons.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="23653.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="38148.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="ont-rna-wtc11-amplicons.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11-amplicons.bam_junctions" maxdepth="50" name="ont-rna-wtc11-amplicons.bam Junctions" visible="false"/>
         <Track attributeKey="ont-rna-wtc11-amplicons.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="255,255,255" displayMode="EXPANDED" experimentType="OTHER" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11-amplicons.bam" name="ont-rna-wtc11-amplicons.bam" visible="true">
             <RenderOptions colorOption="READ_STRAND" sortOption="STRAND"/>
         </Track>
     </Panel>
-    <Panel height="1640" name="Panel1676174146681" width="1566">
+    <Panel height="170" name="Panel1676174146681" width="1566">
         <Track _color="153,153,255" attributeKey="pb-rna-wtc11-amplicons.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11-amplicons.bam_coverage" name="pb-rna-wtc11-amplicons.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="7732.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="10.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="pb-rna-wtc11-amplicons.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11-amplicons.bam_junctions" maxdepth="50" name="pb-rna-wtc11-amplicons.bam Junctions" visible="false"/>
         <Track attributeKey="pb-rna-wtc11-amplicons.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="185,185,185" displayMode="EXPANDED" experimentType="OTHER" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11-amplicons.bam" name="pb-rna-wtc11-amplicons.bam" visible="true">
             <RenderOptions colorOption="READ_STRAND"/>
         </Track>
     </Panel>
-    <Panel height="1486" name="Panel1676444664828" width="1566">
+    <Panel height="236" name="Panel1676444664828" width="1566">
         <Track attributeKey="ont-rna-wtc11.indel=2.amplicon.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11.indel=2.amplicon.bam_coverage" name="ont-rna-wtc11.indel=2.amplicon.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="3630.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="10.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="ont-rna-wtc11.indel=2.amplicon.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11.indel=2.amplicon.bam_junctions" maxdepth="50" name="ont-rna-wtc11.indel=2.amplicon.bam Junctions" visible="false"/>
         <Track attributeKey="ont-rna-wtc11.indel=2.amplicon.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="153,255,153" displayMode="EXPANDED" experimentType="OTHER" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/ont-rna-wtc11.indel=2.amplicon.bam" name="ont-rna-wtc11.indel=2.amplicon.bam" visible="true">
             <RenderOptions colorOption="READ_STRAND" shadeAlignmentsByOption="NONE" sortOption="STRAND"/>
         </Track>
     </Panel>
-    <Panel height="1486" name="Panel1676445135178" width="1566">
+    <Panel height="185" name="Panel1676445135178" width="1566">
         <Track _color="102,255,51" attributeKey="pb-rna-wtc11.indel=2.amplicon.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11.indel=2.amplicon.bam_coverage" name="pb-rna-wtc11.indel=2.amplicon.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="4703.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="10.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="pb-rna-wtc11.indel=2.amplicon.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11.indel=2.amplicon.bam_junctions" maxdepth="50" name="pb-rna-wtc11.indel=2.amplicon.bam Junctions" visible="false"/>
         <Track attributeKey="pb-rna-wtc11.indel=2.amplicon.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="185,185,185" displayMode="EXPANDED" experimentType="OTHER" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/wtc11-amplicons/pb-rna-wtc11.indel=2.amplicon.bam" name="pb-rna-wtc11.indel=2.amplicon.bam" visible="true">
             <RenderOptions colorOption="READ_STRAND" sortOption="STRAND"/>
         </Track>
     </Panel>
-    <PanelLayout dividerFractions="0.006369426751592357,0.027600849256900213,0.11040339702760085,0.2961783439490446,0.5520169851380042,0.7537154989384289"/>
+    <PanelLayout dividerFractions="0.006369426751592357,0.2526539278131635,0.27388535031847133,0.35668789808917195,0.5424628450106157,0.7983014861995754"/>
     <HiddenAttributes>
         <Attribute name="DATA FILE"/>
         <Attribute name="DATA TYPE"/>
