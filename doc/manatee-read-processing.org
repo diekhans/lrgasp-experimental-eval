@@ -9,18 +9,19 @@ Just a reminder that that is not a direct link to your data, but to be used to c
 cd data/pb-sequencing-mixed/
 azcopy copy --recursive 'https://stcjuly2022.blob.core.windows.net/st183-lrgasp?sv=2021-10-04&st=2023-01-22T23%3A40%3A10Z&se=2023-02-28T23%3A40%3A00Z&sr=c&sp=rl&sig=4e0Nr2YiYuNyLpgaDPUxIJdwjL%2B%2BUbyOx2%2BUOtL4swc%3D' .
 
-* get targets without target regions (color 0,128,0)
-cd references
+* ALIGNMENT
+** get targets without target regions (color 0,128,0)
+cd manatee/references
 tawk '$9=="0,128,0"'  ../../../hub/manatee/targets.bed >target-trans.bed
 
-* align reads to genome
-cd align
+** align reads to genome
+cd manatee/align
 (time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed ../reference/manatee.fa  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-genome.bam)>&pb.log&
 
 (time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed ../reference/manatee.fa   ../reference/manatee-amplicons.fa  | samtools sort -O BAM > cntl-rna-manatee-genome.bam)>&cntl.log&
 
-* align to amplicons
-cd reference
+** align to amplicons
+cd  manatee-transcriptome/reference
 # have multiple amplicons for each target, so add transcript_id
 tawk '$3==1{print ">" $1 "/" $5 " " $2;print $9}' ../../../../primers/primer-design/hub/manatee/juju_designs.manatee.isoforms.tsv  >manatee-amplicons.fa
 samtools faidx manatee-amplicons.fa
@@ -36,22 +37,19 @@ nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam
 ln -s *.bam* ../../../hub/manatee-amplicons/
 
 
-* browser
+* BROWSER
+cd hub/manatee
 ../../bin/mkBamsTrackDb *rna-manatee*.bam >filtered.trackDb.txt
 bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt manatee targets.bed dir
 
 
-
-
-* -------------
-
-
-* intron chain no indel filter
+* ANALYZE
+** intron chain no indel filter
 cd manatee/analyze
 
 cd data/manatee/analyze
 for prot in pb cntl ; do
-   ../../../bin/genomeAlignAnalyze ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed ../align/${prot}-rna-manatee-genome.bam --supportBam=${prot}-rna-manatee.intron-chains.indel=any.bam ${prot}-rna-manatee.intron-chains.indel=any.tsv  &
+   ../../../bin/genomeAlignAnalyze ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed ../align/${prot}-rna-manatee-genome.bam --supportBam=${prot}-rna-manatee.intron-chains.indel=any.bam ${prot}-rna-manatee.intron-chains.indel=any.tsv  &
 done >&log
 
 for prot in pb cntl ; do
@@ -59,12 +57,12 @@ for prot in pb cntl ; do
  done
 ln -f *.bam* ../../../hub/manatee/
 
-* intron chain with indel=2 filter
+** intron chain with indel=2 filter
 cd manatee/analyze
 
 cd data/manatee/analyze
 for prot in pb cntl ; do
-   ../../../bin/genomeAlignAnalyze --maxIndelBases=2 ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed ../align/${prot}-rna-manatee-genome.bam --supportBam=${prot}-rna-manatee.intron-chains.indel=2.bam ${prot}-rna-manatee.intron-chains.indel=2.tsv  &
+   ../../../bin/genomeAlignAnalyze --maxIndelBases=2 ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed ../align/${prot}-rna-manatee-genome.bam --supportBam=${prot}-rna-manatee.intron-chains.indel=2.bam ${prot}-rna-manatee.intron-chains.indel=2.tsv  &
 done >&2.log
 
 for prot in pb cntl ; do
@@ -73,7 +71,7 @@ done
 ln -f *.bam* ../../../hub/manatee/
 
 
-* data/manatee-transcriptome/analyze.sim
+** data/manatee-transcriptome/analyze.sim
 for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
    ../bin/simAmpSupport $plat $sim &
 done ; done >&log
@@ -81,7 +79,7 @@ ln -f *.genome.bam* ../../../hub/manatee/
 ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
 cp manatee-support.sim.tsv ../../../analyze/
 
-* data/manatee-transcriptome/analyze.indel
+** data/manatee-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb cntl ; do
    nice ../bin/indelAmpSupport ${plat} ${indel}&
 done; done >&log   
@@ -89,21 +87,15 @@ ln -f *.genome.bam* ../../../hub/manatee/
 ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
 cp manatee-support.indel.tsv ../../../analyze/
 
-* browser
-cd hub/manatee
-../../bin/mkBamsTrackDb *rna-manatee*.bam >filtered.trackDb.txt
-bedToHtmlDir -public-browser -sort-by-name -title "LRGASP experimental validations targets" -hub https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hub.txt -hub http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/hub.txt manatee targets.bed dir
 
-* summaries
+* SUMMARIES
 
 ** cd manatee-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.indel=2.tsv  --genomeStatsTsv=../../manatee/analyze/cntl-rna-manatee.intron-chains.indel=2.tsv *-manatee.indel=*.tsv >manatee-support.indel.tsv
-
- cp manatee-support.indel.tsv ../../../analyze/
+cp manatee-support.indel.tsv ../../../analyze/
 
 ** cd manatee-transcriptome/analyze.sim
 ../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../manatee/analyze/pb-rna-manatee.intron-chains.indel=any.tsv  --genomeStatsTsv=../../manatee/analyze/cntl-rna-manatee.intron-chains.indel=any.tsv *-manatee.sim=*.tsv >manatee-support.sim.tsv
-
  cp manatee-support.sim.tsv ../../../analyze/
 
 * spreadsheet coloring

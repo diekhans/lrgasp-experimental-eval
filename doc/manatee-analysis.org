@@ -1,3 +1,7 @@
-* todo
-add in 98 sim
-better filter of amilicon alignments ?
+* debugging:
+ ../../../bin/genomeAlignAnalyze --target=X --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed 
+ ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
+
+
+*  GZMK_beg FSM-11716
+why no chainsm looks good in browser

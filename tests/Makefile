@@ -11,13 +11,11 @@ alg6GenomeBam = output/ALG6+A.genome.bam
 
 all: test
 
-test: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
+test: transcriptomeTests genomeTests otherTests
+
+transcriptomeTests: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
 	testSimilarity99 testSimilarity95 testANKMY2Sim \
-	testANKMY2Indel testANKMY2Strand \
-	testSummary testFilterCmp testFilterFirstCmp \
-	testHES2+A_introns testALG6+1_introns \
-	testHES2+A_introns_indel \
-	testSummarizeSupport
+	testANKMY2Indel testANKMY2Strand 
 
 testHES2+A: ${hes2AmpliconsBam}
 	${transcriptomeAlignAnalyze} --readStatsTsv=output/$@.rstats.tsv --target=HES2+A $< output/$@.stats.tsv
@@ -57,6 +55,7 @@ testANKMY2Strand: ${ankmy2AmplicaonBam}
 	${transcriptomeAlignAnalyze} --filterStrand --maxIndelBases=5 $< output/pb-$@.stats.tsv
 	diff expected/pb-$@.stats.tsv output/pb-$@.stats.tsv
 
+otherTests: testSummary testFilterCmp testFilterFirstCmp testSummarizeSupport
 
 testSummary: mkdirs
 	${transcriptomeSummary} expected/testAll_limits.stats.tsv > output/$@.summary.tsv
@@ -71,18 +70,21 @@ testFilterFirstCmp: mkdirs
 	${transcriptomeFilterCmp} --first expected/testAll_limits.stats.tsv expected/testHES2+A.stats.tsv > output/$@.cmp.tsv
 	diff expected/$@.cmp.tsv output/$@.cmp.tsv
 
+genomeTests: testHES2+A_introns testALG6+1_introns \
+	testHES2+A_introns_indel
+
 testHES2+A_introns: mkdirs ${hes2GenomeBam}
-	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv --supportBam=output/$@.support.bam
+	${genomeAlignAnalyze} input/HES2+A.isoforms.tsv input/HES2+A.amplicon.bed ${hes2GenomeBam} output/$@.tsv --supportBam=output/$@.support.bam
 	samtools view output/$@.support.bam >output/$@.support.sam
 	diff expected/$@.tsv output/$@.tsv
 	diff expected/$@.support.sam output/$@.support.sam
 
 testHES2+A_introns_indel: mkdirs ${hes2GenomeBam}
-	${genomeAlignAnalyze} --maxIndelBases=2 input/HES2+A.isoforms.tsv input/HES2+A.targets.bed ${hes2GenomeBam} output/$@.tsv
+	${genomeAlignAnalyze} --maxIndelBases=2 input/HES2+A.isoforms.tsv input/HES2+A.amplicon.bed ${hes2GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
 testALG6+1_introns: mkdirs ${alg6GenomeBam}
-	${genomeAlignAnalyze} input/ALG6+1.isoforms.tsv input/ALG6+1.targets.bed ${alg6GenomeBam} output/$@.tsv
+	${genomeAlignAnalyze} input/ALG6+1.isoforms.tsv input/ALG6+1.amplicon.bed ${alg6GenomeBam} output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
 testSummarizeSupport: mkdirs
