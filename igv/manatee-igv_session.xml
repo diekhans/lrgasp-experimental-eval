@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/manatee.fa" locus="contig_12137_pilon:374730-375133" nextAutoscaleGroup="2" version="8">
+<Session genome="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/manatee.fa" locus="contig_12137_pilon:371343-375388" nextAutoscaleGroup="3" version="8">
     <Resources>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/amplicons.bb" type="bb"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/pb-rna-manatee-genome.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/cntl-rna-manatee-genome.bam" type="bam"/>
     </Resources>
-    <Panel height="229" name="FeaturePanel" width="1566">
+    <Panel height="215" name="FeaturePanel" width="1566">
         <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
         <Track attributeKey="amplicons.bb" clazz="org.broad.igv.track.FeatureTrack" displayMode="EXPANDED" featureVisibilityWindow="20610000" fontSize="10" groupByStrand="false" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/amplicons.bb" name="amplicons.bb" visible="true"/>
     </Panel>
@@ -18,7 +18,7 @@
             <RenderOptions/>
         </Track>
     </Panel>
-    <Panel height="2428" name="Panel1676584364269" width="1566">
+    <Panel height="2414" name="Panel1676584364269" width="1566">
         <Track attributeKey="pb-rna-manatee-genome.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/manatee/pb-rna-manatee-genome.bam_coverage" name="pb-rna-manatee-genome.bam Coverage" snpThreshold="0.2" visible="true">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="5025.0" minimum="0.0" type="LINEAR"/>
         </Track>
@@ -27,7 +27,31 @@
             <RenderOptions/>
         </Track>
     </Panel>
-    <PanelLayout dividerFractions="0.006369426751592357,0.08598726114649681,0.1762208067940552"/>
+    <PanelLayout dividerFractions="0.03821656050955414,0.18895966029723993,0.36836518046709127"/>
+    <Regions>
+        <Region chromosome="contig_10129_pilon" description="SPP1_end" end="182640" start="179193"/>
+        <Region chromosome="contig_10129_pilon" description="SPP1_full" end="185014" start="180348"/>
+        <Region chromosome="contig_10129_pilon" description="SPP1_beg" end="185014" start="182585"/>
+        <Region chromosome="contig_12072_pilon" description="IL2" end="31272" start="25719"/>
+        <Region chromosome="contig_12137_pilon" description="GZMK_end" end="371848" start="358877"/>
+        <Region chromosome="contig_12137_pilon" description="GZMK_full" end="375216" start="358877"/>
+        <Region chromosome="contig_12137_pilon" description="GZMK_beg" end="375216" start="371726"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+6" end="22960" start="16273"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+7" end="23316" start="16273"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+5" end="22110" start="16529"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+8" end="23305" start="16529"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+2_long" end="19726" start="16961"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+6_long" end="23316" start="17658"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+2_long5" end="21033" start="19450"/>
+        <Region chromosome="contig_14815_pilon" description="IL1B+3" end="21032" start="19760"/>
+        <Region chromosome="contig_18545_pilon" description="IL7_long_beg" end="304734" start="301890"/>
+        <Region chromosome="contig_18545_pilon" description="IL7+2" end="309400" start="301890"/>
+        <Region chromosome="contig_18545_pilon" description="IL7_short" end="309400" start="303261"/>
+        <Region chromosome="contig_6299_pilon" description="TNFAIP3+1" end="965315" start="960630"/>
+        <Region chromosome="contig_6343_pilon" description="PTX3" end="289933" start="283352"/>
+        <Region chromosome="contig_7963_pilon" description="TAP+1_long" end="248662" start="245909"/>
+        <Region chromosome="contig_7963_pilon" description="TAP_short" end="248662" start="246325"/>
+    </Regions>
     <HiddenAttributes>
         <Attribute name="DATA FILE"/>
         <Attribute name="DATA TYPE"/>
