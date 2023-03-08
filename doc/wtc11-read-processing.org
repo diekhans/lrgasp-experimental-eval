@@ -17,11 +17,11 @@ My student Brandon did the basecalling and set up the server. I asked him to put
 cd references
 tawk '$9=="0,128,0"'  ../../../hub/hg38/targets.bed >target-trans.bed
 
-* align ONT reads to genome
+* ALIGNMENT
+** align ONT reads to genome
 cd align
 (time nice minimap2 -t 64 -ax splice --junc-bed=../reference/target-trans.bed /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz   ../sequencing/221116-basecalled-260bps/runid_7f2d5c3b79ee43d49f5db857aca2eaa618ab7879.fastq.gz  | samtools sort -O BAM > ont-rna-wtc11-genome.bam)>&ont.log&
 
-* ALIGNMENT
 ** align PB reads to genome
 cd align
 (time nice minimap2 -t 64 -ax splice:hq --junc-bed=../reference/target-trans.bed /hive/users/markd/gencode/projs/lrgasp/experimental-eval/data/grch38/reference/lrgasp_grch38_sirvs.fasta.gz  ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-genome.bam)>&pb.log&
@@ -38,13 +38,14 @@ tawk '$3==1{print ">" $1 " " $2;print $9}' ../../../../primers/primer-design/hub
 samtools faidx wtc11-amplicons.fa 
 ln wtc11-amplicons.fa* ../../../hub/wtc11-amplicons/
 
-** ONT alignments
+** ONT amplcons alignments
 cd data/grch38-transcriptome/align
-(time nice minimap2 -ax map-ont -t 32 ../reference/wtc11-amplicons.fa ../sequencing/wtc11.ont.fastq | samtools sort -O BAM >ont-rna-wtc11-amplicons.bam)>&log&
+(time nice minimap2 -ax map-ont -t 32 ../reference/wtc11-amplicons.fa ../sequencing/wtc11.ont.fastq | samtools sort -O BAM >ont-rna-wtc11-amplicons.bam)>&1.log&
 nice samtools index -@ 32 ont-rna-wtc11-amplicons.bam 
 
-(time nice minimap2 -ax map-hifi -t 32 ../reference/wtc11-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-amplicons.bam)>&log&
-nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam 
+(time nice minimap2 -ax map-pb -t 32 ../reference/wtc11-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-wtc11-amplicons.bam)>&2.log&
+nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam
+
 
 ** control alignment of amplicons to amplicons
 cd grch38-transcriptome/align/
@@ -96,7 +97,7 @@ ln -f *.amplicon.bam*  ../../../hub/wtc11-amplicons/
 
 * SUMMARIES
 ** cd grch38-transcriptome/analyze.sim
-../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv  --genomeStatsTsv=../../grch38/analyze/pb+ont-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
+../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
  cp wtc11-support.sim.tsv ../../../analyze/
 ** cd grch38-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels  ../../../hub/hg38/juju_designs.hg38.isoforms.tsv  --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=2.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=2.tsv  --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv  *-wtc11.indel=*.tsv >wtc11-support.indel.tsv

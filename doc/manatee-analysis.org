@@ -1,7 +1,51 @@
 * debugging:
- ../../../bin/genomeAlignAnalyze --target=X --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/targets.bed 
+ ../../../bin/genomeAlignAnalyze --target=X --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed 
  ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
 
 
-*  GZMK_beg FSM-11716
-why no chainsm looks good in browser
+*  IL1B+3
+
+
+| target | transcript | position | browser | plat | pre_chain | chain | sim_100 amp | sim_98 amp | sim_95 amp | per_chain_indel_2 | chain_indel_2 | indel_0 amp | indel_2 amp | Category    | Notes                                |   |   |   |   |   |   |   |   |   |   |
+| IL1B+3 | ISM-113496 |          |         | pb   |       819 |  2564 |           0 |          0 |          0 |               279 |          2455 |           0 |           0 | unsupported | no alignments to amplicon, even cntl |   |   |   |   |   |   |   |   |   |   |
+| IL1B+3 | ISM-113496 |          |         | cntl |         1 |    10 |           0 |          0 |          0 |                 1 |            10 |           0 |           0 | unusual     |                                      |   |   |   |   |   |   |   |   |   |   |
+
+# get genomics alignments
+ ../../../bin/genomeAlignAnalyze --target=IL1B+3 --transcriptId=ISM-113496 --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed  ../../manatee/align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
+picard FilterSamReads I=../../manatee/align/pb-rna-manatee-genome.bam O=genomic.bam READ_LIST_FILE=genomic.read.ids  FILTER=includeReadList
+faSomeRecords ../reference/manatee-amplicons.fa <(echo IL1B+3/ISM-113496) IL1B+3.ISM-113496.fa
+
+
+minimap2 -ax map-hifi -t 32 IL1B+3.ISM-113496.fa genomic.fq | samtools view -F 0x04 | wc -l
+=> 0
+
+minimap2 -a -t 32 IL1B+3.ISM-113496.fa genomic.fq | samtools view -F 0x04 | wc -l
+-> 145422
+
+minimap2 -ax map-pb -t 32 IL1B+3.ISM-113496.fa genomic.fq | samtools view -F 0x04 | wc -l
+-> 145392
+
+minimap2 -ax map-hifi -t 32 IL1B+3.ISM-113496.fa IL1B+3.ISM-113496.fa | samtools view -F 0x04 |wc -l
+=> 0
+minimap2 -a -t 32 IL1B+3.ISM-113496.fa IL1B+3.ISM-113496.fa | samtools view -F 0x04 |wc -l
+=> 1
+
+blat -noHead IL1B+3.ISM-113496.fa IL1B+3.ISM-113496.fa self.psl && wc -l self.psl
+=> 1
+
+
+** map-hifi
+-k19 Minimizer k-mer length [15]
+-w19 Minimizer window size [10]
+-U50,500 Lower  and  upper  bounds of k-mer occurrences [10,1000000]
+-g10k Stop chain enlongation if there are no minimizers within NUM-bp [10k].
+-A1 Matching score [2]
+-B4 Mismatching penalty [4]
+-O6,26 Gap open penalty [4,24]
+-E2,1 Gap extension penalty [2,1]
+-s200  Minimal  peak DP alignment score to output [40].
+
+minimap2 -k19 -w19 -U50,500 -g10k -A1 -B4 -O6,26 -E2,1 -s200 -a -t 32 IL1B+3.ISM-113496.fa IL1B+3.ISM-113496.fa | samtools view -F 0x04 | wc -l
+
+
+minimap2 -a -t 32 IL1B+3.ISM-113496.fa genomic.fq | samtools view -F 0x04 | wc -l >&1.out&

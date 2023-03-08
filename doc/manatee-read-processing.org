@@ -27,14 +27,20 @@ tawk '$3==1{print ">" $1 "/" $5 " " $2;print $9}' ../../../../primers/primer-des
 samtools faidx manatee-amplicons.fa
 ln -s manatee-amplicons.fa* ../../../hub/manatee-amplicons/
 
+#  this did poorly, some failing to align even amplicon unclear why, but map-pb works
+# cd align
+# (time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&pb.log&
+# (time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&cntl.log&
+
+# use map-pb, don't keep unaligned
 cd align
-(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&pb.log&
+(time nice minimap2 -ax map-pb -t 32 ../reference/manatee-amplicons.fa ../../pb-sequencing-mixed/st183-lrgasp/ST183-LRGASP.hifi_reads.fastq.gz | samtools view -h -F 0x04  | samtools sort -O BAM > pb-rna-manatee-amplicons.bam)>&pb.log&
 nice samtools index -@ 32 pb-rna-manatee-amplicons.bam 
 
 # control self-align
-(time nice minimap2 -ax map-hifi -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&cntl.log&
+(time nice minimap2 -ax map-pb -t 32 ../reference/manatee-amplicons.fa  ../reference/manatee-amplicons.fa  | samtools view -h -F 0x04 | samtools sort -O BAM > cntl-rna-manatee-amplicons.bam)>&cntl.log&
 nice samtools index -@ 32 cntl-rna-manatee-amplicons.bam 
-ln -s *.bam* ../../../hub/manatee-amplicons/
+ln -f *.bam* ../../../hub/manatee-amplicons/
 
 
 * BROWSER
@@ -77,7 +83,6 @@ for sim in 1.0 0.99 0.98 0.95 0.90 ; do for plat in pb cntl ; do
 done ; done >&log
 ln -f *.genome.bam* ../../../hub/manatee/
 ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
-cp manatee-support.sim.tsv ../../../analyze/
 
 ** data/manatee-transcriptome/analyze.indel
 for indel in 0 1 2; do for plat in pb cntl ; do
@@ -85,7 +90,6 @@ for indel in 0 1 2; do for plat in pb cntl ; do
 done; done >&log   
 ln -f *.genome.bam* ../../../hub/manatee/
 ln -f *.amplicon.bam* ../../../hub/manatee-amplicons/
-cp manatee-support.indel.tsv ../../../analyze/
 
 
 * SUMMARIES

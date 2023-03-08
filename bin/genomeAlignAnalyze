@@ -18,6 +18,8 @@ def parseArgs():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--target",
                         help="""only analyze this target name""")
+    parser.add_argument("--transcriptId",
+                        help="""only analyze this transcript""")
     parser.add_argument("--maxIndelBases", type=int, default=None,
                         help="""maximum indel bases filter""")
     parser.add_argument("--supportBam",
@@ -34,12 +36,13 @@ def parseArgs():
                         help="""output statistics to this file""")
     opts = parser.parse_args()
     opts.filters = Filters(target=opts.target,
+                           transcriptId=opts.transcriptId,
                            maxIndelBases=opts.maxIndelBases)
     global trace
     trace = opts.trace
     return opts
 
-class Filters(namedtuple("Filters", ("target",
+class Filters(namedtuple("Filters", ("target", "transcriptId",
                                      "maxIndelBases"))):
     __slots__ = ()
 
@@ -129,10 +132,12 @@ def processTargetTrans(tdesign, ampliconBedTbl, readsBamFh, filters, statsFh, su
     supportCnt = countSupports(tdesign.target_id, ampliconBed, ampliconChain, readsBamFh, filters, supportBamFh)
     fileOps.prRowv(statsFh, tdesign.target_id, tdesign.transcript_id, supportCnt)
 
+def useTargetTransDesign(tdesign, filters):
+    return (tdesign.pri == 1) and ((filters.transcriptId is None) or (tdesign.transcript_id == filters.transcriptId))
 
 def processTarget(targetId, designs, ampliconBedTbl, readsBamFh, filters, statsFh, supportBamFh):
     for tdesign in designs[targetId]:
-        if tdesign.pri == 1:
+        if useTargetTransDesign(tdesign, filters):
             processTargetTrans(tdesign, ampliconBedTbl, readsBamFh, filters, statsFh, supportBamFh)
 
 def processTargets(designs, ampliconBedTbl, readsBamFh, filters, statsFh, supportBamFh):
