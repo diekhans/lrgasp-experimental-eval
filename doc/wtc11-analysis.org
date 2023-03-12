@@ -35,26 +35,33 @@ looks like there are reads confirming splice sites, but only a few reported
 ** samtools view ../align/pb-rna-wtc11-genome.bam chr1:23558247-23559143 > ID3+1.pb.sam
 8501 ID3+1.pb.sam
 
-*** these look like they should support:
-
-Read name = m64152e_230121_000958/105972269/ccs
-Read length = 2,908bp
-Cigar = 760S233M519N85M107N25M1D277M1D158M1370S
-Clipping = Left 760 soft; Right 1,370 soft
-SupplementaryAlignments
-chr10:95,238,611-95,290,909 (-) = 52,298bp  @MAPQ 60 NM1
-chr1:159,918,758-159,925,470 (-) = 6,712bp  @MAPQ 57 NM2
-chr3:39,407,709-39,411,993 (+) = 4,284bp  @MAPQ 1 NM4
-
-countSupport: ID3+1 NNC_380057 ((23558415, 23558934), (23559010, 23559114))
-  [nosupport] m64152e_230121_000958/105972269/ccs ((23558415, 23558934), (23559019, 23559126)) 
-
-two possible accept AG acceptors, 9 bases apart
 
 
-Read name = m64152e_230121_000958/171837960/ccs
-Read length = 1,050bp
-Reference span = chr1:23,557,921-23,559,499 (+) = 1,579bp
-Cigar = 53S495M519N85M107N373M44S
-Clipping = Left 53 soft; Right 44 soft
+* DGAT2+D	ENST00000705697
+Unclear why exon at chr11:75,790,178-75,790,305 is not called by minimap2. Reads locally support exon, but not chained. Many supplementary alignments. Short, secondary alignments on amplicon.
 
+** PB:
+Read name = m64152e_230121_000958/113050968/ccs
+Read length = 1,820bp
+Flags = 16
+----------------------
+Mapping = Primary @ MAPQ 60
+Reference span = chr11:75,768,994-75,796,447 (-) = 27,454bp
+Cigar = 1273S 119M 15505N 129M 5441N 108M 365N 71M 5596N 120M 
+Clipping = Left 1,273 soft
+----------------------
+EXON    75790178        75790305
+
+% cigar_coordinates -d - -c 119M15505N129M5441N108M365N71M5596N120M -s 75768994
+120M    75768994        75769113
+5596N   75769114        75774709
+71M     75774710        75774780
+365N    75774781        75775145
+108M    75775146        75775253
+5441N   75775254        75780694
+129M    75780695        75780823
+15505N  75780824        75796328
+  EXON    75790178        75790305
+119M    75796329        75796447
+
+** 

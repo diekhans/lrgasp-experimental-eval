@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Session genome="hg38" locus="chr1:63367629-63437204" nextAutoscaleGroup="11" version="8">
+<Session genome="hg38" locus="chr11:75784726-75784766" nextAutoscaleGroup="11" version="8">
     <Resources>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/pb-rna-wtc11-genome.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/amplicons.bb" type="bb"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/cntl-rna-wtc11-genome.bam" type="bam"/>
         <Resource path="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/ont-rna-wtc11-genome.bam" type="bam"/>
     </Resources>
-    <Panel height="79" name="Panel1677485818588" width="1566">
+    <Panel height="3764" name="Panel1677485818588" width="1582">
         <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" height="67" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
         <Track attributeKey="Gene" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;396.0;255,255,255;0,0,178" displayMode="EXPANDED" fontSize="10" groupByStrand="false" height="67" id="hg38_genes" name="Gene" visible="true"/>
     </Panel>
-    <Panel height="123" name="FeaturePanel" width="1566">
+    <Panel height="359" name="FeaturePanel" width="1582">
         <Track attributeKey="amplicons.bb" clazz="org.broad.igv.track.FeatureTrack" colorScale="ContinuousColorScale;0.0;5.297152042388916;255,255,255;0,0,178" displayMode="EXPANDED" featureVisibilityWindow="39312000" fontSize="10" groupByStrand="false" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/amplicons.bb" name="amplicons.bb" visible="true"/>
     </Panel>
-    <Panel height="195" name="Panel1675901747412" width="1566">
+    <Panel height="208" name="Panel1675901747412" width="1582">
         <Track _color="255,51,102" attributeKey="cntl-rna-wtc11-genome.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" height="67" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/cntl-rna-wtc11-genome.bam_coverage" name="cntl-rna-wtc11-genome.bam Coverage" snpThreshold="0.2" visible="true">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="10.0" minimum="0.0" type="LINEAR"/>
         </Track>
@@ -22,9 +22,9 @@
             <RenderOptions colorOption="READ_STRAND"/>
         </Track>
     </Panel>
-    <Panel height="19518" name="Panel1675901522660" width="1566">
+    <Panel height="14982" name="Panel1675901522660" width="1582">
         <Track _color="102,255,102" attributeKey="ont-rna-wtc11-genome.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" height="67" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/ont-rna-wtc11-genome.bam_coverage" name="ont-rna-wtc11-genome.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="225013.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="70972.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="ont-rna-wtc11-genome.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="67" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/ont-rna-wtc11-genome.bam_junctions" maxdepth="50" name="ont-rna-wtc11-genome.bam Junctions" visible="true"/>
         <Track attributeKey="ont-rna-wtc11-genome.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="185,185,185" displayMode="EXPANDED" experimentType="RNA" fontSize="10" height="67" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/ont-rna-wtc11-genome.bam" name="ont-rna-wtc11-genome.bam" visible="true">
@@ -32,16 +32,16 @@
         </Track>
         <Track attributeKey="pb-rna-wtc11-genome.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/pb-rna-wtc11-genome.bam_junctions" maxdepth="50" name="pb-rna-wtc11-genome.bam Junctions" visible="true"/>
     </Panel>
-    <Panel height="8084" name="Panel1676263410374" width="1566">
+    <Panel height="4976" name="Panel1676263410374" width="1582">
         <Track _color="153,153,255" attributeKey="pb-rna-wtc11-genome.bam Coverage" autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/pb-rna-wtc11-genome.bam_coverage" name="pb-rna-wtc11-genome.bam Coverage" snpThreshold="0.2" visible="true">
-            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="57786.0" minimum="0.0" type="LINEAR"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="27560.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track attributeKey="pb-rna-wtc11-genome.bam Junctions" autoScale="false" clazz="org.broad.igv.sam.SpliceJunctionTrack" fontSize="10" groupByStrand="false" height="60" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/pb-rna-wtc11-genome.bam_junctions" maxdepth="50" name="pb-rna-wtc11-genome.bam Junctions" visible="true"/>
         <Track attributeKey="pb-rna-wtc11-genome.bam" clazz="org.broad.igv.sam.AlignmentTrack" color="185,185,185" displayMode="EXPANDED" experimentType="RNA" fontSize="10" id="https://hgwdev.gi.ucsc.edu/~markd/lrgasp/experimental-eval/hub/hg38/pb-rna-wtc11-genome.bam" name="pb-rna-wtc11-genome.bam" visible="true">
             <RenderOptions colorOption="READ_STRAND"/>
         </Track>
     </Panel>
-    <PanelLayout dividerFractions="0.008492569002123142,0.09766454352441614,0.23354564755838642,0.42250530785562634,0.6624203821656051"/>
+    <PanelLayout dividerFractions="0.008348794063079777,0.09740259740259741,0.43506493506493504,0.5714285714285714,0.7597402597402597"/>
     <Regions>
         <Region chromosome="chr1" description="HES2+B" end="6419324" start="6413087"/>
         <Region chromosome="chr1" description="HES2+A" end="6419897" start="6413112"/>
@@ -88,9 +88,10 @@
         <Region chromosome="chr11" description="LDHA+1" end="18400725" start="18394700"/>
         <Region chromosome="chr11" description="SAC3D1+1" end="65044624" start="65040954"/>
         <Region chromosome="chr11" description="DPP3+1" end="66491612" start="66480434"/>
-        <Region chromosome="chr11" description="DGAT2+A" end="75796492" start="75768793"/>
+        <Region chromosome="chr11" end="75796492" start="75768793"/>
         <Region chromosome="chr11" description="DGAT2+D" end="75797235" start="75784632"/>
         <Region chromosome="chr11" description="MPZL3+B" end="118252346" start="118228529"/>
+        <Region chromosome="chr11" description="uncalled exon" end="75790305" start="75790177"/>
         <Region chromosome="chr12" description="RERG+A" end="15119254" start="15109346"/>
         <Region chromosome="chr12" description="RERG+B" end="15121119" start="15110167"/>
         <Region chromosome="chr12" description="ITGA7+1" end="55700227" start="55692870"/>
