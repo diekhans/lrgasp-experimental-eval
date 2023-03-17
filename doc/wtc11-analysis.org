@@ -29,39 +29,35 @@ How is it possible
  ../../../bin/genomeAlignAnalyze --target=DUSP4+C ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed  ../align/pb-rna-wtc11-genome.bam debug.tsv --supportBam=debug.bam &
 
 
-* ID3+1 chr1:23558247-23559143
-looks like there are reads confirming splice sites, but only a few reported
+* stats for paper
+GENCODE-known, N=XX:
+GENCODE-novel, N=XX:,
+GENCODE-suspect, N=XX:
+GENCODE-known  validation rate, XX%
+GENCODE-known that failed to validate n+XX
+GENCODE-novel   validation rate, XX %
+GENCODE-suspect validation rate of XX,
+GENCODE-suspect “validated” XX
 
-** samtools view ../align/pb-rna-wtc11-genome.bam chr1:23558247-23559143 > ID3+1.pb.sam
-8501 ID3+1.pb.sam
+
+novel isoforms were detected in this study, XX novel isoforms in WTC11, Fig. 1b).
+
+Some isoforms were detected consistently (found in more than XX of the XX pipelines) but a vast majority
+of isoforms were detected in less than XX pipelines.
+
+we find XX validation rate for isoforms that were not reproducible across pipelines:
+
+In order to maintain a fair comparison, we limited selection of targets to <XX kb,
+
+targets with at least an average TPM of XX
+
+An isoform, X, which was detected in XX of XX ONT pipelines but only XX of XX PacBio pipelines
+was characterized by being low
+abundance.
 
 
+ including cases of a single long read (Figure XX).
 
-* DGAT2+D	ENST00000705697
-Unclear why exon at chr11:75,790,178-75,790,305 is not called by minimap2. Reads locally support exon, but not chained. Many supplementary alignments. Short, secondary alignments on amplicon.
+We found that [Mark add an example here] deemed validated revealed that an isoform for gene XX had an
+incorrect alignment.
 
-** PB:
-Read name = m64152e_230121_000958/113050968/ccs
-Read length = 1,820bp
-Flags = 16
-----------------------
-Mapping = Primary @ MAPQ 60
-Reference span = chr11:75,768,994-75,796,447 (-) = 27,454bp
-Cigar = 1273S 119M 15505N 129M 5441N 108M 365N 71M 5596N 120M 
-Clipping = Left 1,273 soft
-----------------------
-EXON    75790178        75790305
-
-% cigar_coordinates -d - -c 119M15505N129M5441N108M365N71M5596N120M -s 75768994
-120M    75768994        75769113
-5596N   75769114        75774709
-71M     75774710        75774780
-365N    75774781        75775145
-108M    75775146        75775253
-5441N   75775254        75780694
-129M    75780695        75780823
-15505N  75780824        75796328
-  EXON    75790178        75790305
-119M    75796329        75796447
-
-** 

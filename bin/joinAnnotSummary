@@ -20,18 +20,23 @@ addColumns = ["mediaCpm", "pbPlatformCount", "ontPlatformCount",
 emptyAdds = len(addColumns) * ['']
 
 
-def updateRow(annots, row, outTsvFh):
+def updateRow(annots, row, done, outTsvFh):
     annot = annots.get(row.transcript)
-    if annot is None:
+    # GENCODE known control don't have stats and only output
+    # on the first occurrence of (target, transcript)
+    pairKey = (row.target, row.transcript)
+    if (annot is None) or (pairKey in done):
         addedCols = emptyAdds
     else:
         addedCols = [annot[c] for c in addColumns]
+        done.add(pairKey)
     fileOps.prRow(outTsvFh, row.getRow() + addedCols)
 
 def joinTsvs(annots, inTsvFh, outTsvFh):
+    done = set()
     fileOps.prRow(outTsvFh, inTsvFh.columns + addColumns)
     for row in inTsvFh:
-        updateRow(annots, row, outTsvFh)
+        updateRow(annots, row, done, outTsvFh)
 
 def joinAnnotSummary(annotTsv, summaryTsv, updatedSummaryTsv):
     annots = {r.name: r for r in TsvReader(annotTsv)}

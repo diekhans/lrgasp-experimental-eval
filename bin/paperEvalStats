@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """pull stats for paper from eval spreadsheet tsv, add joinAnnotSummary added consolidate information"""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("evalTsv")
+    parser.add_argument("statsTsv")
+    return parser.parse_args()
+
+intNoneCols =
+chain	chain_in2	sim_100	sim_98	sim_95	indel_0	indel_2	Category	Notes	mediaCpm	pbPlatformCount	ontPlatformCount	freestylePlatformCount	cDNAPrepCount	dRNAPrepCount	capTrapPrepCount	r2c2PrepCount	freestylePrepCount	longOnlyCatCount	longShortCatCount	freeStyleCatCount
+
+
+def colValues(evalTbl, column):
+
+
+def paperEvalStats(evalTsv, statsTsv):
+
+    annots = {r.name: r for r in TsvReader(annotTsv)}
+    inTsvFh = TsvReader(summaryTsv)
+    with open(updatedSummaryTsv, 'w') as outTsvFh:
+        joinTsvs(annots, inTsvFh, outTsvFh)
+
+def main(opts):
+    paperEvalStats(opts.evalTsv, opts.statsTsv)
+
+main(parseArgs())
