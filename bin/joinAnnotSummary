@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """add columns from the annotation BED (in  TSV form) to the summary TSV from spreadsheet."""
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("annotTsv",)
+    parser.add_argument("summaryTsv")
+    parser.add_argument("updatedSummaryTsv")
+    return parser.parse_args()
+
+addColumns = ["mediaCpm", "pbPlatformCount", "ontPlatformCount",
+              "freestylePlatformCount", "cDNAPrepCount", "dRNAPrepCount",
+              "capTrapPrepCount", "r2c2PrepCount", "freestylePrepCount", "longOnlyCatCount",
+              "longShortCatCount", "freeStyleCatCount"]
+emptyAdds = len(addColumns) * ['']
+
+
+def updateRow(annots, row, outTsvFh):
+    annot = annots.get(row.transcript)
+    if annot is None:
+        addedCols = emptyAdds
+    else:
+        addedCols = [annot[c] for c in addColumns]
+    fileOps.prRow(outTsvFh, row.getRow() + addedCols)
+
+def joinTsvs(annots, inTsvFh, outTsvFh):
+    fileOps.prRow(outTsvFh, inTsvFh.columns + addColumns)
+    for row in inTsvFh:
+        updateRow(annots, row, outTsvFh)
+
+def joinAnnotSummary(annotTsv, summaryTsv, updatedSummaryTsv):
+    annots = {r.name: r for r in TsvReader(annotTsv)}
+    inTsvFh = TsvReader(summaryTsv)
+    with open(updatedSummaryTsv, 'w') as outTsvFh:
+        joinTsvs(annots, inTsvFh, outTsvFh)
+
+def main(opts):
+    joinAnnotSummary(opts.annotTsv, opts.summaryTsv, opts.updatedSummaryTsv)
+
+main(parseArgs())
