@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import sys
 import argparse
+import pandas as pd
 from pycbio.sys import fileOps
 from pycbio.tsv import TsvReader
+
 
 def parseArgs():
     desc = """pull stats for paper from eval spreadsheet tsv, add joinAnnotSummary added consolidate information"""
@@ -12,19 +13,100 @@ def parseArgs():
     parser.add_argument("statsTsv")
     return parser.parse_args()
 
-intNoneCols =
-chain	chain_in2	sim_100	sim_98	sim_95	indel_0	indel_2	Category	Notes	mediaCpm	pbPlatformCount	ontPlatformCount	freestylePlatformCount	cDNAPrepCount	dRNAPrepCount	capTrapPrepCount	r2c2PrepCount	freestylePrepCount	longOnlyCatCount	longShortCatCount	freeStyleCatCount
+def intOrNone(v):
+    return None if v == "" else int(v)
+
+def floatOrNone(v):
+    return None if v == "" else float(v)
+
+typeMap = {
+    "sim_100": intOrNone,
+    "sim_98": intOrNone,
+    "sim_95": intOrNone,
+    "indel_0": intOrNone,
+    "indel_2": intOrNone,
+    "mediaCpm": floatOrNone,
+    "pbPlatformCount": intOrNone,
+    "ontPlatformCount": intOrNone,
+    "freestylePlatformCount": intOrNone,
+    "cDNAPrepCount": intOrNone,
+    "dRNAPrepCount": intOrNone,
+    "capTrapPrepCount": intOrNone,
+    "r2c2PrepCount": intOrNone,
+    "freestylePrepCount": intOrNone,
+    "longOnlyCatCount": intOrNone,
+    "longShortCatCount": intOrNone,
+    "freeStyleCatCount": intOrNone,
+}
+
+def loadEvals(evalTsv):
+    return [r for r in TsvReader(evalTsv, typeMap=typeMap)]
 
 
-def colValues(evalTbl, column):
+def getRows(evals, col, val):
+    return [r for r in evals
+            if getattr(col) == val]
+
+def percent(n, total):
+    if total == 0:
+        return 0.0
+    else:
+        return round(100 * (n / total), 1)
+
+def gencodeReport(evals, evalDf, fh):
+    # pb row is first with gencode and category
+    df = evalDf[(evalDf.plat == "pb")]
+    knownDf = df[(df.gencode == "known")]
+    novelDf = df[(df.gencode == "novel")]
+    rejectedDf = df[(df.gencode == "rejected")]
+
+    # GENCODE-known, N=XX:
+    fileOps.prRowv(fh, "gencodeKnown", len(knownDf))
+
+    # GENCODE-novel, N=XX:,
+    fileOps.prRowv(fh, "gencodeNovel", len(novelDf))
+
+    # GENCODE-suspect, N=XX:
+    fileOps.prRowv(fh, "gencodeRejected", len(rejectedDf))
+
+    total = len(knownDf) + len(novelDf) + len(rejectedDf)
+
+    # GENCODE-known validation rate, XX%
+    fileOps.prRowv(fh, "gencodeKnowSupportRate",
+                   percent(len(knownDf[knownDf.category != "unsupported"]),
+                           len(knownDf)))
+
+    # GENCODE-known that failed to validate n+XX
+    fileOps.prRowv(fh, "gencodeKnowNotValidated",
+                   percent(len(knownDf[knownDf.category == "unsupported"]),
+                           len(knownDf)))
+
+    # GENCODE-novel   validation rate, XX %
+    fileOps.prRowv(fh, "gencodeNoverlSupportRate",
+                   percent(len(novelDf[novelDf.category == "supported"]),
+                           len(novelDf)))
+
+    # GENCODE-suspect validation rate of XX,
+    fileOps.prRowv(fh, "gencodeRejectedSupportRate",
+                   percent(len(rejectedDf[rejectedDf.category == "supported"]),
+                           len(rejectedDf)))
+
+    # GENCODE-suspect “validated” XX
+    fileOps.prRowv(fh, "gencodeRejectedSupport",
+                   len(rejectedDf[rejectedDf.category == "supported"]))
+
+
+def report(evals, evalsDf, fh):
+    fileOps.prRowv(fh, "name", "value")
+    if 'gencode' in evalsDf.columns:
+        gencodeReport(evals, evalsDf, fh)
 
 
 def paperEvalStats(evalTsv, statsTsv):
-
-    annots = {r.name: r for r in TsvReader(annotTsv)}
-    inTsvFh = TsvReader(summaryTsv)
-    with open(updatedSummaryTsv, 'w') as outTsvFh:
-        joinTsvs(annots, inTsvFh, outTsvFh)
+    evals = loadEvals(evalTsv)
+    evalsDf = pd.read_table(evalTsv)
+    with open(statsTsv, 'w') as fh:
+        report(evals, evalsDf, fh)
 
 def main(opts):
     paperEvalStats(opts.evalTsv, opts.statsTsv)

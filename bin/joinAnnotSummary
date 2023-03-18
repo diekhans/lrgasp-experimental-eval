@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import argparse
 from pycbio.sys import fileOps
 from pycbio.tsv import TsvReader

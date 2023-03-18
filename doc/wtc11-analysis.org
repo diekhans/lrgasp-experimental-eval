@@ -30,33 +30,29 @@ How is it possible
 
 
 * stats for paper
+../bin/paperEvalStats wtc11-support.summary.tsv /dev/stdout
 GENCODE-known, N=XX:
 GENCODE-novel, N=XX:,
 GENCODE-suspect, N=XX:
-GENCODE-known  validation rate, XX%
+GENCODE-known validation rate, XX%
 GENCODE-known that failed to validate n+XX
 GENCODE-novel   validation rate, XX %
 GENCODE-suspect validation rate of XX,
 GENCODE-suspect “validated” XX
 
+novel isoforms count:
+novel isoforms detected in N pipelines (different customs)
+novel isoforms in less name Npipelines
 
-novel isoforms were detected in this study, XX novel isoforms in WTC11, Fig. 1b).
-
-Some isoforms were detected consistently (found in more than XX of the XX pipelines) but a vast majority
-of isoforms were detected in less than XX pipelines.
-
+validation rate for isoforms unique 
 we find XX validation rate for isoforms that were not reproducible across pipelines:
 
 In order to maintain a fair comparison, we limited selection of targets to <XX kb,
-
 targets with at least an average TPM of XX
 
 An isoform, X, which was detected in XX of XX ONT pipelines but only XX of XX PacBio pipelines
-was characterized by being low
-abundance.
 
-
- including cases of a single long read (Figure XX).
+including cases of a single long read (Figure XX).
 
 We found that [Mark add an example here] deemed validated revealed that an isoform for gene XX had an
 incorrect alignment.
