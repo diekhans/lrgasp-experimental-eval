@@ -11,24 +11,14 @@ https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hN
 * JuJu spread sheet
 https://docs.google.com/spreadsheets/d/1Y3KhZoezR8Ti5mauYXQFxuwE04xmEgPPyxoJoRxuYuA/edit#gid=210377221
 
-
-* ALG6+1
-All models are bad. Intron 3' end at chr1:63,411,128-63,411,194 has GT-AT
-splice site.  This is a documented U12 intron, but with a very rare splicing
-pattern.  Supported by WTC-11 reads. GENCODE and RefSeq.  Models and minimap2
-seemed to have force GT-AG 6 bases upstream by calling an intron +
-target-insertion (D).
-
-* ARPC2+1 (287pb
-Lots of 100% amplicon support, but no chain support.
-Exon at chr2:218,217,459-218,217,545 is include in all chains, but not in target.
-How is it possible
-
+* issues:
+** how to get squanti stats for gencode models ENST & TM_
 
 * debugging:
  ../../../bin/genomeAlignAnalyze --target=DUSP4+C ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed  ../align/pb-rna-wtc11-genome.bam debug.tsv --supportBam=debug.bam &
 
-
+evalsDf = pd.read_table("wtc11-support.summary.tsv")
+ 
 * stats for paper
 ../bin/paperEvalStats wtc11-support.summary.tsv /dev/stdout
 GENCODE-known, N=XX:
@@ -42,7 +32,7 @@ GENCODE-suspect “validated” XX
 
 novel isoforms count:
 novel isoforms detected in N pipelines (different customs)
-novel isoforms in less name Npipelines
+novel isoforms in less name N pipelines
 
 validation rate for isoforms unique 
 we find XX validation rate for isoforms that were not reproducible across pipelines:
@@ -56,4 +46,5 @@ including cases of a single long read (Figure XX).
 
 We found that [Mark add an example here] deemed validated revealed that an isoform for gene XX had an
 incorrect alignment.
+
 
