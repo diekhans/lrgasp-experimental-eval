@@ -8,15 +8,22 @@ from pycbio.sys import fileOps
 def parseArgs():
     desc = """pull stats for paper from eval spreadsheet tsv, add joinAnnotSummary added consolidate information"""
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--transcriptTsv")
     parser.add_argument("evalTsv")
     parser.add_argument("statsTsv")
     return parser.parse_args()
+
 
 def percent(n, total):
     if total == 0:
         return 0.0
     else:
         return round(100 * (n / total), 1)
+
+def basicReport(evalDf, fh):
+    fileOps.prRowv(fh, "genes", len(set(evalDf.gene)))
+    fileOps.prRowv(fh, "targets", len(set(evalDf.target)))
+    fileOps.prRowv(fh, "transcripts", len(set(evalDf.transcript)))
 
 def gencodeReport(evalDf, fh):
     # pb row is first with gencode and category
@@ -34,8 +41,6 @@ def gencodeReport(evalDf, fh):
     # GENCODE-suspect, N=XX:
     fileOps.prRowv(fh, "gencodeRejected", len(rejectedDf))
 
-    total = len(knownDf) + len(novelDf) + len(rejectedDf)
-
     # GENCODE-known validation rate, XX%
     fileOps.prRowv(fh, "gencodeKnowSupportRate",
                    percent(len(knownDf[knownDf.category != "unsupported"]),
@@ -47,7 +52,7 @@ def gencodeReport(evalDf, fh):
                            len(knownDf)))
 
     # GENCODE-novel   validation rate, XX %
-    fileOps.prRowv(fh, "gencodeNoverlSupportRate",
+    fileOps.prRowv(fh, "gencodeNovelSupportRate",
                    percent(len(novelDf[novelDf.category == "supported"]),
                            len(novelDf)))
 
@@ -67,9 +72,12 @@ _supportRanks = {
     "": 4
 }
 
-def squantiEval(evalsDf, fh):
+def squantiReport(evalDf, fh, transcriptTsv):
+    # manatee doesn't have captrap
+    isManatee = "capTrapPrepCount" not in evalDf.columns
+
     # pb is first line of experiment experiment, other stats are NaN if not squanti-evaluated
-    df = evalsDf[(evalsDf.plat == "pb")].dropna(subset=("capTrapPrepCount",))
+    df = evalDf[(evalDf.plat == "pb")].dropna(subset=("mediaCpm",))
 
     # convert category to key
     transDf = df.copy()
@@ -77,16 +85,16 @@ def squantiEval(evalsDf, fh):
     transDf.sort_values(["transcript", "rank"], inplace=True)
     transDf.drop_duplicates("transcript", inplace=True)
 
-    # pull out highest
-    novelDf = transDf[transDf.transcript.str.startswith('N')]
+    # all consider novel in manatee due to poor annotation
+    if isManatee:
+        novelDf = transDf
+    else:
+        noveldf = transDf[transDf.transcript.str.startswith('N')]
 
-    pc = novelDf.loc[:, ["longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]].sum(axis = 1).copy()
+    catCols = [c for c in ["longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]
+               if c in novelDf.columns]
+    pc = novelDf.loc[:, catCols].sum(axis=1).copy().convert_dtypes()
     novelDf.insert(len(novelDf.columns), 'pipeLineCount', pc)
-
-    # overview
-    fileOps.prRowv(fh, "targets", len(set(evalsDf.target)))
-    fileOps.prRowv(fh, "transcripts", len(set(evalsDf.transcript)))
-
 
     # novel isoforms count:
     fileOps.prRowv(fh, "novelIsoforms", len(novelDf))
@@ -102,20 +110,28 @@ def squantiEval(evalsDf, fh):
         fileOps.prRowv(fh, "novelPipelineCnt_ge_" + str(np), len(novelDf[novelDf.pipeLineCount >= np]))
         fileOps.prRowv(fh, "novelPipelineCnt_lt_" + str(np), len(novelDf[novelDf.pipeLineCount < np]))
 
+    if transcriptTsv is not None:
+        # don't include these eval counts are not summed
+        drop = ["rank", "plat", "chain", "chain_in2", "sim_100", "sim_98", "sim_95", "indel_0", "indel_2", "notes"]
+        transDf.drop(drop, axis=1).to_csv(transcriptTsv, index=False, sep="\t")
 
-def report(evalsDf, fh):
+
+def report(evalDf, fh, transcriptTsv):
     fileOps.prRowv(fh, "name", "value")
-    if 'gencode' in evalsDf.columns:
-        gencodeReport(evalsDf, fh)
-    squantiEval(evalsDf, fh)
+    basicReport(evalDf, fh)
+    if "longOnlyCatCount" in evalDf.columns:
+        squantiReport(evalDf, fh, transcriptTsv)
+    if 'gencode' in evalDf.columns:
+        gencodeReport(evalDf, fh)
 
 
-def paperEvalStats(evalTsv, statsTsv):
-    evalsDf = pd.read_table(evalTsv)
+def paperEvalStats(evalTsv, statsTsv, transcriptTsv):
+    evalDf = pd.read_table(evalTsv)
+    evalDf = evalDf.convert_dtypes()  # make ints ints rather than floats
     with open(statsTsv, 'w') as fh:
-        report(evalsDf, fh)
+        report(evalDf, fh, transcriptTsv)
 
 def main(opts):
-    paperEvalStats(opts.evalTsv, opts.statsTsv)
+    paperEvalStats(opts.evalTsv, opts.statsTsv, opts.transcriptTsv)
 
 main(parseArgs())

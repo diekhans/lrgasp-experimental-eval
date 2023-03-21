@@ -48,3 +48,38 @@ We found that [Mark add an example here] deemed validated revealed that an isofo
 incorrect alignment.
 
 
+* % ../bin/paperEvalStats wtc11-support.tsv wtc11-stats.tsv
+| name                   | value |
+|------------------------+-------|
+| genes                  |    88 |
+| targets                |    89 |
+| transcripts            |    88 |
+| novelIsoforms          |    64 |
+| maxPipelines           |    33 |
+| novelPipelineCnt_ge_1  |    64 |
+| novelPipelineCnt_lt_1  |     0 |
+| novelPipelineCnt_ge_9  |    39 |
+| novelPipelineCnt_lt_9  |    25 |
+| novelPipelineCnt_ge_17 |    29 |
+| novelPipelineCnt_lt_17 |    35 |
+| novelPipelineCnt_ge_25 |    16 |
+| novelPipelineCnt_lt_25 |    48 |
+| novelPipelineCnt_ge_33 |     2 |
+| novelPipelineCnt_lt_33 |    62 |
+
+
+* % ../bin/paperEvalStats gencode-support.tsv gencode-stats.tsv
+| name                       | value |
+|----------------------------+-------|
+| genes                      |    36 |
+| targets                    |    80 |
+| transcripts                |    77 |
+| gencodeKnown               |    28 |
+| gencodeNovel               |    42 |
+| gencodeRejected            |     9 |
+| gencodeKnowSupportRate     |  82.1 |
+| gencodeKnowNotValidated    |  17.9 |
+| gencodeNovelSupportRate    |  59.5 |
+| gencodeRejectedSupportRate |  22.2 |
+| gencodeRejectedSupport     |     2 |
+

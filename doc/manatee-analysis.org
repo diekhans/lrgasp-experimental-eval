@@ -6,16 +6,19 @@
  ../../../bin/genomeAlignAnalyze --target=X --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed 
  ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
 
-* stats
-../bin/paperEvalStats manatee-support.summary.tsv /dev/stdout
-name	value
-novelIsoforms	40
-maxPipelines	4
-novelPipelineCnt_ge_1	40
-novelPipelineCnt_lt_1	0
-novelPipelineCnt_ge_10	0
-novelPipelineCnt_lt_10	40
-novelPipelineCnt_ge_4	3
-novelPipelineCnt_lt_4	37
-
-
+* % ../bin/paperEvalStats --transcriptTsv=manatee.transcripts.tsv manatee-support.tsv manatee-stats.tsv 
+| name                  | value |
+|-----------------------+-------|
+| genes                 |     8 |
+| targets               |    22 |
+| transcripts           |    26 |
+| novelIsoforms         |    19 |
+| maxPipelines          |     4 |
+| novelPipelineCnt_ge_1 |    19 |
+| novelPipelineCnt_lt_1 |     0 |
+| novelPipelineCnt_ge_2 |    11 |
+| novelPipelineCnt_lt_2 |     8 |
+| novelPipelineCnt_ge_3 |     4 |
+| novelPipelineCnt_lt_3 |    15 |
+| novelPipelineCnt_ge_4 |     1 |
+| novelPipelineCnt_lt_4 |    18 |
