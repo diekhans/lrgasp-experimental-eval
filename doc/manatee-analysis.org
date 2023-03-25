@@ -21,6 +21,7 @@ tmlr filter '$pri==1' ../../../primers/primer-design/hub/manatee/juju_designs.ma
  ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
 
 * % ../bin/paperEvalStats --transcriptTsv=manatee.transcripts.tsv manatee-support.tsv manatee-stats.tsv 
+|-----------------------+-------|
 | name                  | value |
 |-----------------------+-------|
 | genes                 |     8 |
@@ -36,3 +37,5 @@ tmlr filter '$pri==1' ../../../primers/primer-design/hub/manatee/juju_designs.ma
 | novelPipelineCnt_lt_3 |    15 |
 | novelPipelineCnt_ge_4 |     1 |
 | novelPipelineCnt_lt_4 |    18 |
+|-----------------------+-------|
+

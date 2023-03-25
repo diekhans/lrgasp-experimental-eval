@@ -20,17 +20,49 @@ def percent(n, total):
     else:
         return round(100 * (n / total), 1)
 
+_supports = ("supported", "likely", "unsupported")
+_supportRanks = {
+    "supported": 1,
+    "likely": 2,
+    "unsupported": 3,
+    "": 4
+}
+
+def filterToTranscript(evalDf):
+    "get a per-transcript data frame, with maximum support, worth with squanti or gencode"
+
+    # transcript lines have non-null in either  transcript stats columns or
+    # has a gencode columnn
+    if "gencode" in evalDf.columns:
+        transDf = evalDf.drop(evalDf[evalDf.gencode == ""].index)
+        transDf = transDf.drop(evalDf[~evalDf.category.isin(_supports)].index)
+    else:
+        transDf = evalDf.dropna(subset=("mediaCpm",))
+
+    # drop per-target columns
+    dropCols = set(transDf.columns) & set(["target", "position", "plat", "chain", "chain_in2", "sim_100", "sim_98", "sim_95", "indel_0", "indel_2", "notes", "amplicon_len"])
+    transDf = transDf.drop(dropCols, axis=1)
+
+    # convert support category to key to sort to get best support
+    transDf.insert(0, "rank", transDf.category.apply(lambda c: _supportRanks[c]))
+    transDf = transDf.sort_values(["transcript", "rank"])
+    transDf = transDf.drop_duplicates("transcript")
+    transDf = transDf.drop("rank", axis=1)
+    transDf = transDf.sort_values(["gene", "transcript"])
+    return transDf
+
 def basicReport(evalDf, fh):
     fileOps.prRowv(fh, "genes", len(set(evalDf.gene)))
     fileOps.prRowv(fh, "targets", len(set(evalDf.target)))
     fileOps.prRowv(fh, "transcripts", len(set(evalDf.transcript)))
 
-def gencodeReport(evalDf, fh):
+def gencodeReport(transDf, fh):
     # pb row is first with gencode and category
-    df = evalDf[(evalDf.plat == "pb")]
-    knownDf = df[(df.gencode == "known")]
-    novelDf = df[(df.gencode == "novel")]
-    rejectedDf = df[(df.gencode == "rejected")]
+    knownDf = transDf[(transDf.gencode == "known")]
+    novelDf = transDf[(transDf.gencode == "novel")]
+    rejectedDf = transDf[(transDf.gencode == "rejected")]
+
+    fileOps.prRowv(fh, "gencodeTotal", len(knownDf) + len(novelDf) + len(rejectedDf))
 
     # GENCODE-known, N=XX:
     fileOps.prRowv(fh, "gencodeKnown", len(knownDf))
@@ -42,54 +74,50 @@ def gencodeReport(evalDf, fh):
     fileOps.prRowv(fh, "gencodeRejected", len(rejectedDf))
 
     # GENCODE-known validation rate, XX%
-    fileOps.prRowv(fh, "gencodeKnowSupportRate",
+    fileOps.prRowv(fh, "gencodeKnowSupported",
+                   len(knownDf[knownDf.category != "unsupported"]))
+    fileOps.prRowv(fh, "gencodeKnowSupportedRate",
                    percent(len(knownDf[knownDf.category != "unsupported"]),
                            len(knownDf)))
 
     # GENCODE-known that failed to validate n+XX
-    fileOps.prRowv(fh, "gencodeKnowNotValidated",
+    fileOps.prRowv(fh, "gencodeKnowUnsupported",
+                   len(knownDf[knownDf.category == "unsupported"]))
+    fileOps.prRowv(fh, "gencodeKnowUnsupportedRate",
                    percent(len(knownDf[knownDf.category == "unsupported"]),
                            len(knownDf)))
 
     # GENCODE-novel   validation rate, XX %
-    fileOps.prRowv(fh, "gencodeNovelSupportRate",
+    fileOps.prRowv(fh, "gencodeNovelSupported",
+                   len(novelDf[novelDf.category == "supported"]))
+    fileOps.prRowv(fh, "gencodeNovelSupportedRate",
                    percent(len(novelDf[novelDf.category == "supported"]),
                            len(novelDf)))
 
     # GENCODE-suspect validation rate of XX,
-    fileOps.prRowv(fh, "gencodeRejectedSupportRate",
+    fileOps.prRowv(fh, "gencodeRejectedSupported",
+                   len(rejectedDf[rejectedDf.category == "supported"]))
+    fileOps.prRowv(fh, "gencodeRejectedSupportedRate",
                    percent(len(rejectedDf[rejectedDf.category == "supported"]),
                            len(rejectedDf)))
 
-    # GENCODE-suspect “validated” XX
-    fileOps.prRowv(fh, "gencodeRejectedSupport",
-                   len(rejectedDf[rejectedDf.category == "supported"]))
+    # GENCODE-suspect unsupported rate of XX,
+    fileOps.prRowv(fh, "gencodeRejectedUnupported",
+                   len(rejectedDf[rejectedDf.category != "supported"]))
+    fileOps.prRowv(fh, "gencodeRejectedUnupportedRate",
+                   percent(len(rejectedDf[rejectedDf.category != "supported"]),
+                           len(rejectedDf)))
 
-_supportRanks = {
-    "supported": 1,
-    "likely": 2,
-    "unsupported": 3,
-    "": 4
-}
 
-def squantiReport(evalDf, fh, transcriptTsv):
+def squantiReport(transDf, fh):
     # manatee doesn't have captrap
-    isManatee = "capTrapPrepCount" not in evalDf.columns
-
-    # pb is first line of experiment experiment, other stats are NaN if not squanti-evaluated
-    df = evalDf[(evalDf.plat == "pb")].dropna(subset=("mediaCpm",))
-
-    # convert category to key
-    transDf = df.copy()
-    transDf.insert(0, "rank", transDf.category.apply(lambda c: _supportRanks[c]))
-    transDf.sort_values(["transcript", "rank"], inplace=True)
-    transDf.drop_duplicates("transcript", inplace=True)
+    isManatee = "capTrapPrepCount" not in transDf.columns
 
     # all consider novel in manatee due to poor annotation
     if isManatee:
         novelDf = transDf
     else:
-        noveldf = transDf[transDf.transcript.str.startswith('N')]
+        novelDf = transDf[transDf.transcript.str.startswith('N')]
 
     catCols = [c for c in ["longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]
                if c in novelDf.columns]
@@ -110,19 +138,16 @@ def squantiReport(evalDf, fh, transcriptTsv):
         fileOps.prRowv(fh, "novelPipelineCnt_ge_" + str(np), len(novelDf[novelDf.pipeLineCount >= np]))
         fileOps.prRowv(fh, "novelPipelineCnt_lt_" + str(np), len(novelDf[novelDf.pipeLineCount < np]))
 
-    if transcriptTsv is not None:
-        # don't include these eval counts are not summed
-        drop = ["rank", "plat", "chain", "chain_in2", "sim_100", "sim_98", "sim_95", "indel_0", "indel_2", "notes"]
-        transDf.drop(drop, axis=1).to_csv(transcriptTsv, index=False, sep="\t")
-
-
 def report(evalDf, fh, transcriptTsv):
     fileOps.prRowv(fh, "name", "value")
     basicReport(evalDf, fh)
+    transDf = filterToTranscript(evalDf)
     if "longOnlyCatCount" in evalDf.columns:
-        squantiReport(evalDf, fh, transcriptTsv)
-    if 'gencode' in evalDf.columns:
-        gencodeReport(evalDf, fh)
+        squantiReport(transDf, fh)
+    elif 'gencode' in evalDf.columns:
+        gencodeReport(transDf, fh)
+    if transcriptTsv is not None:
+        transDf.to_csv(transcriptTsv, index=False, sep="\t")
 
 
 def paperEvalStats(evalTsv, statsTsv, transcriptTsv):

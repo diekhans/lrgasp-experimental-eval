@@ -5,6 +5,21 @@ https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+o
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.95.genome.bam
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.90.genome.bam
 
+* squanti data
+** Francisco J. Pardo-Palacios
+I think I already have the data you need uploaded
+to synapse I calculated the median CPM per Unique Intron Chain using all the
+classification files in a given sample (i.e. WTC11). In those tsv files, the
+FL column stands for the number of reads that the submitters used to build
+their model according to their read2transcript file, and the UIC name
+corresponds to the column LRGASP_ID . And that's all I used The evaluation
+results can be found in the LRGASP synapse --> Files --> results -->
+Challenge1 For each tool/submitter, I uploaded a compressed folder that
+includes the evaluation for all the samples, platforms and library preps
+submitted (files named *classification.txt ). These files were given to the
+submitters when we finished the evaluation, so they should be already public
+to some extent
+
 * Gloria spread sheet
 https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hNMVA/edit#gid=0
 
@@ -77,7 +92,8 @@ We found that [Mark add an example here] deemed validated revealed that an isofo
 incorrect alignment.
 
 
-* % ../bin/paperEvalStats wtc11-support.tsv wtc11-stats.tsv
+* % ../bin/paperEvalStats  --transcriptTsv=wtc11-transcripts.tsv wtc11-support.tsv wtc11-stats.tsv
+|------------------------+-------|
 | name                   | value |
 |------------------------+-------|
 | genes                  |    88 |
@@ -95,20 +111,28 @@ incorrect alignment.
 | novelPipelineCnt_lt_25 |    48 |
 | novelPipelineCnt_ge_33 |     2 |
 | novelPipelineCnt_lt_33 |    62 |
+|------------------------+-------|
 
 
-* % ../bin/paperEvalStats gencode-support.tsv gencode-stats.tsv
-| name                       | value |
-|----------------------------+-------|
-| genes                      |    36 |
-| targets                    |    80 |
-| transcripts                |    77 |
-| gencodeKnown               |    28 |
-| gencodeNovel               |    42 |
-| gencodeRejected            |     9 |
-| gencodeKnowSupportRate     |  82.1 |
-| gencodeKnowNotValidated    |  17.9 |
-| gencodeNovelSupportRate    |  59.5 |
-| gencodeRejectedSupportRate |  22.2 |
-| gencodeRejectedSupport     |     2 |
-
+* % ../bin/paperEvalStats --transcriptTsv=gencode-transcripts.tsv gencode-support.tsv gencode-stats.tsv
+|-------------------------------+-------|
+| name                          | value |
+|-------------------------------+-------|
+| genes                         |    35 |
+| targets                       |    79 |
+| transcripts                   |    76 |
+| gencodeTotal                  |    76 |
+| gencodeKnown                  |    27 |
+| gencodeNovel                  |    40 |
+| gencodeRejected               |     9 |
+| gencodeKnowSupported          |    22 |
+| gencodeKnowSupportedRate      |  81.5 |
+| gencodeKnowUnsupported        |     5 |
+| gencodeKnowUnsupportedRate    |  18.5 |
+| gencodeNovelSupported         |    23 |
+| gencodeNovelSupportedRate     |  57.5 |
+| gencodeRejectedSupported      |     2 |
+| gencodeRejectedSupportedRate  |  22.2 |
+| gencodeRejectedUnupported     |     7 |
+| gencodeRejectedUnupportedRate |  77.8 |
+|-------------------------------+-------|
