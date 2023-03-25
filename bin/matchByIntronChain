@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+import argparse
+from collections import defaultdict
+from pycbio.sys import fileOps
+from pycbio.hgdata.bed import BedReader
+
+trace = False
+
+def parseArgs():
+    desc = """Match BED records from two files by intron chain.
+    """
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("matchBed",
+                        help="""names in this BED are match inBed  """)
+    parser.add_argument("inBedTsv",
+                        help="""bed record with TSV header to match with ids from matchBed.
+                        Records not matched are skipped.""")
+    parser.add_argument("outNamesBedTsv",
+                        help="""first column is name from matchBed, rest is full in BED.
+                        match""")
+    parser.add_argument("unmatchedBed",
+                        help="""file will have matchBeds that are not matched""")
+    return parser.parse_args()
+
+def buildIntronChain(bed):
+    chain = []
+    prevBlk = None
+    for blk in bed.blocks:
+        if prevBlk is not None:
+            chain.append((bed.chrom, prevBlk.end, blk.start))
+        prevBlk = blk
+    return tuple(chain)
+
+def loadMatchRecord(matchTbl, bed):
+    introns = buildIntronChain(bed)
+    if len(introns) > 0:
+        matchTbl[introns].append(bed)
+
+def loadMatchBed(matchBedFile):
+    matchTbl = defaultdict(list)
+    for bed in BedReader(matchBedFile):
+        loadMatchRecord(matchTbl, bed)
+    matchTbl.default_factory = None
+    return matchTbl
+
+def inBedTsvOpen(inBedTsv):
+    inBedFh = fileOps.opengz(inBedTsv)
+    line0 = inBedFh.readline()
+    if len(line0) == 0:
+        raise Exception(f"unexpected empty file: {inBedTsv}")
+    columns = line0[0:-1].split("\t")
+    return columns, inBedFh
+
+def processInBed(matchTbl, matchedIntrons, inBed, outNamesBedFh):
+    introns = buildIntronChain(inBed)
+    matchBeds = matchTbl.get(introns)
+    if matchBeds is not None:
+        for matchBed in matchBeds:
+            fileOps.prRowv(outNamesBedFh, matchBed.name, *inBed.toRow())
+            matchedIntrons.add(introns)
+
+def findMatches(matchTbl, columns, inBedFh, outNamesBedFh):
+    matchedIntrons = set()
+    fileOps.prRowv(outNamesBedFh, "matchName", *columns)
+    for inBed in BedReader(inBedFh):
+        processInBed(matchTbl, matchedIntrons, inBed, outNamesBedFh)
+    return matchedIntrons
+
+def reportUnmatched(matchTbl, matchedIntrons, unmatchedBedFh):
+    for intron in matchTbl.keys():
+        if intron not in matchedIntrons:
+            for matchBed in matchTbl[intron]:
+                matchBed.write(unmatchedBedFh)
+
+def matchByIntronChain(matchBed, inBedTsv, outNamesBedTsv, unmatchedBed):
+    matchTbl = loadMatchBed(matchBed)
+    columns, inBedFh = inBedTsvOpen(inBedTsv)
+    with open(outNamesBedTsv, 'w') as outNamesBedFh:
+        matchedIntrons = findMatches(matchTbl, columns, inBedFh, outNamesBedFh)
+    with open(unmatchedBed, 'w') as unmatchedBedFh:
+        reportUnmatched(matchTbl, matchedIntrons, unmatchedBedFh)
+
+def main(opts):
+    matchByIntronChain(opts.matchBed, opts.inBedTsv, opts.outNamesBedTsv, opts.unmatchedBed)
+
+main(parseArgs())

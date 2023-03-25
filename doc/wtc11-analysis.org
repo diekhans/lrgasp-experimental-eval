@@ -11,9 +11,38 @@ https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hN
 * JuJu spread sheet
 https://docs.google.com/spreadsheets/d/1Y3KhZoezR8Ti5mauYXQFxuwE04xmEgPPyxoJoRxuYuA/edit#gid=210377221
 
-* issues:
-** how to get squanti stats for gencode models ENST & TM_
 
+* wtc11:  generate amplicon and transcript lengths to add to spread sheet
+cd extra-data/wtc11
+
+# wtc11-trans_len.tsv
+bigBedToBed ../../../primers/primer-design/data/hg38/WTC11_consolidated.bigBed stdout | cut -f 1-12 >WTC11_consolidated.bed
+(echo "transcript${tab}trans_len" ; (twoBitToFa -bed=WTC11_consolidated.bed  /hive/data/genomes/hg38/hg38.2bit  stdout | faSize -detailed /dev/stdin)) >wtc11-trans_len.tsv
+
+# wtc11.isoforms.tsv
+tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f wtc11-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript > wtc11.isoforms.tsv 
+
+# wtc11-lengths.rows.tsv
+../../bin/spreadSheetOrder --rowsToAddPerGroup=2 wtc11-support.tsv wtc11.isoforms.tsv /dev/stdout | tmlr cut -o -f target,transcript,trans_len,amplicon_len >wtc11-lengths.rows.tsv
+
+* gencode: generate amplicon and transcript lengths to add to spread sheet
+
+# gencode-trans_len.tsv
+for bb in  ../../../primers/primer-design/data/hg38/human_GENCODE_tmerge_transcripts.bb ../../../primers/primer-design/data/hg38/non_redundant_*.bb ; do bigBedToBed $bb stdout | cut -f 1-12 ; done > gencode-combined.bed 
+(echo "transcript${tab}trans_len" ; (twoBitToFa -bed=gencode-combined.bed /hive/data/genomes/hg38/hg38.2bit stdout) | faSize -detailed stdin) >gencode-trans_len.tsv
+
+# gencode.isoforms.tsv
+tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f gencode-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript > gencode.isoforms.tsv 
+
+# gencode-lengths.rows.tsv
+../../bin/spreadSheetOrder --rowsToAddPerGroup=2 gencode-support.tsv gencode.isoforms.tsv /dev/stdout | tmlr cut -o -f target,transcript,trans_len,amplicon_len >gencode-lengths.rows.tsv
+
+
+* match GENCODE models to WTC11 consolidated tracks
+gtfToGenePred ../gencode/human_LRGASP_unannotated_transcripts.gtf gencode.gp
+genePredToBed gencode.gp gencode.bed
+../bin/matchByIntronChain LRGASP_manual_annotation.human.all.20220428.bed WTC11_consolidated-gencode.tsv gencode.unmatched.bed >&out
+# nothing useful found
 * debugging:
  ../../../bin/genomeAlignAnalyze --target=DUSP4+C ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed  ../align/pb-rna-wtc11-genome.bam debug.tsv --supportBam=debug.bam &
 

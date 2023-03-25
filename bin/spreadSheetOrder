@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+import argparse
+from collections import defaultdict
+from pycbio.sys import fileOps
+from pycbio.tsv import TsvReader
+
+def parseArgs():
+    desc = """order a TSV to match the spread sheet so it can be inserted in the spread sheet """
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--rowsToAddPerGroup", type=int,
+                        help="""for each target/transcript pair include this many copys of match""")
+    parser.add_argument("spreadSheetTsv",)
+    parser.add_argument("dataTsv")
+    parser.add_argument("orderedTsv")
+    return parser.parse_args()
+
+def getRowKey(row):
+    return (row.target, row.transcript)
+
+def loadSpeadsheetOrder(spreadSheetTsv):
+    spreadOrder = dict()
+    groupRowCnt = defaultdict(int)
+    iOrder = 0
+    for row in TsvReader(spreadSheetTsv):
+        key = getRowKey(row)
+        if key not in spreadOrder:
+            spreadOrder[key] = iOrder
+            iOrder += 1
+        groupRowCnt[key] += 1
+    minGrc = min(groupRowCnt.values())
+    maxGrc = max(groupRowCnt.values())
+    if minGrc != maxGrc:
+        raise Exception("minGrc != maxGrc")
+    return spreadOrder, maxGrc
+
+def loadSortData(dataTsv, spreadOrder):
+    rows = [r for r in TsvReader(dataTsv)]
+    return sorted(filter(lambda r: getRowKey(r) in spreadOrder, rows),
+                  key=lambda r: spreadOrder[getRowKey(r)])
+
+def outputSpread(data, groupRowCount, rowsToAddPerGroup, fh):
+    fill = len(data[0]._columns_) * ['']
+    fileOps.prRow(fh, data[0]._columns_)
+    for row in data:
+        for i in range(0, rowsToAddPerGroup):
+            fileOps.prRow(fh, row)
+        for i in range(rowsToAddPerGroup, groupRowCount):
+            fileOps.prRow(fh, fill)
+
+def spreedSheetOrder(spreadSheetTsv, dataTsv, orderedTsv, rowsToAddPerGroup):
+    spreadOrder, groupRowCount = loadSpeadsheetOrder(spreadSheetTsv)
+    rowsToAddPerGroup = groupRowCount if rowsToAddPerGroup is None else min(rowsToAddPerGroup, groupRowCount)
+    data = loadSortData(dataTsv, spreadOrder)
+    with open(orderedTsv, 'w') as fh:
+        outputSpread(data, groupRowCount, rowsToAddPerGroup, fh)
+
+def main(opts):
+    spreedSheetOrder(opts.spreadSheetTsv, opts.dataTsv, opts.orderedTsv, opts.rowsToAddPerGroup)
+
+main(parseArgs())

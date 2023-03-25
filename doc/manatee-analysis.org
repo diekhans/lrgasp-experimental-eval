@@ -2,6 +2,20 @@
 ** aligning without dups resulted in some controls aligning only to the wrong isoform, so stuck with allowing dups
 
 
+* manatee: generate amplicon and transcript lengths to add to spread sheet
+cd extra-data/manatee
+
+# manatee-trans_len.tsv
+bigBedToBed ../../../primers/primer-design/data/manatee/Manatee_consolidated.bb stdout | cut -f 1-12 >Manatee_consolidated.bed
+(echo "transcript${tab}trans_len" ; (twoBitToFa -bed=Manatee_consolidated.bed ../../../primers/primer-design/hub/manatee/manatee.2bit  stdout | faSize -detailed /dev/stdin)) >manatee-trans_len.tsv
+
+# manatee.isoforms.tsv 
+tmlr filter '$pri==1' ../../../primers/primer-design/hub/manatee/juju_designs.manatee.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f manatee-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript > manatee.isoforms.tsv 
+
+# manatee-lengths.rows.tsv
+../../bin/spreadSheetOrder --rowsToAddPerGroup=1 manatee-support.tsv manatee.isoforms.tsv /dev/stdout | tmlr cut -o -f target,transcript,trans_len,amplicon_len >manatee-lengths.rows.tsv
+
+
 * debugging:
  ../../../bin/genomeAlignAnalyze --target=X --trace ../../../hub/manatee/juju_designs.manatee.isoforms.tsv ../../../hub/manatee/amplicons.bed 
  ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
