@@ -24,10 +24,10 @@ def loadSpeadsheetOrder(spreadSheetTsv):
     iOrder = 0
     for row in TsvReader(spreadSheetTsv):
         key = getRowKey(row)
+        groupRowCnt[key] += 1
         if key not in spreadOrder:
             spreadOrder[key] = iOrder
             iOrder += 1
-        groupRowCnt[key] += 1
     minGrc = min(groupRowCnt.values())
     maxGrc = max(groupRowCnt.values())
     if minGrc != maxGrc:

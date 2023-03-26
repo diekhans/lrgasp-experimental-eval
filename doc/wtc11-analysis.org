@@ -20,6 +20,9 @@ submitted (files named *classification.txt ). These files were given to the
 submitters when we finished the evaluation, so they should be already public
 to some extent
 
+* BED with Squanti stats
+http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed
+
 * Gloria spread sheet
 https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hNMVA/edit#gid=0
 
@@ -27,41 +30,38 @@ https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hN
 https://docs.google.com/spreadsheets/d/1Y3KhZoezR8Ti5mauYXQFxuwE04xmEgPPyxoJoRxuYuA/edit#gid=210377221
 
 
-* wtc11:  generate amplicon and transcript lengths to add to spread sheet
-cd extra-data/wtc11
+* wtc11: gather amplicon and transcript lengths, and squanti data
+cd tmp/wtc11
 
 # wtc11-trans_len.tsv
 bigBedToBed ../../../primers/primer-design/data/hg38/WTC11_consolidated.bigBed stdout | cut -f 1-12 >WTC11_consolidated.bed
-(echo "transcript${tab}trans_len" ; (twoBitToFa -bed=WTC11_consolidated.bed  /hive/data/genomes/hg38/hg38.2bit  stdout | faSize -detailed /dev/stdin)) >wtc11-trans_len.tsv
+(echo "transcript${tab}transcript_len" ; (twoBitToFa -bed=WTC11_consolidated.bed  /hive/data/genomes/hg38/hg38.2bit  stdout | faSize -detailed /dev/stdin)) >wtc11-trans_len.tsv
 
-# wtc11.isoforms.tsv
-tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f wtc11-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript > wtc11.isoforms.tsv 
+# wtc11.lengths.tsv
+tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f wtc11-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript | tmlr cut -o -f target,transcript,transcript_len,amplicon_len  >../../evaluation/wtc11.lengths.tsv
 
-# wtc11-lengths.rows.tsv
+# get squanti stats
+bigBedToBed -header http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed stdout | sed 's/^#//' > WTC11_consolidated.bed.tsv
+
+
+# wtc11-lengths.rows.tsv (for spreadsheet merge)
 ../../bin/spreadSheetOrder --rowsToAddPerGroup=2 wtc11-support.tsv wtc11.isoforms.tsv /dev/stdout | tmlr cut -o -f target,transcript,trans_len,amplicon_len >wtc11-lengths.rows.tsv
 
-* gencode: generate amplicon and transcript lengths to add to spread sheet
+* gencode: gather amplicon and transcript lengths
+cd tmp/gencode
 
 # gencode-trans_len.tsv
 for bb in  ../../../primers/primer-design/data/hg38/human_GENCODE_tmerge_transcripts.bb ../../../primers/primer-design/data/hg38/non_redundant_*.bb ; do bigBedToBed $bb stdout | cut -f 1-12 ; done > gencode-combined.bed 
-(echo "transcript${tab}trans_len" ; (twoBitToFa -bed=gencode-combined.bed /hive/data/genomes/hg38/hg38.2bit stdout) | faSize -detailed stdin) >gencode-trans_len.tsv
+(echo "transcript${tab}transcript_len" ; (twoBitToFa -bed=gencode-combined.bed /hive/data/genomes/hg38/hg38.2bit stdout) | faSize -detailed stdin) >gencode-trans_len.tsv
 
-# gencode.isoforms.tsv
-tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f gencode-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript > gencode.isoforms.tsv 
-
-# gencode-lengths.rows.tsv
-../../bin/spreadSheetOrder --rowsToAddPerGroup=2 gencode-support.tsv gencode.isoforms.tsv /dev/stdout | tmlr cut -o -f target,transcript,trans_len,amplicon_len >gencode-lengths.rows.tsv
+# gencode.lengths.tsv
+tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f gencode-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript | tmlr cut -o -f target,transcript,transcript_len,amplicon_len  >../../evaluation/gencode.lengths.tsv
 
 
-* match GENCODE models to WTC11 consolidated tracks
-gtfToGenePred ../gencode/human_LRGASP_unannotated_transcripts.gtf gencode.gp
-genePredToBed gencode.gp gencode.bed
-../bin/matchByIntronChain LRGASP_manual_annotation.human.all.20220428.bed WTC11_consolidated-gencode.tsv gencode.unmatched.bed >&out
-# nothing useful found
-* debugging:
- ../../../bin/genomeAlignAnalyze --target=DUSP4+C ../../../hub/hg38/juju_designs.hg38.isoforms.tsv ../../../hub/hg38/targets.bed  ../align/pb-rna-wtc11-genome.bam debug.tsv --supportBam=debug.bam &
+# gencode-lengths.rows.tsv (for spreadsheet merge)
+../../bin/spreadSheetOrder --rowsToAddPerGroup=2 gencode-support.tsv gencode.isoforms.tsv /dev/stdout | tmlr cut -o -f gene,target,transcript,trans_len,amplicon_len >gencode-lengths.rows.tsv
 
-evalsDf = pd.read_table("wtc11-support.summary.tsv")
+
  
 * stats for paper
 ../bin/paperEvalStats wtc11-support.summary.tsv /dev/stdout
@@ -92,8 +92,9 @@ We found that [Mark add an example here] deemed validated revealed that an isofo
 incorrect alignment.
 
 
-* % ../bin/paperEvalStats  --transcriptTsv=wtc11-transcripts.tsv wtc11-support.tsv wtc11-stats.tsv
-|------------------------+-------|
+
+* paper stats
+% ../../bin/paperEvalStats wtc11-isoforms.tsv wtc11-stats.tsv
 | name                   | value |
 |------------------------+-------|
 | genes                  |    88 |
@@ -114,7 +115,10 @@ incorrect alignment.
 |------------------------+-------|
 
 
-* % ../bin/paperEvalStats --transcriptTsv=gencode-transcripts.tsv gencode-support.tsv gencode-stats.tsv
+
+* paper stats
+../../bin/paperEvalStats gencode.isoform.tsv gencode-stats.tsv
+
 |-------------------------------+-------|
 | name                          | value |
 |-------------------------------+-------|
