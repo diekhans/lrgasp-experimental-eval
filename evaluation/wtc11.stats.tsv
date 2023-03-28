@@ -1,0 +1,16 @@
+name	value
+genes	88
+targets	89
+transcripts	88
+novelIsoforms	64
+maxPipelines	33
+novelPipelineCnt_ge_1	64
+novelPipelineCnt_lt_1	0
+novelPipelineCnt_ge_9	39
+novelPipelineCnt_lt_9	25
+novelPipelineCnt_ge_17	29
+novelPipelineCnt_lt_17	35
+novelPipelineCnt_ge_25	16
+novelPipelineCnt_lt_25	48
+novelPipelineCnt_ge_33	2
+novelPipelineCnt_lt_33	62

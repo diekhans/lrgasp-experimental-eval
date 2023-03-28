@@ -92,9 +92,11 @@ We found that [Mark add an example here] deemed validated revealed that an isofo
 incorrect alignment.
 
 
-
 * paper stats
-% ../../bin/paperEvalStats wtc11-isoforms.tsv wtc11-stats.tsv
+
+cd evaluation
+% ../bin/paperEvalStats  --squantiTsv=wtc11.squanti-consolidate.tsv wtc11.evaluation.tsv wtc11.stats.tsv
+|------------------------+-------|
 | name                   | value |
 |------------------------+-------|
 | genes                  |    88 |
@@ -117,7 +119,7 @@ incorrect alignment.
 
 
 * paper stats
-../../bin/paperEvalStats gencode.isoform.tsv gencode-stats.tsv
+../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv
 
 |-------------------------------+-------|
 | name                          | value |

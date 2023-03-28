@@ -31,7 +31,7 @@ tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.length
 
 
 * stats for paper
-../../bin/paperEvalStats --ampliconTsv=manatee.amplicons.tsv --transcriptTsv=manatee.transcripts.tsv manatee.isoforms.tsv manatee-stats.tsv
+% ../bin/paperEvalStats  --squantiTsv=manatee.squanti-consolidate.tsv manatee.evaluation.tsv manatee.stats.tsv
 
 
 | name                  | value |
