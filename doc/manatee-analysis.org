@@ -31,23 +31,5 @@ tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.length
 
 
 * stats for paper
-% ../bin/paperEvalStats  --squantiTsv=manatee.squanti-consolidate.tsv manatee.evaluation.tsv manatee.stats.tsv
-
-
-| name                  | value |
-|-----------------------+-------|
-| genes                 |     8 |
-| targets               |    22 |
-| transcripts           |    26 |
-| novelIsoforms         |    19 |
-| maxPipelines          |     4 |
-| novelPipelineCnt_ge_1 |    19 |
-| novelPipelineCnt_lt_1 |     0 |
-| novelPipelineCnt_ge_2 |    11 |
-| novelPipelineCnt_lt_2 |     8 |
-| novelPipelineCnt_ge_3 |     4 |
-| novelPipelineCnt_lt_3 |    15 |
-| novelPipelineCnt_ge_4 |     1 |
-| novelPipelineCnt_lt_4 |    18 |
-|-----------------------+-------|
-
+cd evaluation
+../bin/paperEvalStats  --squantiTsv=manatee.squanti-consolidate.tsv manatee.evaluation.tsv manatee.stats.tsv

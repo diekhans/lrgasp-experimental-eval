@@ -95,50 +95,46 @@ incorrect alignment.
 * paper stats
 
 cd evaluation
-% ../bin/paperEvalStats  --squantiTsv=wtc11.squanti-consolidate.tsv wtc11.evaluation.tsv wtc11.stats.tsv
-|------------------------+-------|
-| name                   | value |
-|------------------------+-------|
-| genes                  |    88 |
-| targets                |    89 |
-| transcripts            |    88 |
-| novelIsoforms          |    64 |
-| maxPipelines           |    33 |
-| novelPipelineCnt_ge_1  |    64 |
-| novelPipelineCnt_lt_1  |     0 |
-| novelPipelineCnt_ge_9  |    39 |
-| novelPipelineCnt_lt_9  |    25 |
-| novelPipelineCnt_ge_17 |    29 |
-| novelPipelineCnt_lt_17 |    35 |
-| novelPipelineCnt_ge_25 |    16 |
-| novelPipelineCnt_lt_25 |    48 |
-| novelPipelineCnt_ge_33 |     2 |
-| novelPipelineCnt_lt_33 |    62 |
-|------------------------+-------|
-
-
-
-* paper stats
+../bin/paperEvalStats  --squantiTsv=wtc11.squanti-consolidate.tsv wtc11.evaluation.tsv wtc11.stats.tsv
 ../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv
 
-|-------------------------------+-------|
-| name                          | value |
-|-------------------------------+-------|
-| genes                         |    35 |
-| targets                       |    79 |
-| transcripts                   |    76 |
-| gencodeTotal                  |    76 |
-| gencodeKnown                  |    27 |
-| gencodeNovel                  |    40 |
-| gencodeRejected               |     9 |
-| gencodeKnowSupported          |    22 |
-| gencodeKnowSupportedRate      |  81.5 |
-| gencodeKnowUnsupported        |     5 |
-| gencodeKnowUnsupportedRate    |  18.5 |
-| gencodeNovelSupported         |    23 |
-| gencodeNovelSupportedRate     |  57.5 |
-| gencodeRejectedSupported      |     2 |
-| gencodeRejectedSupportedRate  |  22.2 |
-| gencodeRejectedUnupported     |     7 |
-| gencodeRejectedUnupportedRate |  77.8 |
-|-------------------------------+-------|
+
+* wtc11
+pipelines:     33   half: 16.5
+novelIsoforms  64   half: 32
+
+novelPipelineCnt_ge_1  64   novelPipelineCnt_lt_1   0
+novelPipelineCnt_ge_2  48   novelPipelineCnt_lt_2  16
+novelPipelineCnt_ge_3  46   novelPipelineCnt_lt_3  18
+novelPipelineCnt_ge_4  46   novelPipelineCnt_lt_4  18
+novelPipelineCnt_ge_5  46   novelPipelineCnt_lt_5  18
+novelPipelineCnt_ge_6  45   novelPipelineCnt_lt_6  19
+novelPipelineCnt_ge_7  43   novelPipelineCnt_lt_7  21
+novelPipelineCnt_ge_8  40   novelPipelineCnt_lt_8  24
+novelPipelineCnt_ge_9  39   novelPipelineCnt_lt_9  25
+novelPipelineCnt_ge_10 37   novelPipelineCnt_lt_10 27
+novelPipelineCnt_ge_11 36   novelPipelineCnt_lt_11 28
+novelPipelineCnt_ge_12 33   novelPipelineCnt_lt_12 31
+novelPipelineCnt_ge_13 33   novelPipelineCnt_lt_13 31
+
+novelPipelineCnt_ge_14 32   novelPipelineCnt_lt_14 32   0.42 of pipelines detect 1/2 of novel transcritps
+
+novelPipelineCnt_ge_15 30   novelPipelineCnt_lt_15 34
+novelPipelineCnt_ge_16 30   novelPipelineCnt_lt_16 34
+novelPipelineCnt_ge_17 29   novelPipelineCnt_lt_17 35
+novelPipelineCnt_ge_18 27   novelPipelineCnt_lt_18 37
+novelPipelineCnt_ge_19 24   novelPipelineCnt_lt_19 40
+novelPipelineCnt_ge_20 24   novelPipelineCnt_lt_20 40
+novelPipelineCnt_ge_21 23   novelPipelineCnt_lt_21 41
+novelPipelineCnt_ge_22 23   novelPipelineCnt_lt_22 41
+novelPipelineCnt_ge_23 22   novelPipelineCnt_lt_23 42
+novelPipelineCnt_ge_24 20   novelPipelineCnt_lt_24 44
+novelPipelineCnt_ge_25 16   novelPipelineCnt_lt_25 48
+novelPipelineCnt_ge_26 15   novelPipelineCnt_lt_26 49
+novelPipelineCnt_ge_27 13   novelPipelineCnt_lt_27 51
+novelPipelineCnt_ge_28 10   novelPipelineCnt_lt_28 54
+novelPipelineCnt_ge_29  8   novelPipelineCnt_lt_29 56
+novelPipelineCnt_ge_30  7   novelPipelineCnt_lt_30 57
+novelPipelineCnt_ge_31  6   novelPipelineCnt_lt_31 58
+novelPipelineCnt_ge_32  5   novelPipelineCnt_lt_32 59
+novelPipelineCnt_ge_33  2   novelPipelineCnt_lt_33 62

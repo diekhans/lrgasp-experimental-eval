@@ -128,7 +128,7 @@ def squantiReport(transDf, squantiStats, fh):
 
     # split number of transcripts into at last 1/4
 
-    for np in range(1, maxNp + 1, maxNp // 4):
+    for np in range(1, maxNp + 1):
         fileOps.prRowv(fh, "novelPipelineCnt_ge_" + str(np), len(novelDf[novelDf.pipeLineCount >= np]))
         fileOps.prRowv(fh, "novelPipelineCnt_lt_" + str(np), len(novelDf[novelDf.pipeLineCount < np]))
 
