@@ -1,5 +1,5 @@
 gene	target	transcript	plat	chain	chain_in2	sim_100	sim_98	sim_95	indel_0	indel_2	category	reason	notes
-ALG6	ALG6+1	NNC_39352	pb	10	0	0	46048	48411	0	0	unsupported		U12 intron GT-AT; not aligned my minimap;forced into a GT–AG intron plus a six base genomic deletion.
+ALG6	ALG6+1	NNC_39352	pb	10	0	0	46048	48411	0	0	unsupported		U12 intron GT-AT; not aligned by minimap; forced into a GT–AG intron plus a six base genomic deletion.
 ALG6	ALG6+1	NNC_39352	ont	4930	3	0	41805	54351	0	1	unsupported		
 ALG6	ALG6+1	NNC_39352	cntl	1	1	1	1	1	1	1	unsupported		
 ANAPC16	ANAPC16+1	NIC_39183	pb	1685	1590	538	1329	1371	581	1252	supported		
