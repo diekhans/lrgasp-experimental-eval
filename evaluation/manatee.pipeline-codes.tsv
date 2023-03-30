@@ -1,0 +1,10 @@
+tool	platform	library_prep	data_category	pipeline_code
+Bambu	ONT	cDNA	long_only	ONT1
+Bambu	PacBio	cDNA	long_only	PB1
+RNA-Bloom	ONT	cDNA	long_only	ONT2
+RNA-Bloom	ONT	cDNA	long_short	ONT5
+IsoQuant	ONT	cDNA	long_only	ONT3
+IsoQuant	PacBio	cDNA	long_only	PB2
+rnaSPAdes	ONT	cDNA	long_short	ONT4
+rnaSPAdes	PacBio	cDNA	long_short	PB3
+rnaSPAdes	Illumina	cDNA	long_only	illumina1
