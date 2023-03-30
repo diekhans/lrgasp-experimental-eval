@@ -113,9 +113,9 @@ def squantiReport(transDf, squantiStats, fh):
     else:
         novelDf = transDf[transDf.transcript.str.startswith('N')]
 
-    catCols = [c for c in ["longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]
-               if c in novelDf.columns]
-    pc = novelDf.loc[:, catCols].sum(axis=1).copy().convert_dtypes()
+    raise Exception("wrong to sum")
+    plCols = list(set(novelDf.columns) & set(["pbPlatformCount", "ontPlatformCount", "freestylePlatformCount", "cDNAPrepCount", "dRNAPrepCount", "capTrapPrepCount", "r2c2PrepCount", "freestylePrepCount", "longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]))
+    pc = novelDf.loc[:, plCols].sum(axis=1).copy().convert_dtypes()
     novelDf.insert(len(novelDf.columns), 'pipeLineCount', pc)
 
     # novel isoforms count:
