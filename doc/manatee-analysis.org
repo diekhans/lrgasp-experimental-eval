@@ -30,6 +30,15 @@ tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.length
  ../align/pb-rna-manatee-genome.bam debug.tsv --supportBam=debug.bam  >&trace.out
 
 
+* get fine-grained pipeline information
+cd work
+find ../squanti/results/Challenge3 -name models_classification.txt >filt.sh
+# covert to commands like
+../bin/joinSquantiTransId ../evaluation/manatee.id_ujc.tsv ../squanti/results/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt joined/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt
+nice parallel -j 32 <filt.sh >&log
+tmlr cat $(find joined/Challenge3/ -type f) >manatee.squnati-transcripts.tsv
+
+ 
 * stats for paper
 cd evaluation
 ../bin/paperEvalStats  --squantiTsv=manatee.squanti-consolidate.tsv manatee.evaluation.tsv manatee.stats.tsv

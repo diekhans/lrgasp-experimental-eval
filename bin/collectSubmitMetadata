@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import pickle
+import argparse
+from pycbio.sys import fileOps
+from lrgasp.defs import Challenge
+from lrgasp import entry_metadata
+
+def parseArgs():
+    desc = """collect submission data for a challenge and pickle an array of
+    entries for later use
+    """
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("challenge", choices=Challenge, type=Challenge)
+    parser.add_argument("submissionRoot")
+    parser.add_argument("submissionDataPkl")
+    return parser.parse_args()
+
+def findEntries(submissionRoot):
+    entryDirs = []
+    for dirpath, dirnames, filenames in os.walk(submissionRoot):
+        for filename in filenames:
+            if filename == "entry.json":
+                entryDirs.append(os.path.abspath(dirpath))
+    return entryDirs
+
+def loadEntries(challenge, entryDirs):
+    entry_mds = []
+    for entryDir in entryDirs:
+        entry_md = entry_metadata.load_dir(entryDir)
+        if entry_md.challenge_id == challenge:
+            entry_metadata.load_experiments_metadata(entry_md)
+            entry_mds.append(entry_md)
+    return entry_mds
+
+def collectSubmitMetdata(challenge, submissionRoot, submissionDataPkl):
+    entry_mds = loadEntries(challenge, findEntries(submissionRoot))
+    with open(submissionDataPkl, 'wb') as fh:
+        pickle.dump(entry_mds, fh)
+
+def main(opts):
+    collectSubmitMetdata(opts.challenge, opts.submissionRoot, opts.submissionDataPkl)
+
+main(parseArgs())

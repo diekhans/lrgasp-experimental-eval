@@ -91,6 +91,13 @@ including cases of a single long read (Figure XX).
 We found that [Mark add an example here] deemed validated revealed that an isoform for gene XX had an
 incorrect alignment.
 
+* get fine-grained pipeline information
+cd work
+find ../squanti/results/Challenge1 -name models_classification.txt | fgrep WTC11 >filt.sh
+# covert to commands like
+../bin/joinSquantiTransId ../evaluation/wtc11.id_ujc.tsv ../squanti/results/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt joined/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt
+nice parallel -j 32 <filt.sh >&log
+tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
 * paper stats
 
@@ -138,3 +145,5 @@ novelPipelineCnt_ge_30  7   novelPipelineCnt_lt_30 57
 novelPipelineCnt_ge_31  6   novelPipelineCnt_lt_31 58
 novelPipelineCnt_ge_32  5   novelPipelineCnt_lt_32 59
 novelPipelineCnt_ge_33  2   novelPipelineCnt_lt_33 62
+
+

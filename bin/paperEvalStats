@@ -36,7 +36,6 @@ def filterToTranscript(evalDf):
     transDf = transDf.sort_values(["transcript", "rank"])
     transDf = transDf.drop_duplicates("transcript")
 
-
     # drop per-target columns
     dropCols = set(transDf.columns) & set(["rank", "target", "position", "plat", "chain", "chain_in2", "sim_100", "sim_98", "sim_95", "indel_0", "indel_2", "notes"])
     transDf = transDf.drop(dropCols, axis=1)

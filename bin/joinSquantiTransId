@@ -1,0 +1,17 @@
+#!/bin/bash
+set -beEu -o pipefail
+
+# join consolidated transcript id with squanti reports
+
+if [ $# != 3 ] ; then
+    echo "Wrong number of args: idUjcTsv squanitClassTsv filteredClassTsv" >&2
+    exit 1
+fi
+idUjcTsv="$1" ; shift
+squanitClassTsv="$1" ; shift
+filteredClassTsv="$1" ; shift
+
+mkdir -p $(dirname $filteredClassTsv)
+
+tmlr join -j LRGASP_id -f $idUjcTsv $squanitClassTsv > $filteredClassTsv.tmp
+mv -f $filteredClassTsv.tmp $filteredClassTsv
