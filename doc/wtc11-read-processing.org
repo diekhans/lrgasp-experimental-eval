@@ -49,7 +49,7 @@ nice samtools index -@ 32 pb-rna-wtc11-amplicons.bam
 
 ** control alignment of amplicons to amplicons
 cd grch38-transcriptome/align/
-(time nice minimap2 -t 64 -ax splice ../reference/wtc11-amplicons.fa   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-amplicons.bam)>&log&
+(time nice minimap2 -t 64 -ax map-pb ../reference/wtc11-amplicons.fa   ../../grch38-transcriptome/reference/wtc11-amplicons.fa  | samtools sort -O BAM > cntl-rna-wtc11-amplicons.bam)>&log&
 
 
 
@@ -97,7 +97,8 @@ ln -f *.amplicon.bam*  ../../../hub/wtc11-amplicons/
 
 * SUMMARIES
 ** cd grch38-transcriptome/analyze.sim
-../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv   --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
+../../../bin/summarizeSupport similarity ../../../hub/hg38/juju_designs.hg38.isoforms.tsv --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=any.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=any.tsv   
+--genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=any.tsv *-wtc11.sim=*.tsv >wtc11-support.sim.tsv
  cp wtc11-support.sim.tsv ../../../analyze/
 ** cd grch38-transcriptome/analyze.indel
 ../../../bin/summarizeSupport indels  ../../../hub/hg38/juju_designs.hg38.isoforms.tsv  --genomeStatsTsv=../../grch38/analyze/ont-rna-wtc11.intron-chains.indel=2.tsv --genomeStatsTsv=../../grch38/analyze/pb-rna-wtc11.intron-chains.indel=2.tsv  --genomeStatsTsv=../../grch38/analyze/cntl-rna-wtc11.intron-chains.indel=2.tsv  *-wtc11.indel=*.tsv >wtc11-support.indel.tsv
