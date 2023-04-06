@@ -6,12 +6,12 @@ from pycbio.sys import fileOps
 
 
 def parseArgs():
-    desc = """pull stats for paper from eval spreadsheet tsv, add joinAnnotSummary added consolidate information"""
+    desc = """pull stats for paper from eval spreadsheet tsv"""
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--squantiTsv")
     parser.add_argument("evalTsv")
     parser.add_argument("statsTsv")
-    return parser.parse_args()
+    opts = parser.parse_args()
+    return opts
 
 
 def percent(n, total):
@@ -29,7 +29,7 @@ _supportRanks = {
 }
 
 def filterToTranscript(evalDf):
-    "get a per-transcript data frame, with maximum support, worth with squanti or gencode"
+    "get a per-transcript data frame, with maximum support"
 
     transDf = evalDf[evalDf.plat == "pb"]  # one line per target
     transDf.insert(0, "rank", transDf.category.apply(lambda c: _supportRanks[c]))
@@ -99,56 +99,20 @@ def gencodeReport(transDf, fh):
                    percent(len(rejectedDf[rejectedDf.category != "supported"]),
                            len(rejectedDf)))
 
-
-def squantiReport(transDf, squantiStats, fh):
-    transDf = pd.merge(transDf, squantiStats, on="transcript")
-
-    # manatee doesn't have captrap
-    isManatee = "capTrapPrepCount" not in transDf.columns
-
-    # all consider novel in manatee due to poor annotation
-    if isManatee:
-        novelDf = transDf
-    else:
-        novelDf = transDf[transDf.transcript.str.startswith('N')]
-
-    raise Exception("wrong to sum")
-    plCols = list(set(novelDf.columns) & set(["pbPlatformCount", "ontPlatformCount", "freestylePlatformCount", "cDNAPrepCount", "dRNAPrepCount", "capTrapPrepCount", "r2c2PrepCount", "freestylePrepCount", "longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]))
-    pc = novelDf.loc[:, plCols].sum(axis=1).copy().convert_dtypes()
-    novelDf.insert(len(novelDf.columns), 'pipeLineCount', pc)
-
-    # novel isoforms count:
-    fileOps.prRowv(fh, "novelIsoforms", len(set(novelDf.transcript)))
-
-    # novel isoforms detected in N pipelines (different cuttons)
-    # novel isoforms in less name N pipelines
-    maxNp = int(novelDf.pipeLineCount.max())
-    fileOps.prRowv(fh, "maxPipelines", maxNp)
-
-    # split number of transcripts into at last 1/4
-
-    for np in range(1, maxNp + 1):
-        fileOps.prRowv(fh, "novelPipelineCnt_ge_" + str(np), len(novelDf[novelDf.pipeLineCount >= np]))
-        fileOps.prRowv(fh, "novelPipelineCnt_lt_" + str(np), len(novelDf[novelDf.pipeLineCount < np]))
-
-def report(evalDf, fh, squantiStats):
+def report(evalDf, fh):
     fileOps.prRowv(fh, "name", "value")
     basicReport(evalDf, fh)
     transDf = filterToTranscript(evalDf)
     if 'gencode' in evalDf.columns:
         gencodeReport(transDf, fh)
-    elif squantiStats is not None:
-        squantiReport(transDf, squantiStats, fh)
 
-
-def paperEvalStats(evalTsv, statsTsv, squantiTsv):
+def paperEvalStats(evalTsv, statsTsv):
     evalDf = pd.read_table(evalTsv)
-    squantiStats = None if squantiTsv is None else pd.read_table(squantiTsv)
     evalDf = evalDf.convert_dtypes()  # make ints ints rather than floats
     with open(statsTsv, 'w') as fh:
-        report(evalDf, fh, squantiStats)
+        report(evalDf, fh)
 
 def main(opts):
-    paperEvalStats(opts.evalTsv, opts.statsTsv, opts.squantiTsv)
+    paperEvalStats(opts.evalTsv, opts.statsTsv)
 
 main(parseArgs())
