@@ -40,5 +40,5 @@ tmlr cat $(find joined/Challenge3/ -type f) >manatee.squnati-transcripts.tsv
 
  
 * stats for paper
-cd evaluation
-../bin/paperEvalStats  --squantiTsv=manatee.squanti-consolidate.tsv manatee.evaluation.tsv manatee.stats.tsv
+cd evaluation/manatee
+../../bin/paperEvalStats manatee.evaluation.tsv manatee.stats.tsv

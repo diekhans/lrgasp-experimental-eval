@@ -47,57 +47,46 @@ def basicReport(evalDf, fh):
     fileOps.prRowv(fh, "targets", len(set(evalDf.target)))
     fileOps.prRowv(fh, "transcripts", len(set(evalDf.transcript)))
 
+def reportSupportRate(fh, labelPrefix, subsetDf):
+    fileOps.prRowv(fh, labelPrefix + "Count", len(subsetDf))
+    fileOps.prRowv(fh, labelPrefix + "Supported",
+                   len(subsetDf[subsetDf.category != "unsupported"]))
+    fileOps.prRowv(fh, labelPrefix + "SupportedRate",
+                   percent(len(subsetDf[subsetDf.category != "unsupported"]),
+                           len(subsetDf)))
+    fileOps.prRowv(fh, labelPrefix + "Unsupported",
+                   len(subsetDf[subsetDf.category == "unsupported"]))
+    fileOps.prRowv(fh, labelPrefix + "UnsupportedRate",
+                   percent(len(subsetDf[subsetDf.category == "unsupported"]),
+                           len(subsetDf)))
+
 def gencodeReport(transDf, fh):
     # pb row is first with gencode and category
     knownDf = transDf[(transDf.gencode == "known")]
     novelDf = transDf[(transDf.gencode == "novel")]
     rejectedDf = transDf[(transDf.gencode == "rejected")]
+    if len(knownDf) + len(novelDf) + len(rejectedDf) != len(transDf):
+        raise Exception("logic error splitting gencode transcripts")
 
-    fileOps.prRowv(fh, "gencodeTotal", len(knownDf) + len(novelDf) + len(rejectedDf))
+    reportSupportRate(fh, "gencodeAll", transDf)
+    reportSupportRate(fh, "gencodeKnown", knownDf)
+    reportSupportRate(fh, "gencodeNovel", novelDf)
+    reportSupportRate(fh, "gencodeRejected", rejectedDf)
 
-    # GENCODE-known, N=XX:
-    fileOps.prRowv(fh, "gencodeKnown", len(knownDf))
 
-    # GENCODE-novel, N=XX:,
-    fileOps.prRowv(fh, "gencodeNovel", len(novelDf))
+def squantiReport(transDf, fh):
+    knownDf = transDf[transDf.transcript.str.startswith('FSM')]  # FSM
+    novelDf = transDf[transDf.transcript.str.startswith('NIC')
+                      + transDf.transcript.str.startswith('NNC')]  # NIC/NNC
+    ismDf = transDf[transDf.transcript.str.startswith('ISM')]  # FSM
+    if len(knownDf) + len(novelDf) + len(ismDf) != len(transDf):
+        raise Exception("logic error splitting transcripts")
 
-    # GENCODE-suspect, N=XX:
-    fileOps.prRowv(fh, "gencodeRejected", len(rejectedDf))
+    reportSupportRate(fh, "all", transDf)
+    reportSupportRate(fh, "known", knownDf)
+    reportSupportRate(fh, "novel", novelDf)
+    reportSupportRate(fh, "ism", ismDf)
 
-    # GENCODE-known validation rate, XX%
-    fileOps.prRowv(fh, "gencodeKnowSupported",
-                   len(knownDf[knownDf.category != "unsupported"]))
-    fileOps.prRowv(fh, "gencodeKnowSupportedRate",
-                   percent(len(knownDf[knownDf.category != "unsupported"]),
-                           len(knownDf)))
-
-    # GENCODE-known that failed to validate n+XX
-    fileOps.prRowv(fh, "gencodeKnowUnsupported",
-                   len(knownDf[knownDf.category == "unsupported"]))
-    fileOps.prRowv(fh, "gencodeKnowUnsupportedRate",
-                   percent(len(knownDf[knownDf.category == "unsupported"]),
-                           len(knownDf)))
-
-    # GENCODE-novel   validation rate, XX %
-    fileOps.prRowv(fh, "gencodeNovelSupported",
-                   len(novelDf[novelDf.category == "supported"]))
-    fileOps.prRowv(fh, "gencodeNovelSupportedRate",
-                   percent(len(novelDf[novelDf.category == "supported"]),
-                           len(novelDf)))
-
-    # GENCODE-suspect validation rate of XX,
-    fileOps.prRowv(fh, "gencodeRejectedSupported",
-                   len(rejectedDf[rejectedDf.category == "supported"]))
-    fileOps.prRowv(fh, "gencodeRejectedSupportedRate",
-                   percent(len(rejectedDf[rejectedDf.category == "supported"]),
-                           len(rejectedDf)))
-
-    # GENCODE-suspect unsupported rate of XX,
-    fileOps.prRowv(fh, "gencodeRejectedUnupported",
-                   len(rejectedDf[rejectedDf.category != "supported"]))
-    fileOps.prRowv(fh, "gencodeRejectedUnupportedRate",
-                   percent(len(rejectedDf[rejectedDf.category != "supported"]),
-                           len(rejectedDf)))
 
 def report(evalDf, fh):
     fileOps.prRowv(fh, "name", "value")
@@ -105,6 +94,8 @@ def report(evalDf, fh):
     transDf = filterToTranscript(evalDf)
     if 'gencode' in evalDf.columns:
         gencodeReport(transDf, fh)
+    else:
+        squantiReport(transDf, fh)
 
 def paperEvalStats(evalTsv, statsTsv):
     evalDf = pd.read_table(evalTsv)

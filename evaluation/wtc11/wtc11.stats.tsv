@@ -2,5 +2,23 @@ name	value
 genes	88
 targets	89
 transcripts	88
-novelIsoforms	64
-
+allCount	88
+allSupported	82
+allSupportedRate	93.2
+allUnsupported	6
+allUnsupportedRate	6.8
+knownCount	24
+knownSupported	23
+knownSupportedRate	95.8
+knownUnsupported	1
+knownUnsupportedRate	4.2
+novelCount	64
+novelSupported	59
+novelSupportedRate	92.2
+novelUnsupported	5
+novelUnsupportedRate	7.8
+ismCount	0
+ismSupported	0
+ismSupportedRate	0.0
+ismUnsupported	0
+ismUnsupportedRate	0.0

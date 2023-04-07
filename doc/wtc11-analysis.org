@@ -101,8 +101,11 @@ tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
 * paper stats
 
-cd evaluation
-../bin/paperEvalStats  --squantiTsv=wtc11.squanti-consolidate.tsv wtc11.evaluation.tsv wtc11.stats.tsv
-../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv
+cd evaluation/wtc11
+../../bin/paperEvalStats wtc11.evaluation.tsv wtc11.stats.tsv
 
+cd evaluation/gencode
+../../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv
+
+cd evaluation/wtc11
 ../../bin/squantiSummary wtc11.evaluation.tsv wtc11.id_ujc.tsv wtc11.pipeline-codes.tsv wtc11.squanti-transcripts.tsv x

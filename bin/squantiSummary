@@ -61,7 +61,7 @@ def paperEvalStats(evalTsv, idUjcMapTsv, pipelineTsv, squantiTranscriptTsv, repo
     evalDf = pd.read_table(evalTsv)
     evalDf = evalDf.convert_dtypes()  # make ints ints rather than floats
     idUjcMap = pd.read_table(idUjcMapTsv)
-    pipelineCodes = pd.read_table(pipelineTsv)
+    # pipelineCodes = pd.read_table(pipelineTsv)
     squantiTranscripts = pd.read_table(squantiTranscriptTsv)
     with open(reportTsv, 'w') as fh:
         report(evalDf, idUjcMap, squantiTranscripts, fh)
