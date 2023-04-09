@@ -2,72 +2,79 @@
 
 import argparse
 import pandas as pd
+from collections import defaultdict
 from pycbio.sys import fileOps
+from evalLib import rate, filterToTranscript
 
 
 def parseArgs():
-    desc = """summarize squanti data for each transcript"""
+    desc = """get various stats from the squanti reportst"""
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("squantiPaCsv",
+                        help="""Presence-absence matrices by UJC""")
     parser.add_argument("evalTsv")
     parser.add_argument("idUjcMapTsv")
-    parser.add_argument("pipelineTsv")
-    parser.add_argument("squantiTranscriptTsv")
     parser.add_argument("reportTsv")
     return parser.parse_args()
 
+def loadSquantiPaCsv(squantiPaCsv):
+    paMatrixDf = pd.read_csv(squantiPaCsv)
+    paMatrixDf.set_index('TAGS', inplace=True)
+    return paMatrixDf
 
-def squantiReport(transDf, squantiReport, fh):
-    transDf = pd.merge(transDf, squantiReport, on="transcript")
-
-    # manatee doesn't have captrap
-    isManatee = "capTrapPrepCount" not in transDf.columns
-
-    # all consider novel in manatee due to poor annotation
-    if isManatee:
-        novelDf = transDf
-    else:
-        novelDf = transDf[transDf.transcript.str.startswith('N')]
-
-    raise Exception("wrong to sum")
-    plCols = list(set(novelDf.columns) & set(["pbPlatformCount", "ontPlatformCount", "freestylePlatformCount", "cDNAPrepCount", "dRNAPrepCount", "capTrapPrepCount", "r2c2PrepCount", "freestylePrepCount", "longOnlyCatCount", "longShortCatCount", "freeStyleCatCount"]))
-    pc = novelDf.loc[:, plCols].sum(axis=1).copy().convert_dtypes()
-    novelDf.insert(len(novelDf.columns), 'pipeLineCount', pc)
-
-    # novel isoforms count:
-    fileOps.prRowv(fh, "novelIsoforms", len(set(novelDf.transcript)))
-
-    # novel isoforms detected in N pipelines (different cuttons)
-    # novel isoforms in less name N pipelines
-    maxNp = int(novelDf.pipeLineCount.max())
-    fileOps.prRowv(fh, "maxPipelines", maxNp)
-
-    # split number of transcripts into at last 1/4
-
-    for np in range(1, maxNp + 1):
-        fileOps.prRowv(fh, "novelPipelineCnt_ge_" + str(np), len(novelDf[novelDf.pipeLineCount >= np]))
-        fileOps.prRowv(fh, "novelPipelineCnt_lt_" + str(np), len(novelDf[novelDf.pipeLineCount < np]))
-
-def getTranscriptSquantiRecs(transcriptId, idUjcMap, squantiTranscripts):
-    LRGASP_ids = idUjcMap[idUjcMap.transcript == transcriptId].LRGASP_id
-    mask = squantiTranscripts.LRGASP_id.isin(LRGASP_ids)
-    return squantiTranscripts[mask]
-
-def report(evalDf, idUjcMap, squantiTranscripts, fh):
-    for transcriptId in evalDf.transcript:
-        print("@@@@", transcriptId, file=fh)
-        print(getTranscriptSquantiRecs(transcriptId, idUjcMap, squantiTranscripts).to_string(), file=fh)
-
-def paperEvalStats(evalTsv, idUjcMapTsv, pipelineTsv, squantiTranscriptTsv, reportTsv):
+def loadEvalTsv(evalTsv):
     evalDf = pd.read_table(evalTsv)
-    evalDf = evalDf.convert_dtypes()  # make ints ints rather than floats
+    transDf = filterToTranscript(evalDf)
+    return transDf
+
+def getPipelineColumns(paMatrixDf):
+    return [c for c in paMatrixDf.columns if c.startswith("pipeline")]
+
+def countPipelinePredictions(subsetDf):
+    predictedByCnt = defaultdict(int)
+    pipelineCols = getPipelineColumns(subsetDf)
+    predictedCnts = subsetDf[pipelineCols].eq(1).sum(axis=1)
+    for pc in predictedCnts:
+        predictedByCnt[pc] += 1
+    return predictedByCnt
+
+def writePredictions(fh, label, pipelineCnt, predictedByCnt):
+    total = sum(predictedByCnt.values())
+    for cnt in range(1, pipelineCnt + 1):
+        fileOps.prRowv(fh, label, cnt, predictedByCnt[cnt],
+                       rate(predictedByCnt[cnt], total))
+
+def report(paMatrixDf, transDf, idUjcMap, fh):
+    fileOps.prRowv(fh, "subset", "pipelineCnts", "transcripts")
+
+    pipelineCnt = len(getPipelineColumns(paMatrixDf))
+    writePredictions(fh, "all", pipelineCnt,
+                     countPipelinePredictions(paMatrixDf))
+
+    transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
+    transPaMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
+
+    writePredictions(fh, "eval", pipelineCnt,
+                     countPipelinePredictions(transPaMatrixDf))
+    supportedDf = transPaMatrixDf[transPaMatrixDf.category != "unsupported"]
+    unsupportedDf = transPaMatrixDf[transPaMatrixDf.category == "unsupported"]
+    assert (len(supportedDf) + len(unsupportedDf)) == len(transPaMatrixDf)
+
+    writePredictions(fh, "supported", pipelineCnt,
+                     countPipelinePredictions(supportedDf))
+    writePredictions(fh, "unsupported", pipelineCnt,
+                     countPipelinePredictions(unsupportedDf))
+
+
+def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, reportTsv):
+    paMatrixDf = loadSquantiPaCsv(squantiPaCsv)
+    transDf = loadEvalTsv(evalTsv)
     idUjcMap = pd.read_table(idUjcMapTsv)
-    # pipelineCodes = pd.read_table(pipelineTsv)
-    squantiTranscripts = pd.read_table(squantiTranscriptTsv)
+
     with open(reportTsv, 'w') as fh:
-        report(evalDf, idUjcMap, squantiTranscripts, fh)
+        report(paMatrixDf, transDf, idUjcMap, fh)
 
 def main(opts):
-    paperEvalStats(opts.evalTsv, opts.idUjcMapTsv, opts.pipelineTsv,
-                   opts.squantiTranscriptTsv, opts.reportTsv)
+    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.reportTsv)
 
 main(parseArgs())

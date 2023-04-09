@@ -1,0 +1,100 @@
+gene	target	transcript	plat	chain	chain_in2	sim_100	sim_98	sim_95	indel_0	indel_2	category	reason	notes
+ALG6	ALG6+1	NNC_39352	pb	10	0	0	46048	48411	0	0	unsupported		U12 intron GT-AT; not aligned by minimap; forced into a GT–AG intron plus a six base genomic deletion.
+ALG6	ALG6+1	NNC_39352	ont	4930	3	0	41805	54351	0	1	unsupported		
+ALG6	ALG6+1	NNC_39352	cntl	1	1	1	1	1	1	1	unsupported		
+ANAPC16	ANAPC16+1	NIC_39183	pb	1685	1590	538	1329	1371	581	1252	supported		
+ANAPC16	ANAPC16+1	NIC_39183	ont	14490	7816	949	5545	6828	949	2737	supported		
+ANAPC16	ANAPC16+1	NIC_39183	cntl	1	1	1	1	1	1	1	supported		
+ANKMY2	ANKMY2+1	FSM_32744	pb	1	1	1	1	1	1	1	likely		only one PB read, however
+ANKMY2	ANKMY2+1	FSM_32744	ont	0	0	0	0	0	0	0	likely		
+ANKMY2	ANKMY2+1	FSM_32744	cntl	1	1	1	1	1	1	1	likely		
+APMAP	APMAP+1	NIC_59594	pb	1036	948	445	842	879	447	634	supported		
+APMAP	APMAP+1	NIC_59594	ont	9268	1837	42	1782	5064	42	260	supported		
+APMAP	APMAP+1	NIC_59594	cntl	1	1	1	1	1	1	1	supported		
+ARPC2	ARPC2+1	NIC_485306	pb	1	0	3419	5957	6412	3510	4703	supported	end exon	Initial exon is not aliigned due to being short and having repeative sequence in the intron just before the second exon amd is extended into the intron after clipping 2 bases.
+ARPC2	ARPC2+1	NIC_485306	ont	0	0	1325	8730	10874	1325	3630	supported	end exon	
+ARPC2	ARPC2+1	NIC_485306	cntl	0	0	1	1	1	1	1	supported	end exon	
+ASNS	ASNS+1	FSM_33192	pb	0	0	798	1968	2450	888	1350	supported	end exon	Unaligned small initial exon with 7 bases soft-clipped 
+ASNS	ASNS+1	FSM_33192	ont	0	0	24	886	2030	24	132	supported	end exon	
+ASNS	ASNS+1	FSM_33192	cntl	0	0	1	1	1	1	1	supported	end exon	
+ASNSD1	ASNSD1+1	NIC_59301	pb	10410	8591	4517	10962	79391	4587	7745	supported		
+ASNSD1	ASNSD1+1	NIC_59301	ont	5306	127	0	2244	8326	0	0	supported		
+ASNSD1	ASNSD1+1	NIC_59301	cntl	1	1	1	1	1	1	1	supported		
+B2M	B2M+1	NNC_381534	pb	0	0	11662	16321	16707	12523	15948	supported	end exon	
+B2M	B2M+1	NNC_381534	ont	29	13	1380	16263	30490	1380	4728	supported	end exon	
+B2M	B2M+1	NNC_381534	cntl	0	0	1	1	1	1	1	supported	end exon	
+CALB1	CALB1+1	NNC_75451	pb	75	67	21	50	61	21	40	supported		
+CALB1	CALB1+1	NNC_75451	ont	290	144	12	135	181	12	44	supported		
+CALB1	CALB1+1	NNC_75451	cntl	1	1	1	1	1	1	1	supported		
+CALM2	CALM2+1	FSM_21072	pb	31	27	9155	20985	32794	9713	17054	supported		
+CALM2	CALM2+1	FSM_21072	ont	18	2	30	2037	15124	30	204	supported		
+CALM2	CALM2+1	FSM_21072	cntl	0	0	1	1	1	1	1	supported		
+CC2D2A	CC2D2A+1	NIC_532252	pb	546	491	92	465	510	94	167	supported		
+CC2D2A	CC2D2A+1	NIC_532252	ont	686	30	0	63	437	0	2	supported		
+CC2D2A	CC2D2A+1	NIC_532252	cntl	1	1	1	1	1	1	1	supported		
+CCDC106	CCDC106+1	FSM_19966	pb	36	30	4	18	25	5	11	supported		
+CCDC106	CCDC106+1	FSM_19966	ont	24	0	0	1	15	0	0	supported		
+CCDC106	CCDC106+1	FSM_19966	cntl	1	1	1	1	1	1	1	supported		
+CCL26	CCL26+1	NNC_39593	pb	26660	26015	15655	26138	26458	15961	24107	supported		
+CCL26	CCL26+1	NNC_39593	ont	80776	38972	5084	32086	37932	5084	14642	supported		
+CCL26	CCL26+1	NNC_39593	cntl	1	1	1	1	1	1	1	supported		
+CD200	CD200+1	NNC_80928	pb	26	24	7	367	434	7	37	supported		
+CD200	CD200+1	NNC_80928	ont	187	29	0	215	805	0	4	supported		
+CD200	CD200+1	NNC_80928	cntl	1	1	1	1	1	1	1	supported		
+CD24	CD24+1	NIC_262159	pb	36	22	2	15	26	2	6	supported		
+CD24	CD24+1	NIC_262159	ont	7	0	0	0	1	0	0	supported		
+CD24	CD24+1	NIC_262159	cntl	1	1	1	1	1	1	1	supported		
+CENPK	CENPK+1	NIC_72714	pb	0	0	1833	3183	3258	1872	2971	supported		
+CENPK	CENPK+1	NIC_72714	ont	10	7	1483	5907	6978	1483	3636	supported		
+CENPK	CENPK+1	NIC_72714	cntl	0	0	1	1	1	1	1	supported		
+CERCAM	CERCAM+1	NIC_532501	pb	386	370	153	317	323	159	284	supported		
+CERCAM	CERCAM+1	NIC_532501	ont	2314	947	142	1103	1360	142	459	supported		
+CERCAM	CERCAM+1	NIC_532501	cntl	1	1	1	1	1	1	1	supported		
+CERNA1	CERNA1+1	FSM_12039	pb	0	0	315	789	806	390	615	supported	end exon	
+CERNA1	CERNA1+1	FSM_12039	ont	0	0	9	586	2324	9	46	supported	end exon	
+CERNA1	CERNA1+1	FSM_12039	cntl	0	0	1	1	1	1	1	supported	end exon	
+CIBAR1	CIBAR1+1	NIC_39315	pb	101	7	4	30684	31669	4	30	supported		
+CIBAR1	CIBAR1+1	NIC_39315	ont	2407	78	4	28530	37343	4	41	supported		
+CIBAR1	CIBAR1+1	NIC_39315	cntl	1	1	1	1	1	1	1	supported		
+CNN1	CNN1+1	NIC_58623	pb	24475	21613	4224	12885	23640	4278	7988	supported		
+CNN1	CNN1+1	NIC_58623	ont	10565	87	0	465	6265	0	3	supported		
+CNN1	CNN1+1	NIC_58623	cntl	1	1	1	1	1	1	1	supported		
+CYB5B	CYB5B+1	NNC_80301	pb	0	0	0	0	21	0	0	unsupported		
+CYB5B	CYB5B+1	NNC_80301	ont	0	0	0	0	608	0	0	unsupported		
+CYB5B	CYB5B+1	NNC_80301	cntl	1	1	1	1	1	1	1	unsupported		
+DGUOK	DGUOK+1	NIC_59538	pb	15	14	35	109	143	35	51	supported		
+DGUOK	DGUOK+1	NIC_59538	ont	174	97	45	401	577	45	122	supported		
+DGUOK	DGUOK+1	NIC_59538	cntl	0	0	1	1	1	1	1	supported		
+DPP3	DPP3+1	FSM_374933	pb	0	0	32	156	366	44	100	supported	end exon	
+DPP3	DPP3+1	FSM_374933	ont	0	0	0	57	135	0	1	supported	end exon	
+DPP3	DPP3+1	FSM_374933	cntl	0	0	1	1	1	1	1	supported	end exon	
+DUSP6	DUSP6+1	FSM_7937	pb	32883	27701	2100	21978	27210	2164	6298	supported		
+DUSP6	DUSP6+1	FSM_7937	ont	10472	64	0	1229	3544	0	1	supported		
+DUSP6	DUSP6+1	FSM_7937	cntl	1	1	1	1	1	1	1	supported		
+EFHD2	EFHD2+1	NIC_54729	pb	4	3	6486	9226	9491	6553	8975	supported	end exon	
+EFHD2	EFHD2+1	NIC_54729	ont	503	242	1501	8604	19960	1501	4513	supported	end exon	
+EFHD2	EFHD2+1	NIC_54729	cntl	0	0	1	1	1	1	1	supported	end exon	
+EIF4G1	EIF4G1+1	NIC_256086	pb	355	128	11	1475	2341	12	121	supported	end exon	
+EIF4G1	EIF4G1+1	NIC_256086	ont	42	0	0	102	243	0	0	supported	end exon	
+EIF4G1	EIF4G1+1	NIC_256086	cntl	1	1	1	1	1	1	1	supported	end exon	
+ENG	ENG+1	NNC_65365	pb	9354	8696	5071	8380	8677	5156	7001	supported		
+ENG	ENG+1	NNC_65365	ont	13592	1707	22	2129	8248	22	215	supported		
+ENG	ENG+1	NNC_65365	cntl	1	1	1	1	1	1	1	supported		
+ENO1	ENO1+1	NIC_214405	pb	58	44	10	44	80	10	16	supported		
+ENO1	ENO1+1	NIC_214405	ont	137	2	0	8	228	0	0	supported		
+ENO1	ENO1+1	NIC_214405	cntl	1	1	1	1	1	1	1	supported		
+FBXL16	FBXL16+1	NIC_57258	pb	0	0	11	21	22	12	15	supported	end exon	
+FBXL16	FBXL16+1	NIC_57258	ont	0	0	1	34	40	1	9	supported	end exon	
+FBXL16	FBXL16+1	NIC_57258	cntl	0	0	1	1	1	1	1	supported	end exon	
+GABPA	GABPA+1	NNC_389484	pb	4	2	1	33386	34709	1	2	supported		6-base insertion seem in amplicon alignments in both PB & ONT
+GABPA	GABPA+1	NNC_389484	ont	66	5	1	26533	46758	1	24	supported		
+GABPA	GABPA+1	NNC_389484	cntl	1	1	1	1	1	1	1	supported		
+HNRNPH2	HNRNPH2+1	NNC_65559	pb	1548	1454	786	14513	17255	797	1213	supported		
+HNRNPH2	HNRNPH2+1	NNC_65559	ont	17576	8010	1165	18677	47078	1165	3023	supported		
+HNRNPH2	HNRNPH2+1	NNC_65559	cntl	1	1	1	1	1	1	1	supported		
+HSPA9	HSPA9+1	NIC_259605	pb	41	33	16	36	367	17	31	supported		
+HSPA9	HSPA9+1	NIC_259605	ont	97	5	0	4	510	0	0	supported		
+HSPA9	HSPA9+1	NIC_259605	cntl	1	1	1	1	1	1	1	supported		
+HSPB11	HSPB11+1	NNC_39338	pb	2948	2896	1976	3008	3058	2008	2699	supported		
+HSPB11	HSPB11+1	NNC_39338	ont	6780	4313	489	2792	3205	489	1324	supported		
+HSPB11	HSPB11+1	NNC_39338	cntl	1	1	1	1	1	1	1	supported		
