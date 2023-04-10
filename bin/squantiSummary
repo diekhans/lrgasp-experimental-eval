@@ -6,6 +6,7 @@ from collections import defaultdict
 from pycbio.sys import fileOps
 from evalLib import rateFmt, filterToTranscript, splitBySquantiCategory, splitBySupport
 
+printZeros = False
 
 def parseArgs():
     desc = """get various stats from the squanti reportst"""
@@ -28,7 +29,14 @@ def loadEvalTsv(evalTsv):
     return transDf
 
 def getPipelineColumns(paMatrixDf):
-    return [c for c in paMatrixDf.columns if c.startswith("pipeline")]
+    # wtc11 has pipeline1,pipeline2, ...
+    # manatee has illumina1,ONT1,ONT2,...,PB1,PB2,..
+    cols = [c for c in paMatrixDf.columns if c.startswith("pipeline")]
+    if len(cols) == 0:
+        cols = [c for c in paMatrixDf.columns if c.startswith("ONT") or c.startswith("PB")]
+    if len(cols) == 0:
+        raise Exception("no pipeline columns found")
+    return cols
 
 def countPipelinePredictions(subsetDf):
     predictedByCnt = defaultdict(int)
@@ -43,7 +51,7 @@ def writePredictions(fh, label, pipelineCnt, matrixDf):
     total = sum(predictedByCnt.values())
     cumulativeByCnt = 0
     for cnt in range(1, pipelineCnt + 1):
-        if predictedByCnt[cnt] > 0:
+        if printZeros or (predictedByCnt[cnt] > 0):
             cumulativeByCnt += predictedByCnt[cnt]
             fileOps.prRowv(fh, label, cnt,
                            predictedByCnt[cnt], rateFmt(predictedByCnt[cnt], total),
@@ -67,6 +75,7 @@ def report(paMatrixDf, transDf, idUjcMap, fh):
 
     supportedMatrixDf, unsupportedMatrixDf = splitBySupport(allMatrixDf)
     knownDf, novelDf, ismDf = splitBySquantiCategory(allMatrixDf)
+
 
     for filtLabel, filterDf in ((None, None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf)):
         writePredictionsFiltered(fh, "eval", pipelineCnt, allMatrixDf, filtLabel, filterDf)
