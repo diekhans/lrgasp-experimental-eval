@@ -4,7 +4,7 @@ import argparse
 import pandas as pd
 from collections import defaultdict
 from pycbio.sys import fileOps
-from evalLib import rate, filterToTranscript
+from evalLib import rateFmt, filterToTranscript, splitBySquantiCategory, splitBySupport
 
 
 def parseArgs():
@@ -38,32 +38,40 @@ def countPipelinePredictions(subsetDf):
         predictedByCnt[pc] += 1
     return predictedByCnt
 
-def writePredictions(fh, label, pipelineCnt, predictedByCnt):
+def writePredictions(fh, label, pipelineCnt, matrixDf):
+    predictedByCnt = countPipelinePredictions(matrixDf)
     total = sum(predictedByCnt.values())
+    cumulativeByCnt = 0
     for cnt in range(1, pipelineCnt + 1):
-        fileOps.prRowv(fh, label, cnt, predictedByCnt[cnt],
-                       rate(predictedByCnt[cnt], total))
+        if predictedByCnt[cnt] > 0:
+            cumulativeByCnt += predictedByCnt[cnt]
+            fileOps.prRowv(fh, label, cnt,
+                           predictedByCnt[cnt], rateFmt(predictedByCnt[cnt], total),
+                           cumulativeByCnt, rateFmt(cumulativeByCnt, total))
+
+def writePredictionsFiltered(fh, label, pipelineCnt, matrixDf, filtLabel, filterDf):
+    if filterDf is not None:
+        label = filtLabel + label.title()
+        matrixDf = matrixDf[matrixDf.transcript.isin(filterDf.transcript)]
+    writePredictions(fh, label, pipelineCnt, matrixDf)
+
 
 def report(paMatrixDf, transDf, idUjcMap, fh):
-    fileOps.prRowv(fh, "subset", "pipelineCnts", "transcripts")
+    fileOps.prRowv(fh, "subset", "pipelineCnts", "transcripts", "rate", "cumulativeCnt", "cumulativeRate")
 
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
-    writePredictions(fh, "all", pipelineCnt,
-                     countPipelinePredictions(paMatrixDf))
+    writePredictions(fh, "all", pipelineCnt, paMatrixDf)
 
     transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
-    transPaMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
+    allMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
 
-    writePredictions(fh, "eval", pipelineCnt,
-                     countPipelinePredictions(transPaMatrixDf))
-    supportedDf = transPaMatrixDf[transPaMatrixDf.category != "unsupported"]
-    unsupportedDf = transPaMatrixDf[transPaMatrixDf.category == "unsupported"]
-    assert (len(supportedDf) + len(unsupportedDf)) == len(transPaMatrixDf)
+    supportedMatrixDf, unsupportedMatrixDf = splitBySupport(allMatrixDf)
+    knownDf, novelDf, ismDf = splitBySquantiCategory(allMatrixDf)
 
-    writePredictions(fh, "supported", pipelineCnt,
-                     countPipelinePredictions(supportedDf))
-    writePredictions(fh, "unsupported", pipelineCnt,
-                     countPipelinePredictions(unsupportedDf))
+    for filtLabel, filterDf in ((None, None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf)):
+        writePredictionsFiltered(fh, "eval", pipelineCnt, allMatrixDf, filtLabel, filterDf)
+        writePredictionsFiltered(fh, "supported", pipelineCnt, supportedMatrixDf, filtLabel, filterDf)
+        writePredictionsFiltered(fh, "unsupported", pipelineCnt, unsupportedMatrixDf, filtLabel, filterDf)
 
 
 def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, reportTsv):

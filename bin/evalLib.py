@@ -1,14 +1,21 @@
-def percent(n, total):
+def percent(n, total, places=1):
     if total == 0:
         return 0.0
     else:
-        return round(100 * (n / total), 1)
+        return round(100 * (n / total), places)
 
-def rate(n, total):
+def rate(n, total, places=3):
     if total == 0:
         return 0.0
     else:
-        return round((n / total), 3)
+        return round((n / total), places)
+
+def rateFmt(n, total, places=3):
+    if total == 0:
+        return "0.0"
+    else:
+        r = n / total
+        return f"{r:.{places}g}"
 
 supports = ("supported", "likely", "unsupported")
 supportRanks = {
@@ -31,3 +38,19 @@ def filterToTranscript(evalDf):
     transDf = transDf.drop(dropCols, axis=1)
 
     return transDf
+
+def splitBySquantiCategory(transDf):
+    knownDf = transDf[transDf.transcript.str.startswith('FSM')]  # FSM
+    novelDf = transDf[transDf.transcript.str.startswith('NIC')
+                      + transDf.transcript.str.startswith('NNC')]  # NIC/NNC
+    ismDf = transDf[transDf.transcript.str.startswith('ISM')]  # FSM
+    if len(knownDf) + len(novelDf) + len(ismDf) != len(transDf):
+        raise Exception("logic error splitting transcripts")
+
+    return knownDf, novelDf, ismDf
+
+def splitBySupport(transDf):
+    supportedDf = transDf[transDf.category != "unsupported"]
+    unsupportedDf = transDf[transDf.category == "unsupported"]
+    assert (len(supportedDf) + len(unsupportedDf)) == len(transDf)
+    return supportedDf, unsupportedDf

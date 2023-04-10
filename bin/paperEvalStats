@@ -3,7 +3,7 @@
 import argparse
 import pandas as pd
 from pycbio.sys import fileOps
-from evalLib import percent, filterToTranscript
+from evalLib import percent, filterToTranscript, splitBySquantiCategory, splitBySupport
 
 def parseArgs():
     desc = """pull stats for paper from eval spreadsheet tsv"""
@@ -20,17 +20,14 @@ def basicReport(evalDf, fh):
     fileOps.prRowv(fh, "transcripts", len(set(evalDf.transcript)))
 
 def reportSupportRate(fh, labelPrefix, subsetDf):
+    supportedDf, unsupportedDf = splitBySupport(subsetDf)
     fileOps.prRowv(fh, labelPrefix + "Count", len(subsetDf))
-    fileOps.prRowv(fh, labelPrefix + "Supported",
-                   len(subsetDf[subsetDf.category != "unsupported"]))
+    fileOps.prRowv(fh, labelPrefix + "Supported", len(supportedDf))
     fileOps.prRowv(fh, labelPrefix + "SupportedRate",
-                   percent(len(subsetDf[subsetDf.category != "unsupported"]),
-                           len(subsetDf)))
-    fileOps.prRowv(fh, labelPrefix + "Unsupported",
-                   len(subsetDf[subsetDf.category == "unsupported"]))
+                   percent(len(supportedDf), len(subsetDf)))
+    fileOps.prRowv(fh, labelPrefix + "Unsupported", len(unsupportedDf))
     fileOps.prRowv(fh, labelPrefix + "UnsupportedRate",
-                   percent(len(subsetDf[subsetDf.category == "unsupported"]),
-                           len(subsetDf)))
+                   percent(len(unsupportedDf), len(subsetDf)))
 
 def gencodeReport(transDf, fh):
     # pb row is first with gencode and category
@@ -47,12 +44,7 @@ def gencodeReport(transDf, fh):
 
 
 def squantiReport(transDf, fh):
-    knownDf = transDf[transDf.transcript.str.startswith('FSM')]  # FSM
-    novelDf = transDf[transDf.transcript.str.startswith('NIC')
-                      + transDf.transcript.str.startswith('NNC')]  # NIC/NNC
-    ismDf = transDf[transDf.transcript.str.startswith('ISM')]  # FSM
-    if len(knownDf) + len(novelDf) + len(ismDf) != len(transDf):
-        raise Exception("logic error splitting transcripts")
+    knownDf, novelDf, ismDf = splitBySquantiCategory(transDf)
 
     reportSupportRate(fh, "all", transDf)
     reportSupportRate(fh, "known", knownDf)

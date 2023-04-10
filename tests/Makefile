@@ -3,6 +3,7 @@ transcriptomeSummary = ../bin/transcriptomeSummary
 transcriptomeFilterCmp = ../bin/transcriptomeFilterCmp
 genomeAlignAnalyze = ../bin/genomeAlignAnalyze
 summarizeSupport = ../bin/summarizeSupport
+paperEvalStats = ../bin/paperEvalStats
 squantiSummary = ../bin/squantiSummary
 
 hes2AmpliconsBam = output/HES2+A.amplicon.bam
@@ -12,7 +13,7 @@ alg6GenomeBam = output/ALG6+A.genome.bam
 
 all: test
 
-test: transcriptomeTests genomeTests otherTests squantiSummaryTests
+test: transcriptomeTests genomeTests otherTests paperEvalTests squantiSummaryTests
 
 transcriptomeTests: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
 	testSimilarity99 testSimilarity95 testANKMY2Sim \
@@ -108,6 +109,12 @@ ${hes2GenomeBam}: input/HES2+A.genome.sam | mkdirs
 ${alg6GenomeBam}: input/ALG6+1.genome.sam | mkdirs
 	samtools view -b $< > $@
 	samtools index $@
+
+paperEvalTests: testPaperEvalWtc11
+
+testPaperEvalWtc11: mkdirs
+	${paperEvalStats} input/wtc11.evaluation.part.tsv output/$@.tsv
+	diff expected/$@.tsv output/$@.tsv
 
 squantiSummaryTests: testSquantiSummary1
 
