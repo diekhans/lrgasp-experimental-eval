@@ -1,14 +1,17 @@
-subset	transcripts	meanPipeline	medianPipeline
-all	1035639	1.174	1.0
-eval	26	1.962	2.0
-supported	20	2.1	2.0
-unsupported	6	1.5	1.5
-knownEval	3	2.667	2.0
-knownSupported	2	3.0	3.0
-knownUnsupported	1	2.0	2.0
-novelEval	19	1.842	2.0
-novelSupported	14	2.0	2.0
-novelUnsupported	5	1.4	1.0
-ismEval	4	2.0	2.0
-ismSupported	4	2.0	2.0
-ismUnsupported	0	nan	nan
+set	subset	transcripts	meanPipeline	medianPipeline
+all	all	1035639	1.174	1.0
+all	known	94	1.766	1.0
+all	novel	2166	1.021	1.0
+all	ism	275	1.204	1.0
+all	other	1033104	1.174	1.0
+evaled	all	26	1.962	2.0
+evaled	supported	20	2.1	2.0
+evaled	unsupported	6	1.5	1.5
+known	all	3	2.667	2.0
+known	supported	2	3.0	3.0
+known	unsupported	1	2.0	2.0
+novel	all	19	1.842	2.0
+novel	supported	14	2.0	2.0
+novel	unsupported	5	1.4	1.0
+ism	all	4	2.0	2.0
+ism	supported	4	2.0	2.0

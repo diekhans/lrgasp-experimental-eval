@@ -39,15 +39,18 @@ def filterToTranscript(evalDf):
 
     return transDf
 
+def addStructuralCategory(transDf):
+    transDf['structural_category'] = transDf.transcript.str.extract("^([A-Za-z]+)", expand=False)
+
 def splitBySquantiCategory(transDf):
-    knownDf = transDf[transDf.transcript.str.startswith('FSM')]  # FSM
-    novelDf = transDf[transDf.transcript.str.startswith('NIC')
-                      + transDf.transcript.str.startswith('NNC')]  # NIC/NNC
-    ismDf = transDf[transDf.transcript.str.startswith('ISM')]  # FSM
-    if len(knownDf) + len(novelDf) + len(ismDf) != len(transDf):
+    knownDf = transDf[transDf.structural_category == 'FSM']
+    novelDf = transDf[transDf.structural_category.isin(['NIC', 'NNC'])]
+    ismDf = transDf[transDf.structural_category == 'ISM']
+    otherDf = transDf[-transDf.structural_category.isin(['FSM', 'NIC', 'NNC', 'ISM'])]
+    if len(knownDf) + len(novelDf) + len(ismDf) + len(otherDf) != len(transDf):
         raise Exception("logic error splitting transcripts")
 
-    return knownDf, novelDf, ismDf
+    return knownDf, novelDf, ismDf, otherDf
 
 def splitBySupport(transDf):
     supportedDf = transDf[transDf.category != "unsupported"]

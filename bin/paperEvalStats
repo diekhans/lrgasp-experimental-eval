@@ -3,7 +3,7 @@
 import argparse
 import pandas as pd
 from pycbio.sys import fileOps
-from evalLib import percent, filterToTranscript, splitBySquantiCategory, splitBySupport
+from evalLib import percent, filterToTranscript, splitBySquantiCategory, splitBySupport, addStructuralCategory
 
 def parseArgs():
     desc = """pull stats for paper from eval spreadsheet tsv"""
@@ -44,12 +44,13 @@ def gencodeReport(transDf, fh):
 
 
 def squantiReport(transDf, fh):
-    knownDf, novelDf, ismDf = splitBySquantiCategory(transDf)
+    knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(transDf)
 
     reportSupportRate(fh, "all", transDf)
     reportSupportRate(fh, "known", knownDf)
     reportSupportRate(fh, "novel", novelDf)
     reportSupportRate(fh, "ism", ismDf)
+    reportSupportRate(fh, "other", otherDf)
 
 
 def report(evalDf, fh):
@@ -64,6 +65,7 @@ def report(evalDf, fh):
 def paperEvalStats(evalTsv, statsTsv):
     evalDf = pd.read_table(evalTsv)
     evalDf = evalDf.convert_dtypes()  # make ints ints rather than floats
+    addStructuralCategory(evalDf)
     with open(statsTsv, 'w') as fh:
         report(evalDf, fh)
 

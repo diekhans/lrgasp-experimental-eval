@@ -4,7 +4,7 @@ import argparse
 import pandas as pd
 from collections import defaultdict
 from pycbio.sys import fileOps
-from evalLib import rateFmt, filterToTranscript, splitBySquantiCategory, splitBySupport
+from evalLib import rateFmt, filterToTranscript, splitBySquantiCategory, splitBySupport, addStructuralCategory
 
 printZeros = False
 
@@ -46,46 +46,51 @@ def countPipelinePredictions(matrixDf):
         predictedByCnt[pc] += 1
     return predictedByCnt
 
-def writePredictionHisto(histoFh, label, pipelineCnt, matrixDf):
+def writePredictionHisto(histoFh, label, subsetLabel, pipelineCnt, matrixDf):
     predictedByCnt = countPipelinePredictions(matrixDf)
     total = sum(predictedByCnt.values())
     cumulativeByCnt = 0
     for cnt in range(1, pipelineCnt + 1):
         if printZeros or (predictedByCnt[cnt] > 0):
             cumulativeByCnt += predictedByCnt[cnt]
-            fileOps.prRowv(histoFh, label, cnt,
+            fileOps.prRowv(histoFh, label, subsetLabel, cnt,
                            predictedByCnt[cnt], rateFmt(predictedByCnt[cnt], total),
                            cumulativeByCnt, rateFmt(cumulativeByCnt, total))
 
-def writePredictionStats(statsFh, label, matrixDf):
+def writePredictionStats(statsFh, label, subsetLabel, matrixDf):
     predictedCnts = matrixDf[getPipelineColumns(matrixDf)].sum(axis=1)
-    fileOps.prRowv(statsFh, label, len(matrixDf), round(predictedCnts.mean(), 3),
-                   round(predictedCnts.median(), 3))
+    if printZeros or (len(predictedCnts) > 0):
+        fileOps.prRowv(statsFh, label, subsetLabel, len(matrixDf), round(predictedCnts.mean(), 3),
+                       round(predictedCnts.median(), 3))
 
-def writePredictions(histoFh, statsFh, label, pipelineCnt, matrixDf, filtLabel=None, filterDf=None):
+def writePredictions(histoFh, statsFh, label, subsetLabel, pipelineCnt, matrixDf, filterDf=None):
     if filterDf is not None:
-        label = filtLabel + label.title()
-        matrixDf = matrixDf[matrixDf.transcript.isin(filterDf.transcript)]
-    writePredictionHisto(histoFh, label, pipelineCnt, matrixDf)
-    writePredictionStats(statsFh, label, matrixDf)
+        matrixDf = matrixDf[matrixDf.structural_category.isin(filterDf.structural_category)]
+    writePredictionHisto(histoFh, label, subsetLabel, pipelineCnt, matrixDf)
+    writePredictionStats(statsFh, label, subsetLabel, matrixDf)
 
 
 def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
-    fileOps.prRowv(histoFh, "subset", "pipelineCnts", "transcripts", "rate", "cumulativeCnt", "cumulativeRate")
-    fileOps.prRowv(statsFh, "subset", "transcripts", "meanPipeline", "medianPipeline")
-
+    fileOps.prRowv(histoFh, "set", "subset", "pipelineCnts", "transcripts", "rate",
+                   "cumulativeCnt", "cumulativeRate")
+    fileOps.prRowv(statsFh, "set", "subset", "transcripts", "meanPipeline", "medianPipeline")
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
+
+    # full set
+    knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(paMatrixDf)
+    for subsetLabel, filterDf in (("all", None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf), ("other", otherDf)):
+        writePredictions(histoFh, statsFh, "all", subsetLabel, pipelineCnt, paMatrixDf, filterDf)
+
+    # PCR set
     transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
-    allMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
+    evaledMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
+    addStructuralCategory(evaledMatrixDf)
+    supportedMatrixDf, unsupportedMatrixDf = splitBySupport(evaledMatrixDf)
 
-    supportedMatrixDf, unsupportedMatrixDf = splitBySupport(allMatrixDf)
-    knownDf, novelDf, ismDf = splitBySquantiCategory(allMatrixDf)
-
-    writePredictions(histoFh, statsFh, "all", pipelineCnt, paMatrixDf)
-    for filtLabel, filterDf in ((None, None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf)):
-        writePredictions(histoFh, statsFh, "eval", pipelineCnt, allMatrixDf, filtLabel, filterDf)
-        writePredictions(histoFh, statsFh, "supported", pipelineCnt, supportedMatrixDf, filtLabel, filterDf)
-        writePredictions(histoFh, statsFh, "unsupported", pipelineCnt, unsupportedMatrixDf, filtLabel, filterDf)
+    for label, filterDf in (("evaled", None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf)):
+        writePredictions(histoFh, statsFh, label, "all", pipelineCnt, evaledMatrixDf, filterDf)
+        writePredictions(histoFh, statsFh, label, "supported", pipelineCnt, supportedMatrixDf, filterDf)
+        writePredictions(histoFh, statsFh, label, "unsupported", pipelineCnt, unsupportedMatrixDf, filterDf)
 
 
 def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv):

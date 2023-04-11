@@ -1,118 +1,149 @@
-subset	pipelineCnts	transcripts	rate	cumulativeCnt	cumulativeRate
-all	1	9	0.2	9	0.2
-all	5	1	0.0222	10	0.222
-all	6	1	0.0222	11	0.244
-all	7	1	0.0222	12	0.267
-all	8	1	0.0222	13	0.289
-all	9	1	0.0222	14	0.311
-all	11	3	0.0667	17	0.378
-all	13	1	0.0222	18	0.4
-all	14	2	0.0444	20	0.444
-all	15	1	0.0222	21	0.467
-all	16	1	0.0222	22	0.489
-all	17	1	0.0222	23	0.511
-all	18	3	0.0667	26	0.578
-all	20	2	0.0444	28	0.622
-all	22	1	0.0222	29	0.644
-all	23	2	0.0444	31	0.689
-all	26	1	0.0222	32	0.711
-all	27	1	0.0222	33	0.733
-all	28	1	0.0222	34	0.756
-all	30	1	0.0222	35	0.778
-all	31	1	0.0222	36	0.8
-all	32	3	0.0667	39	0.867
-all	33	1	0.0222	40	0.889
-all	34	1	0.0222	41	0.911
-all	40	1	0.0222	42	0.933
-all	44	2	0.0444	44	0.978
-all	45	1	0.0222	45	1
-eval	1	8	0.242	8	0.242
-eval	5	1	0.0303	9	0.273
-eval	6	1	0.0303	10	0.303
-eval	8	1	0.0303	11	0.333
-eval	11	2	0.0606	13	0.394
-eval	13	1	0.0303	14	0.424
-eval	14	1	0.0303	15	0.455
-eval	17	1	0.0303	16	0.485
-eval	18	2	0.0606	18	0.545
-eval	20	1	0.0303	19	0.576
-eval	22	1	0.0303	20	0.606
-eval	23	2	0.0606	22	0.667
-eval	26	1	0.0303	23	0.697
-eval	27	1	0.0303	24	0.727
-eval	28	1	0.0303	25	0.758
-eval	30	1	0.0303	26	0.788
-eval	31	1	0.0303	27	0.818
-eval	32	2	0.0606	29	0.879
-eval	33	1	0.0303	30	0.909
-eval	44	2	0.0606	32	0.97
-eval	45	1	0.0303	33	1
-supported	1	7	0.226	7	0.226
-supported	6	1	0.0323	8	0.258
-supported	8	1	0.0323	9	0.29
-supported	11	2	0.0645	11	0.355
-supported	13	1	0.0323	12	0.387
-supported	14	1	0.0323	13	0.419
-supported	17	1	0.0323	14	0.452
-supported	18	2	0.0645	16	0.516
-supported	20	1	0.0323	17	0.548
-supported	22	1	0.0323	18	0.581
-supported	23	2	0.0645	20	0.645
-supported	26	1	0.0323	21	0.677
-supported	27	1	0.0323	22	0.71
-supported	28	1	0.0323	23	0.742
-supported	30	1	0.0323	24	0.774
-supported	31	1	0.0323	25	0.806
-supported	32	2	0.0645	27	0.871
-supported	33	1	0.0323	28	0.903
-supported	44	2	0.0645	30	0.968
-supported	45	1	0.0323	31	1
-unsupported	1	1	0.5	1	0.5
-unsupported	5	1	0.5	2	1
-knownEval	11	1	0.143	1	0.143
-knownEval	13	1	0.143	2	0.286
-knownEval	23	1	0.143	3	0.429
-knownEval	26	1	0.143	4	0.571
-knownEval	44	2	0.286	6	0.857
-knownEval	45	1	0.143	7	1
-knownSupported	11	1	0.143	1	0.143
-knownSupported	13	1	0.143	2	0.286
-knownSupported	23	1	0.143	3	0.429
-knownSupported	26	1	0.143	4	0.571
-knownSupported	44	2	0.286	6	0.857
-knownSupported	45	1	0.143	7	1
-novelEval	1	8	0.308	8	0.308
-novelEval	5	1	0.0385	9	0.346
-novelEval	6	1	0.0385	10	0.385
-novelEval	8	1	0.0385	11	0.423
-novelEval	11	1	0.0385	12	0.462
-novelEval	14	1	0.0385	13	0.5
-novelEval	17	1	0.0385	14	0.538
-novelEval	18	2	0.0769	16	0.615
-novelEval	20	1	0.0385	17	0.654
-novelEval	22	1	0.0385	18	0.692
-novelEval	23	1	0.0385	19	0.731
-novelEval	27	1	0.0385	20	0.769
-novelEval	28	1	0.0385	21	0.808
-novelEval	30	1	0.0385	22	0.846
-novelEval	31	1	0.0385	23	0.885
-novelEval	32	2	0.0769	25	0.962
-novelEval	33	1	0.0385	26	1
-novelSupported	1	7	0.292	7	0.292
-novelSupported	6	1	0.0417	8	0.333
-novelSupported	8	1	0.0417	9	0.375
-novelSupported	11	1	0.0417	10	0.417
-novelSupported	14	1	0.0417	11	0.458
-novelSupported	17	1	0.0417	12	0.5
-novelSupported	18	2	0.0833	14	0.583
-novelSupported	20	1	0.0417	15	0.625
-novelSupported	22	1	0.0417	16	0.667
-novelSupported	23	1	0.0417	17	0.708
-novelSupported	27	1	0.0417	18	0.75
-novelSupported	28	1	0.0417	19	0.792
-novelSupported	30	1	0.0417	20	0.833
-novelSupported	31	1	0.0417	21	0.875
-novelSupported	32	2	0.0833	23	0.958
-novelSupported	33	1	0.0417	24	1
-novelUnsupported	1	1	0.5	1	0.5
-novelUnsupported	5	1	0.5	2	1
+set	subset	pipelineCnts	transcripts	rate	cumulativeCnt	cumulativeRate
+all	all	1	9	0.2	9	0.2
+all	all	5	1	0.0222	10	0.222
+all	all	6	1	0.0222	11	0.244
+all	all	7	1	0.0222	12	0.267
+all	all	8	1	0.0222	13	0.289
+all	all	9	1	0.0222	14	0.311
+all	all	11	3	0.0667	17	0.378
+all	all	13	1	0.0222	18	0.4
+all	all	14	2	0.0444	20	0.444
+all	all	15	1	0.0222	21	0.467
+all	all	16	1	0.0222	22	0.489
+all	all	17	1	0.0222	23	0.511
+all	all	18	3	0.0667	26	0.578
+all	all	20	2	0.0444	28	0.622
+all	all	22	1	0.0222	29	0.644
+all	all	23	2	0.0444	31	0.689
+all	all	26	1	0.0222	32	0.711
+all	all	27	1	0.0222	33	0.733
+all	all	28	1	0.0222	34	0.756
+all	all	30	1	0.0222	35	0.778
+all	all	31	1	0.0222	36	0.8
+all	all	32	3	0.0667	39	0.867
+all	all	33	1	0.0222	40	0.889
+all	all	34	1	0.0222	41	0.911
+all	all	40	1	0.0222	42	0.933
+all	all	44	2	0.0444	44	0.978
+all	all	45	1	0.0222	45	1
+all	known	11	1	0.143	1	0.143
+all	known	13	1	0.143	2	0.286
+all	known	23	1	0.143	3	0.429
+all	known	26	1	0.143	4	0.571
+all	known	44	2	0.286	6	0.857
+all	known	45	1	0.143	7	1
+all	novel	1	8	0.235	8	0.235
+all	novel	5	1	0.0294	9	0.265
+all	novel	6	1	0.0294	10	0.294
+all	novel	7	1	0.0294	11	0.324
+all	novel	8	1	0.0294	12	0.353
+all	novel	11	2	0.0588	14	0.412
+all	novel	14	2	0.0588	16	0.471
+all	novel	15	1	0.0294	17	0.5
+all	novel	17	1	0.0294	18	0.529
+all	novel	18	3	0.0882	21	0.618
+all	novel	20	1	0.0294	22	0.647
+all	novel	22	1	0.0294	23	0.676
+all	novel	23	1	0.0294	24	0.706
+all	novel	27	1	0.0294	25	0.735
+all	novel	28	1	0.0294	26	0.765
+all	novel	30	1	0.0294	27	0.794
+all	novel	31	1	0.0294	28	0.824
+all	novel	32	3	0.0882	31	0.912
+all	novel	33	1	0.0294	32	0.941
+all	novel	34	1	0.0294	33	0.971
+all	novel	40	1	0.0294	34	1
+all	other	1	1	0.25	1	0.25
+all	other	9	1	0.25	2	0.5
+all	other	16	1	0.25	3	0.75
+all	other	20	1	0.25	4	1
+evaled	all	1	8	0.242	8	0.242
+evaled	all	5	1	0.0303	9	0.273
+evaled	all	6	1	0.0303	10	0.303
+evaled	all	8	1	0.0303	11	0.333
+evaled	all	11	2	0.0606	13	0.394
+evaled	all	13	1	0.0303	14	0.424
+evaled	all	14	1	0.0303	15	0.455
+evaled	all	17	1	0.0303	16	0.485
+evaled	all	18	2	0.0606	18	0.545
+evaled	all	20	1	0.0303	19	0.576
+evaled	all	22	1	0.0303	20	0.606
+evaled	all	23	2	0.0606	22	0.667
+evaled	all	26	1	0.0303	23	0.697
+evaled	all	27	1	0.0303	24	0.727
+evaled	all	28	1	0.0303	25	0.758
+evaled	all	30	1	0.0303	26	0.788
+evaled	all	31	1	0.0303	27	0.818
+evaled	all	32	2	0.0606	29	0.879
+evaled	all	33	1	0.0303	30	0.909
+evaled	all	44	2	0.0606	32	0.97
+evaled	all	45	1	0.0303	33	1
+evaled	supported	1	7	0.226	7	0.226
+evaled	supported	6	1	0.0323	8	0.258
+evaled	supported	8	1	0.0323	9	0.29
+evaled	supported	11	2	0.0645	11	0.355
+evaled	supported	13	1	0.0323	12	0.387
+evaled	supported	14	1	0.0323	13	0.419
+evaled	supported	17	1	0.0323	14	0.452
+evaled	supported	18	2	0.0645	16	0.516
+evaled	supported	20	1	0.0323	17	0.548
+evaled	supported	22	1	0.0323	18	0.581
+evaled	supported	23	2	0.0645	20	0.645
+evaled	supported	26	1	0.0323	21	0.677
+evaled	supported	27	1	0.0323	22	0.71
+evaled	supported	28	1	0.0323	23	0.742
+evaled	supported	30	1	0.0323	24	0.774
+evaled	supported	31	1	0.0323	25	0.806
+evaled	supported	32	2	0.0645	27	0.871
+evaled	supported	33	1	0.0323	28	0.903
+evaled	supported	44	2	0.0645	30	0.968
+evaled	supported	45	1	0.0323	31	1
+evaled	unsupported	1	1	0.5	1	0.5
+evaled	unsupported	5	1	0.5	2	1
+known	all	11	1	0.143	1	0.143
+known	all	13	1	0.143	2	0.286
+known	all	23	1	0.143	3	0.429
+known	all	26	1	0.143	4	0.571
+known	all	44	2	0.286	6	0.857
+known	all	45	1	0.143	7	1
+known	supported	11	1	0.143	1	0.143
+known	supported	13	1	0.143	2	0.286
+known	supported	23	1	0.143	3	0.429
+known	supported	26	1	0.143	4	0.571
+known	supported	44	2	0.286	6	0.857
+known	supported	45	1	0.143	7	1
+novel	all	1	8	0.308	8	0.308
+novel	all	5	1	0.0385	9	0.346
+novel	all	6	1	0.0385	10	0.385
+novel	all	8	1	0.0385	11	0.423
+novel	all	11	1	0.0385	12	0.462
+novel	all	14	1	0.0385	13	0.5
+novel	all	17	1	0.0385	14	0.538
+novel	all	18	2	0.0769	16	0.615
+novel	all	20	1	0.0385	17	0.654
+novel	all	22	1	0.0385	18	0.692
+novel	all	23	1	0.0385	19	0.731
+novel	all	27	1	0.0385	20	0.769
+novel	all	28	1	0.0385	21	0.808
+novel	all	30	1	0.0385	22	0.846
+novel	all	31	1	0.0385	23	0.885
+novel	all	32	2	0.0769	25	0.962
+novel	all	33	1	0.0385	26	1
+novel	supported	1	7	0.292	7	0.292
+novel	supported	6	1	0.0417	8	0.333
+novel	supported	8	1	0.0417	9	0.375
+novel	supported	11	1	0.0417	10	0.417
+novel	supported	14	1	0.0417	11	0.458
+novel	supported	17	1	0.0417	12	0.5
+novel	supported	18	2	0.0833	14	0.583
+novel	supported	20	1	0.0417	15	0.625
+novel	supported	22	1	0.0417	16	0.667
+novel	supported	23	1	0.0417	17	0.708
+novel	supported	27	1	0.0417	18	0.75
+novel	supported	28	1	0.0417	19	0.792
+novel	supported	30	1	0.0417	20	0.833
+novel	supported	31	1	0.0417	21	0.875
+novel	supported	32	2	0.0833	23	0.958
+novel	supported	33	1	0.0417	24	1
+novel	unsupported	1	1	0.5	1	0.5
+novel	unsupported	5	1	0.5	2	1
