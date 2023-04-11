@@ -42,5 +42,5 @@ tmlr cat $(find joined/Challenge3/ -type f) >manatee.squnati-transcripts.tsv
 * stats for paper
 cd evaluation/manatee
 ../../bin/paperEvalStats manatee.evaluation.tsv manatee.stats.tsv
-../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge3_SuppTables/Presence-absence\ matrices\ by\ UJC/manatee_challenge3_metrics.pa.csv manatee.evaluation.tsv manatee.id_ujc.tsv manatee.squanti-summary.tsv
+../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge3_SuppTables/Presence-absence\ matrices\ by\ UJC/manatee_challenge3_metrics.pa.csv manatee.evaluation.tsv manatee.id_ujc.tsv manatee.squanti-summary.tsv manatee.squanti-stats.tsv
 

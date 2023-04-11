@@ -103,7 +103,7 @@ tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
 cd evaluation/wtc11
 ../../bin/paperEvalStats wtc11.evaluation.tsv wtc11.stats.tsv
-../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv wtc11.evaluation.tsv wtc11.id_ujc.tsv wtc11.squanti-summary.tsv
+../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv wtc11.evaluation.tsv wtc11.id_ujc.tsv wtc11.squanti-summary.tsv wtc11.squanti-stats.tsv
 
 cd evaluation/gencode
 ../../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv

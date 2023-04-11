@@ -15,7 +15,8 @@ def parseArgs():
                         help="""Presence-absence matrices by UJC""")
     parser.add_argument("evalTsv")
     parser.add_argument("idUjcMapTsv")
-    parser.add_argument("reportTsv")
+    parser.add_argument("histoTsv")
+    parser.add_argument("statsTsv")
     return parser.parse_args()
 
 def loadSquantiPaCsv(squantiPaCsv):
@@ -38,60 +39,65 @@ def getPipelineColumns(paMatrixDf):
         raise Exception("no pipeline columns found")
     return cols
 
-def countPipelinePredictions(subsetDf):
+def countPipelinePredictions(matrixDf):
     predictedByCnt = defaultdict(int)
-    pipelineCols = getPipelineColumns(subsetDf)
-    predictedCnts = subsetDf[pipelineCols].eq(1).sum(axis=1)
+    predictedCnts = matrixDf[getPipelineColumns(matrixDf)].sum(axis=1)
     for pc in predictedCnts:
         predictedByCnt[pc] += 1
     return predictedByCnt
 
-def writePredictions(fh, label, pipelineCnt, matrixDf):
+def writePredictionHisto(histoFh, label, pipelineCnt, matrixDf):
     predictedByCnt = countPipelinePredictions(matrixDf)
     total = sum(predictedByCnt.values())
     cumulativeByCnt = 0
     for cnt in range(1, pipelineCnt + 1):
         if printZeros or (predictedByCnt[cnt] > 0):
             cumulativeByCnt += predictedByCnt[cnt]
-            fileOps.prRowv(fh, label, cnt,
+            fileOps.prRowv(histoFh, label, cnt,
                            predictedByCnt[cnt], rateFmt(predictedByCnt[cnt], total),
                            cumulativeByCnt, rateFmt(cumulativeByCnt, total))
 
-def writePredictionsFiltered(fh, label, pipelineCnt, matrixDf, filtLabel, filterDf):
+def writePredictionStats(statsFh, label, matrixDf):
+    predictedCnts = matrixDf[getPipelineColumns(matrixDf)].sum(axis=1)
+    fileOps.prRowv(statsFh, label, len(matrixDf), round(predictedCnts.mean(), 3),
+                   round(predictedCnts.median(), 3))
+
+def writePredictions(histoFh, statsFh, label, pipelineCnt, matrixDf, filtLabel=None, filterDf=None):
     if filterDf is not None:
         label = filtLabel + label.title()
         matrixDf = matrixDf[matrixDf.transcript.isin(filterDf.transcript)]
-    writePredictions(fh, label, pipelineCnt, matrixDf)
+    writePredictionHisto(histoFh, label, pipelineCnt, matrixDf)
+    writePredictionStats(statsFh, label, matrixDf)
 
 
-def report(paMatrixDf, transDf, idUjcMap, fh):
-    fileOps.prRowv(fh, "subset", "pipelineCnts", "transcripts", "rate", "cumulativeCnt", "cumulativeRate")
+def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
+    fileOps.prRowv(histoFh, "subset", "pipelineCnts", "transcripts", "rate", "cumulativeCnt", "cumulativeRate")
+    fileOps.prRowv(statsFh, "subset", "transcripts", "meanPipeline", "medianPipeline")
 
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
-    writePredictions(fh, "all", pipelineCnt, paMatrixDf)
-
     transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
     allMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
 
     supportedMatrixDf, unsupportedMatrixDf = splitBySupport(allMatrixDf)
     knownDf, novelDf, ismDf = splitBySquantiCategory(allMatrixDf)
 
-
+    writePredictions(histoFh, statsFh, "all", pipelineCnt, paMatrixDf)
     for filtLabel, filterDf in ((None, None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf)):
-        writePredictionsFiltered(fh, "eval", pipelineCnt, allMatrixDf, filtLabel, filterDf)
-        writePredictionsFiltered(fh, "supported", pipelineCnt, supportedMatrixDf, filtLabel, filterDf)
-        writePredictionsFiltered(fh, "unsupported", pipelineCnt, unsupportedMatrixDf, filtLabel, filterDf)
+        writePredictions(histoFh, statsFh, "eval", pipelineCnt, allMatrixDf, filtLabel, filterDf)
+        writePredictions(histoFh, statsFh, "supported", pipelineCnt, supportedMatrixDf, filtLabel, filterDf)
+        writePredictions(histoFh, statsFh, "unsupported", pipelineCnt, unsupportedMatrixDf, filtLabel, filterDf)
 
 
-def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, reportTsv):
+def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv):
     paMatrixDf = loadSquantiPaCsv(squantiPaCsv)
     transDf = loadEvalTsv(evalTsv)
     idUjcMap = pd.read_table(idUjcMapTsv)
 
-    with open(reportTsv, 'w') as fh:
-        report(paMatrixDf, transDf, idUjcMap, fh)
+    with open(histoTsv, 'w') as histoFh:
+        with open(statsTsv, 'w') as statsFh:
+            report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh)
 
 def main(opts):
-    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.reportTsv)
+    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.histoTsv, opts.statsTsv)
 
 main(parseArgs())
