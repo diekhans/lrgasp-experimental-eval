@@ -57,23 +57,26 @@ def writePredictionHisto(histoFh, label, subsetLabel, pipelineCnt, matrixDf):
                            predictedByCnt[cnt], rateFmt(predictedByCnt[cnt], total),
                            cumulativeByCnt, rateFmt(cumulativeByCnt, total))
 
-def writePredictionStats(statsFh, label, subsetLabel, matrixDf):
+def writePredictionStats(statsFh, label, subsetLabel, pipelineCnt, matrixDf):
     predictedCnts = matrixDf[getPipelineColumns(matrixDf)].sum(axis=1)
     if printZeros or (len(predictedCnts) > 0):
-        fileOps.prRowv(statsFh, label, subsetLabel, len(matrixDf), round(predictedCnts.mean(), 3),
-                       round(predictedCnts.median(), 3))
+        meanPipelineCnt = predictedCnts.mean()
+        medianPipelienCnt = predictedCnts.median()
+        fileOps.prRowv(statsFh, label, subsetLabel, len(matrixDf),
+                       round(meanPipelineCnt, 3),  rateFmt(meanPipelineCnt, pipelineCnt),
+                       round(medianPipelienCnt, 3), rateFmt(medianPipelienCnt, pipelineCnt))
 
 def writePredictions(histoFh, statsFh, label, subsetLabel, pipelineCnt, matrixDf, filterDf=None):
     if filterDf is not None:
         matrixDf = matrixDf[matrixDf.structural_category.isin(filterDf.structural_category)]
     writePredictionHisto(histoFh, label, subsetLabel, pipelineCnt, matrixDf)
-    writePredictionStats(statsFh, label, subsetLabel, matrixDf)
+    writePredictionStats(statsFh, label, subsetLabel, pipelineCnt, matrixDf)
 
 
 def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
     fileOps.prRowv(histoFh, "set", "subset", "pipelineCnts", "transcripts", "rate",
                    "cumulativeCnt", "cumulativeRate")
-    fileOps.prRowv(statsFh, "set", "subset", "transcripts", "meanPipeline", "medianPipeline")
+    fileOps.prRowv(statsFh, "set", "subset", "transcripts", "meanPipeline", "meanPipelineRate", "medianPipeline", "medianPipelineRate")
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
 
     # full set

@@ -1,17 +1,17 @@
-set	subset	transcripts	meanPipeline	medianPipeline
-all	all	1035639	1.174	1.0
-all	known	94	1.766	1.0
-all	novel	2166	1.021	1.0
-all	ism	275	1.204	1.0
-all	other	1033104	1.174	1.0
-evaled	all	26	1.962	2.0
-evaled	supported	20	2.1	2.0
-evaled	unsupported	6	1.5	1.5
-known	all	3	2.667	2.0
-known	supported	2	3.0	3.0
-known	unsupported	1	2.0	2.0
-novel	all	19	1.842	2.0
-novel	supported	14	2.0	2.0
-novel	unsupported	5	1.4	1.0
-ism	all	4	2.0	2.0
-ism	supported	4	2.0	2.0
+set	subset	transcripts	meanPipeline	meanPipelineRate	medianPipeline	medianPipelineRate
+all	all	1035639	1.174	0.147	1.0	0.125
+all	known	94	1.766	0.221	1.0	0.125
+all	novel	2166	1.021	0.128	1.0	0.125
+all	ism	275	1.204	0.15	1.0	0.125
+all	other	1033104	1.174	0.147	1.0	0.125
+evaled	all	26	1.962	0.245	2.0	0.25
+evaled	supported	20	2.1	0.263	2.0	0.25
+evaled	unsupported	6	1.5	0.188	1.5	0.188
+known	all	3	2.667	0.333	2.0	0.25
+known	supported	2	3.0	0.375	3.0	0.375
+known	unsupported	1	2.0	0.25	2.0	0.25
+novel	all	19	1.842	0.23	2.0	0.25
+novel	supported	14	2.0	0.25	2.0	0.25
+novel	unsupported	5	1.4	0.175	1.0	0.125
+ism	all	4	2.0	0.25	2.0	0.25
+ism	supported	4	2.0	0.25	2.0	0.25
