@@ -101,10 +101,17 @@ tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
 * paper stats
 
-cd evaluation/wtc11
-../../bin/paperEvalStats wtc11.evaluation.tsv wtc11.stats.tsv
-../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv wtc11.evaluation.tsv wtc11.id_ujc.tsv wtc11.squanti-summary.tsv wtc11.squanti-stats.tsv
+cd evaluation/WTC11
+../../bin/paperEvalStats WTC11.evaluation.tsv WTC11.stats.tsv
+../../bin/squantiSummary --evalTsv=WTC11.evaluation.tsv --idUjcMapTsv=WTC11.id_ujc.tsv ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv WTC11.squanti-summary.tsv WTC11.squanti-stats.tsv
+
+cd evaluation/H1_mix
+../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/H1_mix.pa.csv H1_mix.squanti-summary.tsv H1_mix.squanti-stats.tsv
+
+cd evaluation/ES
+../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/ES.pa.csv ES.squanti-summary.tsv ES.squanti-stats.tsv
 
 cd evaluation/gencode
 ../../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv
+
 

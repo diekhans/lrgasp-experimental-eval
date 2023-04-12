@@ -1,0 +1,6 @@
+set	subset	transcripts	meanPipeline	meanPipelineRate	medianPipeline	medianPipelineRate
+all	all	453453	3.677	0.0782	1.0	0.0213
+all	known	64843	12.408	0.264	6.0	0.128
+all	novel	229999	2.043	0.0435	1.0	0.0213
+all	ism	64087	2.803	0.0596	2.0	0.0426
+all	other	94524	2.256	0.048	1.0	0.0213

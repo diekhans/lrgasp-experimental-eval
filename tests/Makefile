@@ -119,7 +119,7 @@ testPaperEvalWtc11: mkdirs
 squantiSummaryTests: testSquantiSummary1
 
 testSquantiSummary1: mkdirs
-	${squantiSummary} input/WTC11.pa.part.csv input/wtc11.evaluation.part.tsv input/wtc11.id_ujc.part.tsv output/$@.histos.tsv output/$@.stats.tsv
+	${squantiSummary} --evalTsv=input/wtc11.evaluation.part.tsv --idUjcMapTsv=input/wtc11.id_ujc.part.tsv input/WTC11.pa.part.csv output/$@.histos.tsv output/$@.stats.tsv
 	diff expected/$@.histos.tsv output/$@.histos.tsv
 	diff expected/$@.stats.tsv output/$@.stats.tsv
 
