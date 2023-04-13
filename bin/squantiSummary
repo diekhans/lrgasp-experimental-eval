@@ -13,6 +13,8 @@ def parseArgs():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--evalTsv")
     parser.add_argument("--idUjcMapTsv")
+    parser.add_argument("--evalPipelineCntTsv",
+                        help="write RT-PRC eval info and number of pipelines")
     parser.add_argument("squantiPaCsv",
                         help="""Presence-absence matrices by UJC""")
     parser.add_argument("histoTsv")
@@ -22,6 +24,7 @@ def parseArgs():
 def loadSquantiPaCsv(squantiPaCsv):
     paMatrixDf = pd.read_csv(squantiPaCsv)
     paMatrixDf.set_index('TAGS', inplace=True)
+    paMatrixDf['numPipelines'] = paMatrixDf[getPipelineColumns(paMatrixDf)].sum(axis=1)
     return paMatrixDf
 
 def loadEvalTsv(evalTsv):
@@ -41,9 +44,8 @@ def getPipelineColumns(paMatrixDf):
 
 def countPipelinePredictions(matrixDf):
     predictedByCnt = defaultdict(int)
-    predictedCnts = matrixDf[getPipelineColumns(matrixDf)].sum(axis=1)
-    for pc in predictedCnts:
-        predictedByCnt[pc] += 1
+    for idx, row in matrixDf.iterrows():
+        predictedByCnt[row.numPipelines] += 1
     return predictedByCnt
 
 def writePredictionHisto(histoFh, label, subsetLabel, pipelineCnt, matrixDf):
@@ -78,7 +80,15 @@ def fullSetReport(paMatrixDf, histoFh, statsFh):
     for subsetLabel, filterDf in (("all", None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf), ("other", otherDf)):
         writePredictions(histoFh, statsFh, "all", subsetLabel, pipelineCnt, paMatrixDf, filterDf)
 
-def rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
+def evalPipelineReport(evaledMatrixDf, evalPipelineCntFh):
+    fileOps.prRowv(evalPipelineCntFh, "gene", "transcript", "structural_category", "category", "numPipelines")
+
+    for idx, row in evaledMatrixDf.iterrows():
+        fileOps.prRowv(evalPipelineCntFh, row.gene, row.transcript, row.structural_category,
+                       row.category, row.numPipelines)
+
+
+def rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh):
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
     knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(paMatrixDf)
     transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
@@ -91,26 +101,32 @@ def rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
         writePredictions(histoFh, statsFh, label, "supported", pipelineCnt, supportedMatrixDf, filterDf)
         writePredictions(histoFh, statsFh, label, "unsupported", pipelineCnt, unsupportedMatrixDf, filterDf)
 
-def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh):
+    if evalPipelineCntFh is not None:
+        evalPipelineReport(evaledMatrixDf, evalPipelineCntFh)
+
+def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh):
     fileOps.prRowv(histoFh, "set", "subset", "pipelineCnts", "transcripts", "rate",
                    "cumulativeCnt", "cumulativeRate")
     fileOps.prRowv(statsFh, "set", "subset", "transcripts", "meanPipeline", "meanPipelineRate", "medianPipeline", "medianPipelineRate")
 
     fullSetReport(paMatrixDf, histoFh, statsFh)
     if transDf is not None:
-        rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh)
+        rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh)
 
-def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv):
+def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalPipelineCntTsv):
     paMatrixDf = loadSquantiPaCsv(squantiPaCsv)
 
     transDf = loadEvalTsv(evalTsv) if evalTsv is not None else None
     idUjcMap = pd.read_table(idUjcMapTsv) if idUjcMapTsv is not None else None
 
+    evalPipelineCntFh = open(evalPipelineCntTsv, 'w') if evalPipelineCntTsv is not None else None
+
     with open(histoTsv, 'w') as histoFh:
         with open(statsTsv, 'w') as statsFh:
-            report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh)
+            report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh)
 
 def main(opts):
-    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.histoTsv, opts.statsTsv)
+    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.histoTsv, opts.statsTsv,
+                   opts.evalPipelineCntTsv)
 
 main(parseArgs())

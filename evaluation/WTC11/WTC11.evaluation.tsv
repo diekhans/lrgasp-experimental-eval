@@ -209,9 +209,9 @@ SLC9B1	SLC9B1+1	NIC_379324	cntl	1	1	1	1	1	1	1	supported
 SNHG3	SNHG3+1	NNC_79612	pb	8	1	0	357	397	0	0	supported		4-base deletion in ONT amplicon alignments, also in a few PB, with PB also having lots of alignments start or ending around this point.
 SNHG3	SNHG3+1	NNC_79612	ont	20	0	0	659	1140	0	1	supported		
 SNHG3	SNHG3+1	NNC_79612	cntl	1	1	1	1	1	1	1	supported		
-SORD	SORD+1	NNC_388728	pb	0	0	0	0	0	0	0	supported		
-SORD	SORD+1	NNC_388728	ont	0	0	0	0	0	0	0	supported		
-SORD	SORD+1	NNC_388728	cntl	1	1	1	1	1	1	1	supported		
+SORD	SORD+1	NNC_388728	pb	0	0	0	0	0	0	0	unsupported		
+SORD	SORD+1	NNC_388728	ont	0	0	0	0	0	0	0	unsupported		
+SORD	SORD+1	NNC_388728	cntl	1	1	1	1	1	1	1	unsupported		
 SPRING1	SPRING1+1	NIC_56020	pb	0	0	93	521	622	97	195	supported	end exon	
 SPRING1	SPRING1+1	NIC_56020	ont	0	0	0	78	407	0	1	supported	end exon	
 SPRING1	SPRING1+1	NIC_56020	cntl	0	0	1	1	1	1	1	supported	end exon	
