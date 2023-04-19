@@ -5,7 +5,7 @@ https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+o
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.95.genome.bam
 https://hgwdev.gi.ucsc.edu/~markd/gencode/lrgasp/experimental-eval/hub/hg38/pb+ont-rna-wtc11.sim=0.90.genome.bam
 
-* squanti data
+* sqanti data
 ** Francisco J. Pardo-Palacios
 I think I already have the data you need uploaded
 to synapse I calculated the median CPM per Unique Intron Chain using all the
@@ -20,7 +20,7 @@ submitted (files named *classification.txt ). These files were given to the
 submitters when we finished the evaluation, so they should be already public
 to some extent
 
-* BED with Squanti stats
+* BED with Sqanti stats
 http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed
 
 * Gloria spread sheet
@@ -30,7 +30,7 @@ https://docs.google.com/spreadsheets/d/1nW8W_xtfvKE1sSDBNRsZ3K6HWEtxb4jWwZtPh5hN
 https://docs.google.com/spreadsheets/d/1Y3KhZoezR8Ti5mauYXQFxuwE04xmEgPPyxoJoRxuYuA/edit#gid=210377221
 
 
-* wtc11: gather amplicon and transcript lengths, and squanti data
+* wtc11: gather amplicon and transcript lengths, and sqanti data
 cd tmp/wtc11
 
 # wtc11-trans_len.tsv
@@ -40,7 +40,7 @@ bigBedToBed ../../../primers/primer-design/data/hg38/WTC11_consolidated.bigBed s
 # wtc11.lengths.tsv
 tmlr filter '$pri==1' ../../../primers/primer-design/hub/hg38/juju_designs.hg38.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f wtc11-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript | tmlr cut -o -f target,transcript,transcript_len,amplicon_len  >../../evaluation/wtc11.lengths.tsv
 
-# get squanti stats
+# get sqanti stats
 bigBedToBed -header http://conesalab.org/LRGASP/LRGASP_hub/hg38/Human_samples/WTC11_consolidated.bigBed stdout | sed 's/^#//' > WTC11_consolidated.bed.tsv
 
 
@@ -93,9 +93,9 @@ incorrect alignment.
 
 * get fine-grained pipeline information
 cd work
-find ../squanti/results/Challenge1 -name models_classification.txt | fgrep WTC11 >filt.sh
+find ../sqanti/results/Challenge1 -name models_classification.txt | fgrep WTC11 >filt.sh
 # covert to commands like
-../bin/joinSquantiTransId ../evaluation/wtc11.id_ujc.tsv ../squanti/results/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt joined/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt
+../bin/joinSqantiTransId ../evaluation/wtc11.id_ujc.tsv ../sqanti/results/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt joined/Challenge1/Mandalorion_challenge1_evaluation/Mandalorion_cDNA_PacBio_LRGASP_submission/WTC11_PacBioOnly/models_classification.txt
 nice parallel -j 32 <filt.sh >&log
 tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
@@ -103,13 +103,13 @@ tmlr cat $(find joined/Challenge1/ -type f) >wtc11.squnati-transcripts.tsv
 
 cd evaluation/WTC11
 ../../bin/paperEvalStats WTC11.evaluation.tsv WTC11.stats.tsv
-../../bin/squantiSummary --evalTsv=WTC11.evaluation.tsv --idUjcMapTsv=WTC11.id_ujc.tsv ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv WTC11.squanti-summary.tsv WTC11.squanti-stats.tsv --evalPipelineCntTsv=WTC11.eval-pipelines.tsv
+../../bin/sqantiSummary --evalTsv=WTC11.evaluation.tsv --idUjcMapTsv=WTC11.id_ujc.tsv ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/WTC11.pa.csv WTC11.sqanti-summary.tsv WTC11.sqanti-stats.tsv --evalPipelineCntTsv=WTC11.eval-pipelines.tsv
 
 cd evaluation/H1_mix
-cd ../../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/H1_mix.pa.csv H1_mix.squanti-summary.tsv H1_mix.squanti-stats.tsv --evalPipelineCntTsv=H1_mix.eval-pipelines.tsv
+cd ../../../bin/sqantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/H1_mix.pa.csv H1_mix.sqanti-summary.tsv H1_mix.sqanti-stats.tsv --evalPipelineCntTsv=H1_mix.eval-pipelines.tsv
 
 cd evaluation/ES
-../../bin/squantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/ES.pa.csv ES.squanti-summary.tsv ES.squanti-stats.tsv --evalPipelineCntTsv=ES.eval-pipelines.tsv
+../../bin/sqantiSummary ../../../paper/paper-sync/Stage_2_submission/Challenge1_SuppTables/Presence-absence\ matrices\ by\ UJC/ES.pa.csv ES.sqanti-summary.tsv ES.sqanti-stats.tsv --evalPipelineCntTsv=ES.eval-pipelines.tsv
 
 cd evaluation/gencode
 ../../bin/paperEvalStats gencode.evaluation.tsv  gencode.stats.tsv

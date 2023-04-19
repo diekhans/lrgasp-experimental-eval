@@ -1,7 +1,7 @@
 #!/bin/bash
 set -beEu -o pipefail
 
-# join consolidated transcript id with squanti reports
+# join consolidated transcript id with sqanti reports
 
 if [ $# != 3 ] ; then
     echo "Wrong number of args: idUjcTsv squanitClassTsv filteredClassTsv" >&2

@@ -1,7 +1,7 @@
 * notes:
 ** aligning without dups resulted in some controls aligning only to the wrong isoform, so stuck with allowing dups
 
-* BED with Squanti stats
+* BED with Sqanti stats
 http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/manatee/Manatee_consolidated.bb
 
 
@@ -16,10 +16,10 @@ bigBedToBed ../../../primers/primer-design/data/manatee/Manatee_consolidated.bb 
 tmlr filter '$pri==1' ../../../primers/primer-design/hub/manatee/juju_designs.manatee.isoforms.tsv | tmlr join -j transcript_id -l transcript -r transcript_id -f manatee-trans_len.tsv | tmlr rename target_id,target,transcript_id,transcript | tmlr cut -o -f target,transcript,transcript_len,amplicon_len  >../../evaluation/manatee.lengths.tsv
 
 
-# get squanti stats
+# get sqanti stats
 bigBedToBed -header http://conesalab.org/LRGASP/LRGASP_manatee_hub/manatee/manatee/Manatee_consolidated.bb stdout  | sed 's/^#//' > Manatee_consolidated.bed.tsv
 cols=transcript,platformBarcode,libraryBarcode,dataCetegory,platformLibraryBarcode,tssStdDev,ttsStdDev,numExons,length,mediaCpm,associatedGene,pbPlatformCount,ontPlatformCount,freestylePlatformCount,cDNAPrepCount,dRNAPrepCount,capTrapPrepCount,r2c2PrepCount,freestylePrepCount,longOnlyCatCount,longShortCatCount,freeStyleCatCount
-tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.lengths.tsv Manatee_consolidated.bed.tsv | tmlr cut -f ${cols} >../../evaluation/manatee.squanti-consolidate.tsv
+tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.lengths.tsv Manatee_consolidated.bed.tsv | tmlr cut -f ${cols} >../../evaluation/manatee.sqanti-consolidate.tsv
 
 
 # manatee-lengths.rows.tsv (for spreadsheet merge)
@@ -32,9 +32,9 @@ tmlr join -j transcript -l transcript -r name -f ../../evaluation/manatee.length
 
 * get fine-grained pipeline information
 cd work
-find ../squanti/results/Challenge3 -name models_classification.txt >filt.sh
+find ../sqanti/results/Challenge3 -name models_classification.txt >filt.sh
 # covert to commands like
-../bin/joinSquantiTransId ../evaluation/manatee.id_ujc.tsv ../squanti/results/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt joined/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt
+../bin/joinSqantiTransId ../evaluation/manatee.id_ujc.tsv ../sqanti/results/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt joined/Challenge3/SPBU_challenge3_evaluation/SPBU_cDNA_PacBio_LRGASP_submission/manatee/models_classification.txt
 nice parallel -j 32 <filt.sh >&log
 tmlr cat $(find joined/Challenge3/ -type f) >manatee.squnati-transcripts.tsv
 
@@ -42,5 +42,4 @@ tmlr cat $(find joined/Challenge3/ -type f) >manatee.squnati-transcripts.tsv
 * stats for paper
 cd evaluation/manatee
 ../../bin/paperEvalStats manatee.evaluation.tsv manatee.stats.tsv
-../../bin/squantiSummary --evalTsv=manatee.evaluation.tsv --idUjcMapTsv=manatee.id_ujc.tsv ../../../paper/paper-sync/Stage_2_submission/Challenge3_SuppTables/Presence-absence\ matrices\ by\ UJC/manatee_challenge3_metrics.pa.csv manatee.squanti-summary.tsv manatee.squanti-stats.tsv --evalPipelineCntTsv=manateee.eval-pipelines.tsv
-
+../../bin/sqantiSummary --evalTsv=manatee.evaluation.tsv --idUjcMapTsv=manatee.id_ujc.tsv ../../../paper/paper-sync/Stage_2_submission/Challenge3_SuppTables/Presence-absence\ matrices\ by\ UJC/manatee_challenge3_metrics.pa.csv manatee.sqanti-summary.tsv manatee.sqanti-stats.tsv --evalPipelineCntTsv=manateee.eval-pipelines.tsv

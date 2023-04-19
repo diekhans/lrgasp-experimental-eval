@@ -4,25 +4,29 @@ import argparse
 import pandas as pd
 from collections import defaultdict
 from pycbio.sys import fileOps
-from evalLib import rateFmt, filterToTranscript, splitBySquantiCategory, splitBySupport, addStructuralCategory
+from evalLib import rateFmt, filterToTranscript, splitBySqantiCategory, splitBySupport, addStructuralCategory
 
 printZeros = False
 
 def parseArgs():
-    desc = """get various stats from the squanti reportst"""
+    desc = """get various stats from the sqanti reportst"""
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--printZeros", action="store_true")
     parser.add_argument("--evalTsv")
     parser.add_argument("--idUjcMapTsv")
     parser.add_argument("--evalPipelineCntTsv",
                         help="write RT-PRC eval info and number of pipelines")
-    parser.add_argument("squantiPaCsv",
+    parser.add_argument("sqantiPaCsv",
                         help="""Presence-absence matrices by UJC""")
     parser.add_argument("histoTsv")
     parser.add_argument("statsTsv")
-    return parser.parse_args()
+    opts = parser.parse_args()
+    global printZeros
+    printZeros = opts.printZeros
+    return opts
 
-def loadSquantiPaCsv(squantiPaCsv):
-    paMatrixDf = pd.read_csv(squantiPaCsv)
+def loadSqantiPaCsv(sqantiPaCsv):
+    paMatrixDf = pd.read_csv(sqantiPaCsv)
     paMatrixDf.set_index('TAGS', inplace=True)
     paMatrixDf['numPipelines'] = paMatrixDf[getPipelineColumns(paMatrixDf)].sum(axis=1)
     return paMatrixDf
@@ -76,7 +80,7 @@ def writePredictions(histoFh, statsFh, label, subsetLabel, pipelineCnt, matrixDf
 
 def fullSetReport(paMatrixDf, histoFh, statsFh):
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
-    knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(paMatrixDf)
+    knownDf, novelDf, ismDf, otherDf = splitBySqantiCategory(paMatrixDf)
     for subsetLabel, filterDf in (("all", None), ("known", knownDf), ("novel", novelDf), ("ism", ismDf), ("other", otherDf)):
         writePredictions(histoFh, statsFh, "all", subsetLabel, pipelineCnt, paMatrixDf, filterDf)
 
@@ -90,7 +94,7 @@ def evalPipelineReport(evaledMatrixDf, evalPipelineCntFh):
 
 def rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh):
     pipelineCnt = len(getPipelineColumns(paMatrixDf))
-    knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(paMatrixDf)
+    knownDf, novelDf, ismDf, otherDf = splitBySqantiCategory(paMatrixDf)
     transUjcDf = pd.merge(transDf, idUjcMap, on="transcript")
     evaledMatrixDf = pd.merge(paMatrixDf, transUjcDf, left_on="TAGS", right_on="LRGASP_id")
     addStructuralCategory(evaledMatrixDf)
@@ -113,8 +117,8 @@ def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh):
     if transDf is not None:
         rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh)
 
-def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalPipelineCntTsv):
-    paMatrixDf = loadSquantiPaCsv(squantiPaCsv)
+def sqantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalPipelineCntTsv):
+    paMatrixDf = loadSqantiPaCsv(sqantiPaCsv)
 
     transDf = loadEvalTsv(evalTsv) if evalTsv is not None else None
     idUjcMap = pd.read_table(idUjcMapTsv) if idUjcMapTsv is not None else None
@@ -126,7 +130,7 @@ def squantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalP
             report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh)
 
 def main(opts):
-    squantiSummary(opts.squantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.histoTsv, opts.statsTsv,
-                   opts.evalPipelineCntTsv)
+    sqantiSummary(opts.sqantiPaCsv, opts.evalTsv, opts.idUjcMapTsv, opts.histoTsv, opts.statsTsv,
+                  opts.evalPipelineCntTsv)
 
 main(parseArgs())

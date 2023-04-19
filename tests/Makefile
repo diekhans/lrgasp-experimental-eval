@@ -4,7 +4,7 @@ transcriptomeFilterCmp = ../bin/transcriptomeFilterCmp
 genomeAlignAnalyze = ../bin/genomeAlignAnalyze
 summarizeSupport = ../bin/summarizeSupport
 paperEvalStats = ../bin/paperEvalStats
-squantiSummary = ../bin/squantiSummary
+sqantiSummary = ../bin/sqantiSummary
 
 hes2AmpliconsBam = output/HES2+A.amplicon.bam
 ankmy2AmplicaonBam = output/ANKMY2+1.amplicon
@@ -13,7 +13,7 @@ alg6GenomeBam = output/ALG6+A.genome.bam
 
 all: test
 
-test: transcriptomeTests genomeTests otherTests paperEvalTests squantiSummaryTests
+test: transcriptomeTests genomeTests otherTests paperEvalTests sqantiSummaryTests
 
 transcriptomeTests: testHES2+A testHES2+A_limits testAll_limits testRate_limits \
 	testSimilarity99 testSimilarity95 testANKMY2Sim \
@@ -116,10 +116,10 @@ testPaperEvalWtc11: mkdirs
 	${paperEvalStats} input/wtc11.evaluation.part.tsv output/$@.tsv
 	diff expected/$@.tsv output/$@.tsv
 
-squantiSummaryTests: testSquantiSummary1
+sqantiSummaryTests: testSqantiSummary1
 
-testSquantiSummary1: mkdirs
-	${squantiSummary} --evalTsv=input/wtc11.evaluation.part.tsv --idUjcMapTsv=input/wtc11.id_ujc.part.tsv input/WTC11.pa.part.csv \
+testSqantiSummary1: mkdirs
+	${sqantiSummary} --evalTsv=input/wtc11.evaluation.part.tsv --idUjcMapTsv=input/wtc11.id_ujc.part.tsv input/WTC11.pa.part.csv \
 	    output/$@.histos.tsv output/$@.stats.tsv --evalPipelineCntTsv=output/$@.evalpipeline.tsv
 	diff expected/$@.histos.tsv output/$@.histos.tsv
 	diff expected/$@.stats.tsv output/$@.stats.tsv

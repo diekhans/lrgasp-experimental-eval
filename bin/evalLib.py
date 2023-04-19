@@ -42,7 +42,7 @@ def filterToTranscript(evalDf):
 def addStructuralCategory(transDf):
     transDf['structural_category'] = transDf.transcript.str.extract("^([A-Za-z]+)", expand=False)
 
-def splitBySquantiCategory(transDf):
+def splitBySqantiCategory(transDf):
     knownDf = transDf[transDf.structural_category == 'FSM']
     novelDf = transDf[transDf.structural_category.isin(['NIC', 'NNC'])]
     ismDf = transDf[transDf.structural_category == 'ISM']

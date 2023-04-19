@@ -3,7 +3,7 @@
 import argparse
 import pandas as pd
 from pycbio.sys import fileOps
-from evalLib import percent, filterToTranscript, splitBySquantiCategory, splitBySupport, addStructuralCategory
+from evalLib import percent, filterToTranscript, splitBySqantiCategory, splitBySupport, addStructuralCategory
 
 def parseArgs():
     desc = """pull stats for paper from eval spreadsheet tsv"""
@@ -43,8 +43,8 @@ def gencodeReport(transDf, fh):
     reportSupportRate(fh, "gencodeRejected", rejectedDf)
 
 
-def squantiReport(transDf, fh):
-    knownDf, novelDf, ismDf, otherDf = splitBySquantiCategory(transDf)
+def sqantiReport(transDf, fh):
+    knownDf, novelDf, ismDf, otherDf = splitBySqantiCategory(transDf)
 
     reportSupportRate(fh, "all", transDf)
     reportSupportRate(fh, "known", knownDf)
@@ -60,7 +60,7 @@ def report(evalDf, fh):
     if 'gencode' in evalDf.columns:
         gencodeReport(transDf, fh)
     else:
-        squantiReport(transDf, fh)
+        sqantiReport(transDf, fh)
 
 def paperEvalStats(evalTsv, statsTsv):
     evalDf = pd.read_table(evalTsv)
