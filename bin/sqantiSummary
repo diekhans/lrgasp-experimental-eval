@@ -117,7 +117,7 @@ def report(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh):
     if transDf is not None:
         rtprcReport(paMatrixDf, transDf, idUjcMap, histoFh, statsFh, evalPipelineCntFh)
 
-def sqantiSummary(squantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalPipelineCntTsv):
+def sqantiSummary(sqantiPaCsv, evalTsv, idUjcMapTsv, histoTsv, statsTsv, evalPipelineCntTsv):
     paMatrixDf = loadSqantiPaCsv(sqantiPaCsv)
 
     transDf = loadEvalTsv(evalTsv) if evalTsv is not None else None

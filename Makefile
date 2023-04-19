@@ -9,3 +9,8 @@ all:  lint
 lint:
 	${FLAKE8} --color=never ${pyprogs}
 
+test:
+	cd tests && ${MAKE} test
+
+clean:
+	cd tests && ${MAKE} clean
