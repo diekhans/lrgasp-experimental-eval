@@ -15,18 +15,17 @@ def parseArgs():
 
 
 def basicReport(evalDf, fh):
-    fileOps.prRowv(fh, "genes", len(set(evalDf.gene)))
-    fileOps.prRowv(fh, "targets", len(set(evalDf.target)))
-    fileOps.prRowv(fh, "transcripts", len(set(evalDf.transcript)))
+    fileOps.prRowv(fh, "genes", "", "", len(set(evalDf.gene)), "")
+    fileOps.prRowv(fh, "targets", "", "", len(set(evalDf.target)), "")
+    fileOps.prRowv(fh, "transcripts", "", "", len(set(evalDf.transcript)), "")
 
-def reportSupportRate(fh, labelPrefix, subsetDf):
+def reportSupportRate(fh, label, label2, subsetDf):
     supportedDf, unsupportedDf = splitBySupport(subsetDf)
-    fileOps.prRowv(fh, labelPrefix + "Count", len(subsetDf))
-    fileOps.prRowv(fh, labelPrefix + "Supported", len(supportedDf))
-    fileOps.prRowv(fh, labelPrefix + "SupportedRate",
+    fileOps.prRowv(fh, label, label2, "total", len(subsetDf),
+                   percent(len(subsetDf), len(subsetDf))),
+    fileOps.prRowv(fh, label, label2, "supported", len(supportedDf),
                    percent(len(supportedDf), len(subsetDf)))
-    fileOps.prRowv(fh, labelPrefix + "Unsupported", len(unsupportedDf))
-    fileOps.prRowv(fh, labelPrefix + "UnsupportedRate",
+    fileOps.prRowv(fh, label, label2, "unsupported", len(unsupportedDf),
                    percent(len(unsupportedDf), len(subsetDf)))
 
 def gencodeReport(transDf, fh):
@@ -37,24 +36,24 @@ def gencodeReport(transDf, fh):
     if len(knownDf) + len(novelDf) + len(rejectedDf) != len(transDf):
         raise Exception("logic error splitting gencode transcripts")
 
-    reportSupportRate(fh, "gencodeAll", transDf)
-    reportSupportRate(fh, "gencodeKnown", knownDf)
-    reportSupportRate(fh, "gencodeNovel", novelDf)
-    reportSupportRate(fh, "gencodeRejected", rejectedDf)
+    reportSupportRate(fh, "gencode", "any", transDf)
+    reportSupportRate(fh, "gencode", "known", knownDf)
+    reportSupportRate(fh, "gencode", "novel", novelDf)
+    reportSupportRate(fh, "gencode", "rejected", rejectedDf)
 
 
 def sqantiReport(transDf, fh):
     knownDf, novelDf, ismDf, otherDf = splitBySqantiCategory(transDf)
 
-    reportSupportRate(fh, "all", transDf)
-    reportSupportRate(fh, "known", knownDf)
-    reportSupportRate(fh, "novel", novelDf)
-    reportSupportRate(fh, "ism", ismDf)
-    reportSupportRate(fh, "other", otherDf)
+    reportSupportRate(fh, "transcripts", "any", transDf)
+    reportSupportRate(fh, "transcripts", "known", knownDf)
+    reportSupportRate(fh, "transcripts", "novel", novelDf)
+    reportSupportRate(fh, "transcripts", "ism", ismDf)
+    reportSupportRate(fh, "transcripts", "other", otherDf)
 
 
 def report(evalDf, fh):
-    fileOps.prRowv(fh, "name", "value")
+    fileOps.prRowv(fh, "type", "subtype", "support", "count", "rate")
     basicReport(evalDf, fh)
     transDf = filterToTranscript(evalDf)
     if 'gencode' in evalDf.columns:

@@ -1,24 +1,16 @@
-name	value
-genes	35
-targets	79
-transcripts	76
-gencodeAllCount	76
-gencodeAllSupported	49
-gencodeAllSupportedRate	64.5
-gencodeAllUnsupported	27
-gencodeAllUnsupportedRate	35.5
-gencodeKnownCount	27
-gencodeKnownSupported	22
-gencodeKnownSupportedRate	81.5
-gencodeKnownUnsupported	5
-gencodeKnownUnsupportedRate	18.5
-gencodeNovelCount	40
-gencodeNovelSupported	25
-gencodeNovelSupportedRate	62.5
-gencodeNovelUnsupported	15
-gencodeNovelUnsupportedRate	37.5
-gencodeRejectedCount	9
-gencodeRejectedSupported	2
-gencodeRejectedSupportedRate	22.2
-gencodeRejectedUnsupported	7
-gencodeRejectedUnsupportedRate	77.8
+type	subtype	support	count	rate
+genes			35	
+targets			79	
+transcripts			76	
+gencode	any	total	76	100.0
+gencode	any	supported	49	64.5
+gencode	any	unsupported	27	35.5
+gencode	known	total	27	100.0
+gencode	known	supported	22	81.5
+gencode	known	unsupported	5	18.5
+gencode	novel	total	40	100.0
+gencode	novel	supported	25	62.5
+gencode	novel	unsupported	15	37.5
+gencode	rejected	total	9	100.0
+gencode	rejected	supported	2	22.2
+gencode	rejected	unsupported	7	77.8

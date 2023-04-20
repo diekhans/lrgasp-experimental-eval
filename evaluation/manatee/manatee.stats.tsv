@@ -1,24 +1,19 @@
-name	value
-genes	8
-targets	22
-transcripts	26
-allCount	26
-allSupported	20
-allSupportedRate	76.9
-allUnsupported	6
-allUnsupportedRate	23.1
-knownCount	3
-knownSupported	2
-knownSupportedRate	66.7
-knownUnsupported	1
-knownUnsupportedRate	33.3
-novelCount	19
-novelSupported	14
-novelSupportedRate	73.7
-novelUnsupported	5
-novelUnsupportedRate	26.3
-ismCount	4
-ismSupported	4
-ismSupportedRate	100.0
-ismUnsupported	0
-ismUnsupportedRate	0.0
+type	subtype	support	count	rate
+genes			8	
+targets			22	
+transcripts			26	
+transcripts	any	total	26	100.0
+transcripts	any	supported	20	76.9
+transcripts	any	unsupported	6	23.1
+transcripts	known	total	3	100.0
+transcripts	known	supported	2	66.7
+transcripts	known	unsupported	1	33.3
+transcripts	novel	total	19	100.0
+transcripts	novel	supported	14	73.7
+transcripts	novel	unsupported	5	26.3
+transcripts	ism	total	4	100.0
+transcripts	ism	supported	4	100.0
+transcripts	ism	unsupported	0	0.0
+transcripts	other	total	0	0.0
+transcripts	other	supported	0	0.0
+transcripts	other	unsupported	0	0.0
