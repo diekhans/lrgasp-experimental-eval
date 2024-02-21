@@ -29,3 +29,27 @@ https://docs.google.com/spreadsheets/d/15B8oCs_SnOgBL6UGkD7IpjGNZgb3TZS6et_UbFtC
 ** Gloria Sheynkman
 Minion version, chemistry version, any info that would be needed in Materials and Methods
 And anything they did outside of the protocol
+
+* luis
+I also found that there may be a couple of details to be changed in your Supplementary Data 15 where you described the transcripts tested for experimental validation.
+If you remember we swapped the strand for 2 transcripts that were misannotated
+
+WTC11_consolidated,NNC_389484,GABPA,GABPA+1,1031,1,4069,1,NNC-pipeline-rare --> This does not belong to GABPA gene (+ strand), but to ATP5PF (- strand)?
+WTC11_consolidated,NIC_379324,SLC9B1,SLC9B1+1,1392,1,23662,1,NIC-pipeline-rare --> This does not belong to SLC9B1 (- strand), but to CISD2 (+ strand)?
+
+https://docs.google.com/spreadsheets/d/14yyfEuHLuph9GYEj9iGJU5gvKWaMtmCO/edit#gid=2079101623 in Supp. Data 15 they are still annotated with the wrong gene anyway
+
+I wanted to inform in case you want to make any modification there. For Figure 5, we considered these 2 transcripts as "FSM-pipeline-consistent" (see our email 23/11/2023)
+
+
+
+WTC11_consolidated,NNC_389484,GABPA,GABPA+1,1031,1,4069,1,NNC-pipeline-rare --> This does not belong to GABPA gene (+ strand), but to ATP5PF. (- strand)?
+
+GABPA	GABPA+1	NNC_389484	chr21:25724499-25734903	pb	4	2	1	33386	34709	1	2	supported	6-base insertion seem in amplicon alignments in both PB & ONT	AAAAGCTCCCTCTCCAGCTC	CAGCTCGGGACTGAGTGC	519	249	146.03	0	1	0	1	0	0	0	0	1	0	0
+GABPA	GABPA+1	NNC_389484		ont	66	5	1	26533	46758	1	24			AAAAGCTCCCTCTCCAGCTC	CAGCTCGGGACTGAGTGC	519	249												
+GABPA	GABPA+1	NNC_389484		cntl	1	1	1	1	1	1	1			AAAAGCTCCCTCTCCAGCTC	CAGCTCGGGACTGAGTGC
+
+WTC11_consolidated,NIC_379324,SLC9B1,SLC9B1+1,1392,1,23662,1,NIC-pipeline-rare --> This does not belong to SLC9B1 (- strand), but to CISD2 (+ strand)?
+
+
+* fix header colors in spread sheet
