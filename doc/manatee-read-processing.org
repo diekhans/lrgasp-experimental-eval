@@ -107,3 +107,33 @@ custom format formulas:
 =and(mod(row()-2,4) <= 1,$E1:K1=0)
 =and(mod(row()-2,4) > 1,$E1:K1=0)
 =mod(row()-2,2)=0
+
+* NCBI release
+https://www.ncbi.nlm.nih.gov/nuccore/JARVKP000000000.1/
+
+cd data/manatee-ncbi/reference/ncbi
+
+
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.1.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.2.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.3.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.4.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.5.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.6.fsa_nt.gz
+wget -nv https://sra-download.ncbi.nlm.nih.gov/traces/wgs05/wgs_aux/JA/RV/KP/JARVKP01/JARVKP01.7.fsa_nt.gz
+
+cd ..
+zcat ncbi/JARVKP01.*.fsa_nt.gz > manatee.fa
+samtools faidx manatee.fa
+faSize -detailed manatee.fa | sort -k 2,2nr > manatee.sizes
+% faSize pre-release
+3089088050 bases (2662 N's 3089085388 real 3089085388 upper 0 lower) in 15624
+sequences in 1 files Total size: mean 197714.3 sd 297746.4 min 44
+
+% faSize NCBI
+3088727998 bases (2662 N's 3088725336 real 3088725336 upper 0 lower) in 15608 sequences in 1 files
+Total size: mean 197893.9 sd 297833.7 min 409 (JARVKP010009286.1) max 4160815 (JARVKP010000445.1) median 83684
+
+keep amplicons:
+ln  ../../manatee-pre-release/reference/manatee-amplicons.fa* .
+
